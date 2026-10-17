@@ -108,23 +108,50 @@ op = whoosh(0.6, 350, 1800, peak=0.4, q=0.9, curve=0.7)
 place_panned(op, PILL_T - 0.08, -0.3, 0.3, 0.9)
 
 # ---------------------------------------------------------------- 6) keyboard clicks (one per character)
-def keystroke(pitch=1.0, hard=1.0):
-    n = int(0.14 * SR); tt = np.arange(n) / SR
-    x = rng.standard_normal(n)
-    tap = bandpass(x, 900, 2800) * decay(n, 0.0025)                 # soft fingertip tap
-    thock = bandpass(x, 180 * pitch, 900 * pitch) * decay(n, 0.018)   # muted keycap body
-    tone = np.sin(2 * np.pi * 640 * pitch * tt) * decay(n, 0.012)    # gentle wooden note
-    k = (tap * 0.35 + thock * 1.6 + tone * 0.5) * np.clip(tt / 0.0015, 0, 1)
-    k = np.tanh(k / (np.std(k[:int(0.02 * SR)]) * 3)) * hard   # even out random peaks
-    return k / np.max(np.abs(k))
+# Modelled on a lubed, "creamy/thocky" mechanical board: a rounded low case thock on bottom-out,
+# a short soft plastic clack on top, then a quieter higher upstroke as the key returns.
+KL = np.zeros(N); KR = np.zeros(N)   # dry key bus (kept out of the reverb so it stays close-mic'd)
+
+def modal(n, modes, attack=0.0004, glide=0.0):
+    tt = np.arange(n) / SR
+    out = np.zeros(n)
+    for f, a, tau in modes:
+        fi = f * (1 + glide * np.exp(-tt / 0.006))           # tiny downward 'pop' at impact
+        ph = 2 * np.pi * np.cumsum(fi) / SR + rng.uniform(0, 2 * np.pi)
+        out += a * np.sin(ph) * np.exp(-tt / tau)
+    return out * np.clip(tt / attack, 0, 1)
+
+def keystroke(pitch=1.0, hard=1.0, big=False):
+    n = int(0.2 * SR)
+    p = pitch
+    down = modal(n, [(150 * p, 1.00, 0.034 if big else 0.026),   # case thock
+                     (305 * p, 0.85, 0.020),
+                     (540 * p, 0.55, 0.013),
+                     (910 * p, 0.32, 0.008),
+                     (1480 * p, 0.20, 0.0045),                      # soft keycap clack
+                     (2450 * p, 0.10, 0.0025)], glide=0.06)
+    tx = bandpass(rng.standard_normal(n), 1200, 4500) * decay(n, 0.0009) * 0.25   # felt-damped contact
+    down = down + tx
+    # upstroke: lighter, a little higher, ~70-85 ms later
+    up = modal(n, [(260 * p, 0.45, 0.012), (620 * p, 0.35, 0.008), (1250 * p, 0.18, 0.004)], glide=0.03)
+    up_at = int(rng.uniform(0.070, 0.085) * SR)
+    k = down.copy(); k[up_at:] += up[:n - up_at] * (0.4 if not big else 0.3)
+    if big:  # enter key: extra stabilizer weight
+        k += modal(n, [(95, 0.6, 0.04), (190, 0.4, 0.03)])
+    k = signal.sosfilt(signal.butter(2, 7000, fs=SR, output='sos'), k)
+    return k / np.max(np.abs(k)) * hard
+
+def place_key(sig, t0, pan, gain):
+    i0 = int(round(t0 * SR)); sig = sig[:N - i0] * gain
+    KL[i0:i0 + len(sig)] += sig * np.sqrt((1 - pan) / 2); KR[i0:i0 + len(sig)] += sig * np.sqrt((1 + pan) / 2)
 
 for i in range(NCHARS):
-    jitter = rng.uniform(-0.004, 0.004)
-    place(keystroke(pitch=rng.uniform(0.92, 1.1), hard=rng.uniform(0.85, 1.0)),
-          TYPE_T0 + i * TYPE_DT + jitter, pan=-0.25 + 0.05 * i, gain=0.6)
+    jitter = rng.uniform(-0.006, 0.006)
+    place_key(keystroke(pitch=rng.uniform(0.94, 1.07), hard=rng.uniform(0.82, 1.0)),
+              TYPE_T0 + i * TYPE_DT + jitter, pan=-0.2 + 0.045 * i, gain=0.75)
 
 # ---------------------------------------------------------------- 7) send: button click + "sent" swoop + chime
-place(keystroke(pitch=0.8, hard=1.0), SEND_T - 0.01, 0.35, 0.5)        # pressing send
+place_key(keystroke(pitch=0.88, hard=1.0, big=True), SEND_T - 0.015, 0.3, 0.8)  # enter-key press
 n = int(0.32 * SR); tt = np.arange(n) / SR
 fsw = 380 * (900 / 380) ** np.clip(tt / 0.14, 0, 1)                      # upward pitch swoop
 swoop = np.sin(2 * np.pi * np.cumsum(fsw) / SR)
@@ -164,6 +191,13 @@ for c in range(2):
     mx[:, c] = mx[:, c] * 0.82 + wet * 0.28
 # warm top end: gentle low-pass to remove any remaining edge
 mx = signal.sosfilt(signal.butter(2, 6500, fs=SR, output='sos'), mx, axis=0)
+# dry key bus with a touch of short room so it sits in the same space
+keys = np.stack([KL, KR], 1)
+for c in range(2):
+    ir = rng.standard_normal(int(0.25 * SR)) * np.exp(-np.arange(int(0.25 * SR)) / (0.05 * SR))
+    ir = signal.sosfilt(signal.butter(2, 4000, fs=SR, output='sos'), ir); ir /= np.sqrt(np.sum(ir ** 2))
+    keys[:, c] = keys[:, c] + signal.fftconvolve(keys[:, c], ir)[:N] * 0.12
+mx += keys
 fade = np.clip((DUR - t) / 0.25, 0, 1)[:, None]   # avoid a click at the very end
 mx *= fade
 mx[:240] *= np.linspace(0, 1, 240)[:, None]
