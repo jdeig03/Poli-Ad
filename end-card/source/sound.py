@@ -203,5 +203,7 @@ mx *= fade
 mx[:240] *= np.linspace(0, 1, 240)[:, None]
 mx *= 0.85 / np.max(np.abs(mx))
 with wave.open(sys.argv[1], 'wb') as wf:
-    wf.setnchannels(2); wf.setsampwidth(2); wf.setframerate(SR)
-    wf.writeframes((mx * 32767).astype('<i2').tobytes())
+    # 24-bit PCM
+    pcm = np.ascontiguousarray(np.round(mx * 8388607).astype('<i4'))
+    wf.setnchannels(2); wf.setsampwidth(3); wf.setframerate(SR)
+    wf.writeframes(pcm.view(np.uint8).reshape(-1, 4)[:, :3].tobytes())
