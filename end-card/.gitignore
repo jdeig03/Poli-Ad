@@ -1,2 +1,3 @@
 # ProRes masters are too large for git; share them directly
 *.mov
+*-NoAudio.mp4
