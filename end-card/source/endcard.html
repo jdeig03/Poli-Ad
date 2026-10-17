@@ -1,0 +1,523 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli End Card</title>
+<style>
+  @font-face { font-family: 'PoliDisplay'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
+  @font-face { font-family: 'PoliText'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  html, body { margin: 0; padding: 0; background: #000; overflow: hidden; }
+  canvas { display: block; }
+</style>
+</head>
+<body>
+<canvas id="c" width="1080" height="1920"></canvas>
+<script>
+// Poli end card — vertical 1080x1920. render(t) draws the frame at time t (seconds).
+const W = 1080, H = 1920, DUR = 6.0;
+const BLUE = '#1C56DB', INDIGO = '#4B53C6', PURPLE = '#7A4FB8', MAGENTA = '#A8459A', RED = '#DC3547';
+const BG = '#04050B';
+
+const cv = document.getElementById('c');
+const ctx = cv.getContext('2d');
+
+// ---------- helpers ----------
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const easeOutExpo = k => k >= 1 ? 1 : 1 - Math.pow(2, -10 * k);
+const easeOutCubic = k => 1 - Math.pow(1 - k, 3);
+const easeInOutCubic = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const easeInOutQuart = k => k < .5 ? 8 * k ** 4 : 1 - Math.pow(-2 * k + 2, 4) / 2;
+const easeOutBack = (k, s = 1.6) => k <= 0 ? 0 : 1 + (s + 1) * Math.pow(k - 1, 3) + s * Math.pow(k - 1, 2);
+const pulse = (t, a, b) => { const k = prog(t, a, b); return Math.sin(k * Math.PI); };
+
+function rng(seed) { return () => { seed = (seed * 16807) % 2147483647; return (seed - 1) / 2147483646; }; }
+
+function brandGradient(x0, y0, x1, y1, alpha = 1) {
+  const g = ctx.createLinearGradient(x0, y0, x1, y1);
+  const a = alpha;
+  g.addColorStop(0.00, `rgba(28,86,219,${a})`);
+  g.addColorStop(0.32, `rgba(75,83,198,${a})`);
+  g.addColorStop(0.55, `rgba(122,79,184,${a})`);
+  g.addColorStop(0.78, `rgba(178,64,128,${a})`);
+  g.addColorStop(1.00, `rgba(220,53,71,${a})`);
+  return g;
+}
+
+// ---------- prebuilt layers ----------
+// dot grid
+const grid = document.createElement('canvas'); grid.width = W; grid.height = H + 80;
+{
+  const g = grid.getContext('2d');
+  g.fillStyle = '#ffffff';
+  for (let y = 0; y < grid.height; y += 40) for (let x = 20; x < W; x += 40) {
+    g.beginPath(); g.arc(x, y, 1.3, 0, Math.PI * 2); g.fill();
+  }
+}
+// film grain / dither (kills gradient banding after H.264)
+const grains = [];
+{
+  const r = rng(7);
+  for (let i = 0; i < 4; i++) {
+    const n = document.createElement('canvas'); n.width = 540; n.height = 960;
+    const g = n.getContext('2d'); const id = g.createImageData(540, 960);
+    for (let p = 0; p < id.data.length; p += 4) { const v = r() * 255; id.data[p] = id.data[p + 1] = id.data[p + 2] = v; id.data[p + 3] = 255; }
+    g.putImageData(id, 0, 0); grains.push(n);
+  }
+}
+// particles
+const particles = [];
+{
+  const r = rng(42);
+  const cols = ['120,150,255', '170,140,240', '255,120,140', '255,255,255'];
+  for (let i = 0; i < 70; i++) particles.push({
+    x: r() * W, y: r() * H, s: 0.8 + r() * 2.2, v: 10 + r() * 30,
+    ph: r() * Math.PI * 2, c: cols[Math.floor(r() * cols.length)], a: 0.15 + r() * 0.35
+  });
+}
+
+// ---------- layout ----------
+const CX = W / 2;
+const ORB_Y0 = 900, ORB_Y1 = 650;   // orb center before / after it rises
+const ORB_R0 = 250, ORB_R1 = 195;
+const WORD_Y = 1165;                // wordmark baseline
+const PILL_Y = 1345, PILL_W = 780, PILL_H = 132;
+const URL = 'Askpoli.us';
+const TYPE_T0 = 2.72, TYPE_DT = 0.072;
+const SEND_T = TYPE_T0 + URL.length * TYPE_DT + 0.14; // ~3.58s
+
+// ---------- scene pieces ----------
+function drawBackground(t) {
+  ctx.fillStyle = BG; ctx.fillRect(0, 0, W, H);
+  const amb = easeOutCubic(prog(t, 0.7, 2.0));
+  if (amb > 0) {
+    const blobs = [
+      { x: 170 + 50 * Math.sin(t * 0.5), y: 560 + 40 * Math.cos(t * 0.4), r: 760, c: '28,86,219', a: 0.30 },
+      { x: 560 + 40 * Math.cos(t * 0.35), y: 1080 + 50 * Math.sin(t * 0.45), r: 700, c: '122,79,184', a: 0.22 },
+      { x: 930 + 40 * Math.cos(t * 0.55), y: 1520 + 40 * Math.sin(t * 0.3), r: 760, c: '220,53,71', a: 0.20 },
+    ];
+    for (const b of blobs) {
+      const g = ctx.createRadialGradient(b.x, b.y, 0, b.x, b.y, b.r);
+      g.addColorStop(0, `rgba(${b.c},${b.a * amb})`);
+      g.addColorStop(0.5, `rgba(${b.c},${b.a * amb * 0.35})`);
+      g.addColorStop(1, `rgba(${b.c},0)`);
+      ctx.fillStyle = g; ctx.fillRect(0, 0, W, H);
+    }
+  }
+}
+
+// grid is drawn onto its own layer so masking does not touch the background
+const gridLayer = document.createElement('canvas'); gridLayer.width = W; gridLayer.height = H;
+function drawGrid(t) {
+  const ga = 0.09 * easeOutCubic(prog(t, 0.9, 2.2));
+  if (ga <= 0) return;
+  const g = gridLayer.getContext('2d');
+  g.globalCompositeOperation = 'source-over';
+  g.clearRect(0, 0, W, H);
+  g.drawImage(grid, 0, -((t * 9) % 40));
+  g.globalCompositeOperation = 'destination-in';
+  const m = g.createRadialGradient(CX, 900, 80, CX, 900, 900);
+  m.addColorStop(0, 'rgba(0,0,0,1)'); m.addColorStop(0.6, 'rgba(0,0,0,0.5)'); m.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = m; g.fillRect(0, 0, W, H);
+  ctx.globalAlpha = ga; ctx.drawImage(gridLayer, 0, 0); ctx.globalAlpha = 1;
+}
+
+function drawParticles(t) {
+  const k = easeOutCubic(prog(t, 0.9, 2.0));
+  if (k <= 0) return;
+  for (const p of particles) {
+    const y = ((p.y - t * p.v) % H + H) % H;
+    const tw = 0.55 + 0.45 * Math.sin(t * 2.2 + p.ph);
+    ctx.fillStyle = `rgba(${p.c},${p.a * tw * k})`;
+    ctx.beginPath(); ctx.arc(p.x + Math.sin(t * 0.6 + p.ph) * 8, y, p.s, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+function orbState(t) {
+  const move = easeInOutQuart(prog(t, 1.35, 2.15));
+  let cy = lerp(ORB_Y0, ORB_Y1, move);
+  const R = lerp(ORB_R0, ORB_R1, move);
+  const fl = easeInOutCubic(prog(t, 2.3, 3.2));
+  cy += Math.sin((t - 2.3) * 1.9) * 7 * fl;   // gentle hover
+  const bloom = easeOutBack(prog(t, 0.78, 1.42), 1.45);
+  return { cx: CX, cy, R, bloom };
+}
+
+function drawRings(t, o) {
+  const emits = [0.80, 0.98, 1.16, SEND_T + 0.04, SEND_T + 0.22];
+  for (const e of emits) {
+    const age = t - e; if (age < 0 || age > 1.8) continue;
+    const k = age / 1.8;
+    const r = o.R * (1.02 + easeOutCubic(k) * 2.1);
+    const a = Math.pow(1 - k, 2.2) * 0.75;
+    ctx.save();
+    ctx.lineWidth = 2 + 5 * (1 - k);
+    ctx.strokeStyle = brandGradient(o.cx - r, o.cy - r, o.cx + r, o.cy + r, a);
+    ctx.shadowColor = `rgba(150,90,255,${a * 0.8})`; ctx.shadowBlur = 24;
+    ctx.beginPath(); ctx.arc(o.cx, o.cy, r, 0, Math.PI * 2); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+// persistent HUD orbit rings (nod to the concentric rings in the primary logo)
+function drawOrbits(t, o) {
+  const k = easeOutExpo(prog(t, 1.2, 2.3));
+  if (k <= 0) return;
+  const defs = [
+    { r: 1.28, w: 2.0, a: 0.55, seg: [0.0, 1.35], sp: 0.35 },
+    { r: 1.28, w: 2.0, a: 0.30, seg: [3.4, 4.3], sp: 0.35 },
+    { r: 1.44, w: 1.2, a: 0.22, seg: [0, Math.PI * 2], sp: 0 },
+    { r: 1.60, w: 3.0, a: 0.40, seg: [3.6, 4.3], sp: -0.22 },
+    { r: 1.60, w: 3.0, a: 0.25, seg: [5.4, 5.75], sp: -0.22 },
+  ];
+  for (const d of defs) {
+    const r = o.R * d.r * lerp(0.85, 1, k);
+    const rot = t * d.sp - 0.5;
+    ctx.save();
+    ctx.lineCap = 'round';
+    ctx.lineWidth = d.w;
+    const cg = ctx.createConicGradient(rot, o.cx, o.cy);
+    cg.addColorStop(0.00, `rgba(28,86,219,${d.a * k})`);
+    cg.addColorStop(0.35, `rgba(122,79,184,${d.a * k})`);
+    cg.addColorStop(0.65, `rgba(220,53,71,${d.a * k})`);
+    cg.addColorStop(1.00, `rgba(28,86,219,${d.a * k})`);
+    ctx.strokeStyle = cg;
+    const len = (d.seg[1] - d.seg[0]) * k;
+    ctx.beginPath(); ctx.arc(o.cx, o.cy, r, d.seg[0] + rot, d.seg[0] + rot + len); ctx.stroke();
+    ctx.restore();
+  }
+  // tiny satellite dot riding the inner orbit
+  const ang = t * 0.35 - 0.5 + 1.35 * k;
+  const sr = o.R * 1.28 * lerp(0.85, 1, k);
+  ctx.save();
+  ctx.fillStyle = `rgba(255,255,255,${0.9 * k})`;
+  ctx.shadowColor = 'rgba(140,120,255,0.9)'; ctx.shadowBlur = 18;
+  ctx.beginPath(); ctx.arc(o.cx + Math.cos(ang) * sr, o.cy + Math.sin(ang) * sr, 4.5, 0, Math.PI * 2); ctx.fill();
+  ctx.restore();
+}
+
+function drawOrb(t, o) {
+  const R = o.R * o.bloom;
+  if (R <= 0.5) return;
+  const { cx, cy } = o;
+  // outer halo
+  const hk = clamp(o.bloom);
+  let g = ctx.createRadialGradient(cx, cy, R * 0.8, cx, cy, R * 2.3);
+  g.addColorStop(0, `rgba(150,110,255,${0.38 * hk})`);
+  g.addColorStop(0.4, `rgba(110,80,220,${0.14 * hk})`);
+  g.addColorStop(1, 'rgba(90,60,200,0)');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 2.3, 0, Math.PI * 2); ctx.fill();
+
+  ctx.save();
+  ctx.beginPath(); ctx.arc(cx, cy, R, 0, Math.PI * 2); ctx.clip();
+  // pearl body
+  g = ctx.createRadialGradient(cx - R * 0.22, cy - R * 0.38, R * 0.05, cx, cy, R * 1.08);
+  g.addColorStop(0.00, '#FFFFFF');
+  g.addColorStop(0.45, '#FBF9FF');
+  g.addColorStop(0.78, '#F1EAFA');
+  g.addColorStop(1.00, '#D8C9F0');
+  ctx.fillStyle = g; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+  // lavender bounce light from below
+  g = ctx.createRadialGradient(cx, cy + R * 0.95, 0, cx, cy + R * 0.95, R * 0.9);
+  g.addColorStop(0, 'rgba(170,140,235,0.32)'); g.addColorStop(1, 'rgba(170,140,235,0)');
+  ctx.fillStyle = g; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+  // colored rim tint (blue left, red right) picked up from the environment
+  g = ctx.createLinearGradient(cx - R, cy, cx + R, cy);
+  g.addColorStop(0, 'rgba(28,86,219,0.16)'); g.addColorStop(0.25, 'rgba(28,86,219,0)');
+  g.addColorStop(0.75, 'rgba(220,53,71,0)'); g.addColorStop(1, 'rgba(220,53,71,0.14)');
+  ctx.fillStyle = g; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+  // specular highlight
+  ctx.filter = `blur(${Math.max(1, R * 0.05)}px)`;
+  g = ctx.createRadialGradient(cx, cy - R * 0.6, 0, cx, cy - R * 0.6, R * 0.55);
+  g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.7, 'rgba(255,255,255,0.75)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+  ctx.fillStyle = g;
+  ctx.beginPath(); ctx.ellipse(cx, cy - R * 0.6, R * 0.52, R * 0.22, 0, 0, Math.PI * 2); ctx.fill();
+  ctx.filter = 'none';
+  // glass sweep as the orb lands
+  const sw = prog(t, 1.05, 1.75);
+  if (sw > 0 && sw < 1) {
+    const x = lerp(cx - R * 1.6, cx + R * 1.6, easeInOutCubic(sw));
+    g = ctx.createLinearGradient(x - R * 0.35, cy - R, x + R * 0.35, cy + R);
+    g.addColorStop(0, 'rgba(255,255,255,0)'); g.addColorStop(0.5, 'rgba(255,255,255,0.55)'); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.fillRect(cx - R, cy - R, R * 2, R * 2);
+  }
+  ctx.restore();
+  // fine rim
+  ctx.lineWidth = 1.5;
+  ctx.strokeStyle = 'rgba(215,200,245,0.7)';
+  ctx.beginPath(); ctx.arc(cx, cy, R - 0.75, 0, Math.PI * 2); ctx.stroke();
+
+  // bloom flash
+  const fl = pulse(t, 0.78, 1.15);
+  if (fl > 0) {
+    g = ctx.createRadialGradient(cx, cy, 0, cx, cy, R * 1.9);
+    g.addColorStop(0, `rgba(255,255,255,${0.55 * fl})`); g.addColorStop(1, 'rgba(255,255,255,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, R * 1.9, 0, Math.PI * 2); ctx.fill();
+  }
+}
+
+// Smile: cubic from (-0.714R, 0) to (+0.714R, 0), dipping ~0.27R. Drawn on progressively.
+function smilePoints(o, depth) {
+  const R = o.R, pts = [];
+  const x0 = -0.714 * R, x1 = 0.714 * R, cyc = 0.36 * R * depth, cxo = 0.36 * R;
+  const yOff = -0.02 * R;
+  for (let i = 0; i <= 160; i++) {
+    const u = i / 160, a = 1 - u;
+    const x = a * a * a * x0 + 3 * a * a * u * (-cxo) + 3 * a * u * u * cxo + u * u * u * x1;
+    const y = 3 * a * a * u * cyc + 3 * a * u * u * cyc;
+    pts.push([o.cx + x, o.cy + y + yOff]);
+  }
+  return pts;
+}
+function drawSmile(t, o) {
+  const d = easeInOutCubic(prog(t, 0.12, 0.82));
+  if (d <= 0) return;
+  const happy = 1 + 0.16 * pulse(t, SEND_T, SEND_T + 0.55);
+  const pts = smilePoints(o, happy);
+  const n = Math.max(2, Math.round(d * (pts.length - 1)) + 1);
+  const R = o.R;
+  const grad = () => brandGradient(o.cx - 0.714 * R, o.cy, o.cx + 0.714 * R, o.cy);
+  const path = () => { ctx.beginPath(); ctx.moveTo(pts[0][0], pts[0][1]); for (let i = 1; i < n; i++) ctx.lineTo(pts[i][0], pts[i][1]); };
+  ctx.save();
+  ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+  // wide soft glow (stronger while on the dark background)
+  const onDark = 1 - clamp(o.bloom);
+  ctx.globalAlpha = 0.45 + 0.35 * onDark;
+  ctx.filter = `blur(${R * 0.07}px)`;
+  ctx.lineWidth = R * 0.2; ctx.strokeStyle = grad(); path(); ctx.stroke();
+  ctx.filter = 'none'; ctx.globalAlpha = 1;
+  // core stroke
+  ctx.lineWidth = R * 0.075; ctx.strokeStyle = grad(); path(); ctx.stroke();
+  // inner light line on the core
+  ctx.globalAlpha = 0.18 + 0.4 * onDark;
+  ctx.lineWidth = R * 0.022; ctx.strokeStyle = '#ffffff'; path(); ctx.stroke();
+  ctx.globalAlpha = 1;
+  // spark at the drawing tip
+  if (d < 1) {
+    const [hx, hy] = pts[n - 1];
+    const g = ctx.createRadialGradient(hx, hy, 0, hx, hy, R * 0.28);
+    g.addColorStop(0, 'rgba(255,255,255,1)'); g.addColorStop(0.25, 'rgba(220,210,255,0.7)'); g.addColorStop(1, 'rgba(160,120,255,0)');
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(hx, hy, R * 0.28, 0, Math.PI * 2); ctx.fill();
+  }
+  ctx.restore();
+}
+
+// Wordmark
+const wordLayer = document.createElement('canvas'); wordLayer.width = W; wordLayer.height = 420;
+function drawWordmark(t) {
+  const T0 = 1.72;
+  if (t < T0) return;
+  const g = wordLayer.getContext('2d');
+  g.setTransform(1, 0, 0, 1, 0, 0);
+  g.globalCompositeOperation = 'source-over';
+  g.clearRect(0, 0, W, 420);
+  g.font = '800 250px PoliDisplay';
+  g.textBaseline = 'alphabetic';
+  const letters = ['P', 'o', 'l', 'i'];
+  const track = -6;
+  const widths = letters.map(l => g.measureText(l).width);
+  const total = widths.reduce((a, b) => a + b, 0) + track * (letters.length - 1);
+  let x = CX - total / 2;
+  const base = 300; // baseline inside layer
+  const fill = g.createLinearGradient(CX - total / 2, base - 180, CX + total / 2, base);
+  fill.addColorStop(0.00, '#1E55D8');
+  fill.addColorStop(0.38, '#5E50C2');
+  fill.addColorStop(0.68, '#8E47A6');
+  fill.addColorStop(1.00, '#D23A55');
+  letters.forEach((l, i) => {
+    const k = easeOutExpo(prog(t, T0 + i * 0.07, T0 + i * 0.07 + 0.75));
+    if (k > 0) {
+      g.save();
+      g.globalAlpha = clamp(k * 1.4);
+      g.filter = k < 0.98 ? `blur(${(1 - k) * 14}px)` : 'none';
+      g.fillStyle = fill;
+      g.fillText(l, x, base + (1 - k) * 70);
+      g.restore();
+    }
+    x += widths[i] + track;
+  });
+  // light sweep across the letters
+  const s = prog(t, SEND_T + 0.15, SEND_T + 0.85);
+  if (s > 0 && s < 1) {
+    g.globalCompositeOperation = 'source-atop';
+    const sx = lerp(CX - total / 2 - 200, CX + total / 2 + 200, easeInOutCubic(s));
+    const sg = g.createLinearGradient(sx - 90, 0, sx + 90, 60);
+    sg.addColorStop(0, 'rgba(255,255,255,0)'); sg.addColorStop(0.5, 'rgba(255,255,255,0.6)'); sg.addColorStop(1, 'rgba(255,255,255,0)');
+    g.fillStyle = sg; g.fillRect(0, 0, W, 420);
+  }
+  // soft glow under the word
+  ctx.save();
+  ctx.globalAlpha = 0.55 * easeOutCubic(prog(t, T0, T0 + 1));
+  ctx.filter = 'blur(28px)';
+  ctx.drawImage(wordLayer, 0, WORD_Y - base);
+  ctx.restore();
+  ctx.drawImage(wordLayer, 0, WORD_Y - base);
+}
+
+function roundRect(c, x, y, w, h, r) {
+  r = Math.min(r, h / 2, w / 2);
+  c.beginPath();
+  c.moveTo(x + r, y); c.arcTo(x + w, y, x + w, y + h, r); c.arcTo(x + w, y + h, x, y + h, r);
+  c.arcTo(x, y + h, x, y, r); c.arcTo(x, y, x + w, y, r); c.closePath();
+}
+
+function drawMiniOrb(cx, cy, r, a) {
+  ctx.save(); ctx.globalAlpha = a;
+  let g = ctx.createRadialGradient(cx - r * 0.25, cy - r * 0.35, 0, cx, cy, r);
+  g.addColorStop(0, '#FFFFFF'); g.addColorStop(0.7, '#F2ECFB'); g.addColorStop(1, '#D6C7EF');
+  ctx.fillStyle = g; ctx.beginPath(); ctx.arc(cx, cy, r, 0, Math.PI * 2); ctx.fill();
+  ctx.lineCap = 'round'; ctx.lineWidth = r * 0.16;
+  ctx.strokeStyle = brandGradient(cx - r * 0.7, cy, cx + r * 0.7, cy);
+  ctx.beginPath(); ctx.moveTo(cx - r * 0.62, cy); ctx.bezierCurveTo(cx - r * 0.3, cy + r * 0.34, cx + r * 0.3, cy + r * 0.34, cx + r * 0.62, cy); ctx.stroke();
+  ctx.restore();
+}
+
+function drawPill(t) {
+  const T0 = 2.22;
+  const k = easeOutExpo(prog(t, T0, T0 + 0.75));
+  if (k <= 0) return;
+  const w = lerp(PILL_H, PILL_W, k), h = PILL_H;
+  const x = CX - w / 2, y = PILL_Y - h / 2;
+  const a = clamp(prog(t, T0, T0 + 0.25));
+  ctx.save();
+  ctx.globalAlpha = a;
+  // glow
+  ctx.shadowColor = 'rgba(120,90,255,0.45)'; ctx.shadowBlur = 50;
+  roundRect(ctx, x, y, w, h, h / 2);
+  ctx.fillStyle = 'rgba(14,14,30,0.82)'; ctx.fill();
+  ctx.shadowBlur = 0;
+  // glass fill
+  let g = ctx.createLinearGradient(0, y, 0, y + h);
+  g.addColorStop(0, 'rgba(255,255,255,0.10)'); g.addColorStop(1, 'rgba(255,255,255,0.025)');
+  ctx.fillStyle = g; ctx.fill();
+  // base border
+  ctx.lineWidth = 2.5; ctx.strokeStyle = brandGradient(x, y, x + w, y + h, 0.55); ctx.stroke();
+  // travelling highlight on the border
+  const cg = ctx.createConicGradient(t * 1.6, CX, PILL_Y);
+  cg.addColorStop(0.00, 'rgba(255,255,255,0)');
+  cg.addColorStop(0.06, 'rgba(255,255,255,0.95)');
+  cg.addColorStop(0.14, 'rgba(255,255,255,0)');
+  cg.addColorStop(0.50, 'rgba(255,255,255,0)');
+  cg.addColorStop(0.56, 'rgba(255,255,255,0.6)');
+  cg.addColorStop(0.64, 'rgba(255,255,255,0)');
+  cg.addColorStop(1.00, 'rgba(255,255,255,0)');
+  ctx.lineWidth = 2.5; ctx.strokeStyle = cg; ctx.stroke();
+
+  // contents
+  ctx.save();
+  roundRect(ctx, x, y, w, h, h / 2); ctx.clip();
+  const ck = easeOutCubic(prog(t, T0 + 0.25, T0 + 0.7));
+  const L = CX - PILL_W / 2;
+  drawMiniOrb(L + 70, PILL_Y, 34, ck);
+
+  // typed URL
+  const typed = clamp(Math.floor((t - TYPE_T0) / TYPE_DT) + 1, 0, URL.length);
+  ctx.font = '600 76px PoliText';
+  ctx.textBaseline = 'middle';
+  const tx = L + 132;
+  let cx = tx;
+  for (let i = 0; i < typed; i++) {
+    const ch = URL[i];
+    const ct = TYPE_T0 + i * TYPE_DT;
+    const ek = easeOutCubic(prog(t, ct, ct + 0.16));
+    ctx.save();
+    ctx.globalAlpha = a * ek;
+    ctx.fillStyle = '#FFFFFF';
+    ctx.fillText(ch, cx, PILL_Y + 3 + (1 - ek) * 14);
+    ctx.restore();
+    cx += ctx.measureText(ch).width;
+  }
+  // caret
+  const caretOn = t < TYPE_T0 + URL.length * TYPE_DT + 0.1 ? 1 : (Math.floor((t - SEND_T) / 0.45) % 2 === 0 ? 1 : 0.0);
+  if (t > T0 + 0.45 && caretOn) {
+    ctx.fillStyle = brandGradient(0, PILL_Y - 40, 0, PILL_Y + 40);
+    ctx.globalAlpha = a * 0.95;
+    roundRect(ctx, cx + 6, PILL_Y - 38, 5, 76, 2.5); ctx.fill();
+    ctx.globalAlpha = a;
+  }
+  // send button
+  const bx = L + PILL_W - 74, by = PILL_Y;
+  const press = 1 - 0.12 * pulse(t, SEND_T, SEND_T + 0.28);
+  const br = 46 * press * ck;
+  if (br > 1) {
+    ctx.save();
+    ctx.shadowColor = 'rgba(200,70,140,0.6)'; ctx.shadowBlur = 30 * (0.6 + 0.4 * pulse(t, SEND_T, SEND_T + 0.8));
+    g = ctx.createLinearGradient(bx - br, by - br, bx + br, by + br);
+    g.addColorStop(0, BLUE); g.addColorStop(0.5, PURPLE); g.addColorStop(1, RED);
+    ctx.fillStyle = g; ctx.beginPath(); ctx.arc(bx, by, br, 0, Math.PI * 2); ctx.fill();
+    ctx.restore();
+    // arrow
+    ctx.save();
+    ctx.translate(bx, by); ctx.scale(press * ck, press * ck);
+    ctx.strokeStyle = '#fff'; ctx.lineWidth = 6; ctx.lineCap = 'round'; ctx.lineJoin = 'round';
+    ctx.beginPath(); ctx.moveTo(0, 17); ctx.lineTo(0, -16); ctx.moveTo(-14, -3); ctx.lineTo(0, -17); ctx.lineTo(14, -3); ctx.stroke();
+    ctx.restore();
+  }
+  ctx.restore(); // clip
+  ctx.restore();
+
+  // send ripple
+  const age = t - SEND_T;
+  if (age > 0 && age < 0.9) {
+    const rk = age / 0.9;
+    ctx.save();
+    ctx.globalAlpha = Math.pow(1 - rk, 2) * 0.8;
+    ctx.lineWidth = 3;
+    ctx.strokeStyle = brandGradient(bx - 100, by - 100, bx + 100, by + 100);
+    ctx.beginPath(); ctx.arc(bx, by, 46 + easeOutCubic(rk) * 70, 0, Math.PI * 2); ctx.stroke();
+    // whole-pill outline pulse
+    const pad = easeOutCubic(rk) * 28;
+    roundRect(ctx, CX - PILL_W / 2 - pad, PILL_Y - PILL_H / 2 - pad, PILL_W + pad * 2, PILL_H + pad * 2, PILL_H / 2 + pad);
+    ctx.lineWidth = 2; ctx.strokeStyle = brandGradient(CX - PILL_W / 2, 0, CX + PILL_W / 2, 0); ctx.stroke();
+    ctx.restore();
+  }
+}
+
+function drawFinish(t, frame) {
+  // vignette
+  const v = ctx.createRadialGradient(CX, 950, 500, CX, 950, 1250);
+  v.addColorStop(0, 'rgba(0,0,0,0)'); v.addColorStop(1, 'rgba(0,0,0,0.55)');
+  ctx.fillStyle = v; ctx.fillRect(0, 0, W, H);
+  // grain / dither
+  ctx.save();
+  ctx.globalAlpha = 0.045;
+  ctx.globalCompositeOperation = 'overlay';
+  ctx.drawImage(grains[frame % grains.length], 0, 0, W, H);
+  ctx.restore();
+  // fade up from black
+  const f = 1 - easeOutCubic(prog(t, 0, 0.3));
+  if (f > 0) { ctx.fillStyle = `rgba(0,0,0,${f})`; ctx.fillRect(0, 0, W, H); }
+}
+
+function render(t, frame = Math.round(t * 60)) {
+  ctx.setTransform(1, 0, 0, 1, 0, 0);
+  ctx.globalAlpha = 1; ctx.filter = 'none'; ctx.globalCompositeOperation = 'source-over';
+  drawBackground(t);
+  drawGrid(t);
+  drawParticles(t);
+  const o = orbState(t);
+  drawOrbits(t, o);
+  drawRings(t, o);
+  drawOrb(t, o);
+  drawSmile(t, o);
+  drawWordmark(t);
+  drawPill(t);
+  drawFinish(t, frame);
+}
+
+window.render = render;
+window.DUR = DUR;
+window.ready = document.fonts.load('800 250px PoliDisplay').then(() => document.fonts.load('600 72px PoliText'));
+
+// Live preview when opened normally (?render disables the loop for frame capture)
+if (!location.search.includes('render')) {
+  window.ready.then(() => {
+    const start = performance.now();
+    const loop = now => { render(((now - start) / 1000) % (DUR + 1.0)); requestAnimationFrame(loop); };
+    requestAnimationFrame(loop);
+  });
+}
+</script>
+</body>
+</html>
