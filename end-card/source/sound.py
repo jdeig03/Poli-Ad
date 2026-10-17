@@ -73,77 +73,76 @@ def decay(n, tau):
 
 
 # ---------------------------------------------------------------- 1) smile draw: big swoosh L -> R
-sw = whoosh(1.05, 350, 4200, peak=0.62, q=0.9, curve=1.4)
-place_panned(sw, SMILE_T0 - 0.08, -0.85, 0.85, 1.5)
+sw = whoosh(1.1, 220, 1600, peak=0.6, q=0.8, curve=1.4)
+place_panned(sw, SMILE_T0 - 0.08, -0.7, 0.7, 1.3)
 # airy top layer
-sw2 = whoosh(0.9, 2500, 9000, peak=0.7, q=1.5)
-place_panned(sw2, SMILE_T0, -0.6, 0.7, 0.5)
+sw2 = whoosh(0.95, 900, 2600, peak=0.65, q=1.2)
+place_panned(sw2, SMILE_T0, -0.5, 0.6, 0.25)
 
 # ---------------------------------------------------------------- 2) orb bloom: sub drop + soft impact
 n = int(1.6 * SR); tt = np.arange(n) / SR
 f = 42 + 60 * np.exp(-tt * 4)
 sub = np.sin(2 * np.pi * np.cumsum(f) / SR) * decay(n, 0.45) * np.clip(tt / 0.004, 0, 1)
-place(sub, BLOOM_T, 0, 0.4)
+tt_sub = tt
+place(sub * np.clip(tt_sub / 0.03, 0, 1), BLOOM_T, 0, 0.32)
 thud = bandpass(rng.standard_normal(int(0.4 * SR)), 80, 900) * decay(int(0.4 * SR), 0.06)
-place(thud / np.max(np.abs(thud)), BLOOM_T, 0, 0.35)
+place(signal.sosfilt(signal.butter(2, 300, fs=SR, output='sos'), thud / np.max(np.abs(thud))), BLOOM_T, 0, 0.25)
 # sparkle on the flash
 n = int(1.2 * SR); tt = np.arange(n) / SR
 spark = sum(a * np.sin(2 * np.pi * fr * tt) * decay(n, d) for fr, a, d in
-            [(2093, .4, .35), (3136, .3, .25), (4186, .2, .18), (5274, .1, .12)])
-place(spark * np.clip(tt / 0.01, 0, 1), BLOOM_T + 0.02, 0.1, 0.10)
+            [(1046.5, .4, .45), (1568, .3, .35), (2093, .12, .25)])
+place(spark * np.clip(tt / 0.03, 0, 1), BLOOM_T + 0.02, 0.1, 0.08)
 
 # ---------------------------------------------------------------- 3) orb rises: soft upward riser
-rise = whoosh(RISE_T1 - RISE_T0 + 0.2, 300, 2400, peak=0.75, q=1.6, curve=0.8)
-place(rise, RISE_T0 - 0.05, 0, 0.6)
+rise = whoosh(RISE_T1 - RISE_T0 + 0.2, 200, 1200, peak=0.7, q=1.2, curve=0.8)
+place(rise, RISE_T0 - 0.05, 0, 0.5)
 
 # ---------------------------------------------------------------- 4) wordmark: shimmer swell
 n = int(1.4 * SR); tt = np.arange(n) / SR
 shim = sum(a * np.sin(2 * np.pi * fr * tt + 2 * np.sin(2 * np.pi * 5 * tt)) for fr, a in
-           [(1318.5, .4), (1975.5, .3), (2637, .2)]) * shape(n, 0, 0, 0.25)
-place(shim, WORD_T - 0.05, -0.2, 0.07)
+           [(659.25, .4), (987.77, .3), (1318.5, .15)]) * shape(n, 0, 0, 0.3)
+place(shim, WORD_T - 0.05, -0.2, 0.06)
 
 # ---------------------------------------------------------------- 5) chat bar opens: quick swoosh outward
-op = whoosh(0.55, 900, 5500, peak=0.35, q=1.1, curve=0.7)
-place_panned(op, PILL_T - 0.08, -0.3, 0.3, 1.1)
+op = whoosh(0.6, 350, 1800, peak=0.4, q=0.9, curve=0.7)
+place_panned(op, PILL_T - 0.08, -0.3, 0.3, 0.9)
 
 # ---------------------------------------------------------------- 6) keyboard clicks (one per character)
 def keystroke(pitch=1.0, hard=1.0):
     n = int(0.14 * SR); tt = np.arange(n) / SR
     x = rng.standard_normal(n)
-    click = bandpass(x, 2500, 9000) * decay(n, 0.0011)             # sharp switch tick
-    thock = bandpass(x, 220 * pitch, 1400 * pitch) * decay(n, 0.016)  # keycap body
-    ping = np.sin(2 * np.pi * 1900 * pitch * tt) * decay(n, 0.006)  # plastic resonance
-    press = click * 1.0 + thock * 1.8 + ping * 0.35
-    # key release ~45 ms later, quieter and brighter
-    rel = np.zeros(n); r0 = int(0.045 * SR)
-    rel[r0:] = (bandpass(rng.standard_normal(n - r0), 3000, 10000) * decay(n - r0, 0.0008)) * 0.45
-    k = (press + rel) * hard
+    tap = bandpass(x, 900, 2800) * decay(n, 0.0025)                 # soft fingertip tap
+    thock = bandpass(x, 180 * pitch, 900 * pitch) * decay(n, 0.018)   # muted keycap body
+    tone = np.sin(2 * np.pi * 640 * pitch * tt) * decay(n, 0.012)    # gentle wooden note
+    k = (tap * 0.35 + thock * 1.6 + tone * 0.5) * np.clip(tt / 0.0015, 0, 1)
+    k = np.tanh(k / (np.std(k[:int(0.02 * SR)]) * 3)) * hard   # even out random peaks
     return k / np.max(np.abs(k))
 
 for i in range(NCHARS):
     jitter = rng.uniform(-0.004, 0.004)
     place(keystroke(pitch=rng.uniform(0.92, 1.1), hard=rng.uniform(0.85, 1.0)),
-          TYPE_T0 + i * TYPE_DT + jitter, pan=-0.25 + 0.05 * i, gain=1.0)
+          TYPE_T0 + i * TYPE_DT + jitter, pan=-0.25 + 0.05 * i, gain=0.6)
 
 # ---------------------------------------------------------------- 7) send: button click + "sent" swoop + chime
-place(keystroke(pitch=0.8, hard=1.0), SEND_T - 0.01, 0.35, 1.0)        # pressing send
+place(keystroke(pitch=0.8, hard=1.0), SEND_T - 0.01, 0.35, 0.5)        # pressing send
 n = int(0.32 * SR); tt = np.arange(n) / SR
-fsw = 420 * (1500 / 420) ** np.clip(tt / 0.13, 0, 1)                      # upward pitch swoop
-swoop = (np.sin(2 * np.pi * np.cumsum(fsw) / SR) + 0.25 * np.sin(4 * np.pi * np.cumsum(fsw) / SR))
-swoop *= np.clip(tt / 0.006, 0, 1) * decay(n, 0.07)
-place(swoop, SEND_T, 0.15, 0.7)
-air = whoosh(0.4, 1200, 7000, peak=0.3, q=1.2)                             # message flying off
-place_panned(air, SEND_T - 0.02, 0.0, 0.9, 1.0)
+fsw = 380 * (900 / 380) ** np.clip(tt / 0.14, 0, 1)                      # upward pitch swoop
+swoop = np.sin(2 * np.pi * np.cumsum(fsw) / SR)
+swoop *= np.clip(tt / 0.02, 0, 1) * decay(n, 0.08)
+place(swoop, SEND_T, 0.15, 0.5)
+air = whoosh(0.5, 500, 2200, peak=0.35, q=1.0)                              # message floating off
+place_panned(air, SEND_T - 0.02, 0.0, 0.7, 0.6)
 
 n = int(2.6 * SR); tt = np.arange(n) / SR
 chime = sum(a * np.sin(2 * np.pi * fr * tt) * decay(n, d) for fr, a, d in
-            [(1046.5, .5, .55), (1568.0, .35, .42), (2093.0, .25, .32), (2637.0, .12, .24), (523.25, .3, .7)])
-chime *= np.clip(tt / 0.003, 0, 1)
+            [(783.99, .5, .7), (1567.98, .12, .4), (1174.66, .0, .5)])
+chime2 = sum(a * np.sin(2 * np.pi * fr * tt) * decay(n, d) for fr, a, d in [(1046.5, .45, .8), (2093.0, .08, .45)])
+chime = (chime + np.concatenate([np.zeros(int(0.11 * SR)), chime2[:n - int(0.11 * SR)]])) * np.clip(tt / 0.012, 0, 1)
 CH_T = SEND_T + 0.10
-place(chime, CH_T, 0, 0.45)
+place(chime, CH_T, 0, 0.35)
 for d, g, p in [(0.19, .32, -0.6), (0.38, .2, 0.6), (0.57, .11, -0.4)]:  # stereo echo tail
-    place(chime, CH_T + d, p, 0.45 * g)
-place(sub[:int(0.8 * SR)] * decay(int(0.8 * SR), 0.2), SEND_T, 0, 0.2)   # soft low thump
+    place(chime, CH_T + d, p, 0.35 * g)
+place(sub[:int(0.8 * SR)] * decay(int(0.8 * SR), 0.2) * np.clip(tt_sub[:int(0.8 * SR)] / 0.03, 0, 1), SEND_T, 0, 0.15)   # soft low thump
 
 # ---------------------------------------------------------------- 8) ambient pad bed (quiet, under everything)
 pad = np.zeros(N)
@@ -156,11 +155,19 @@ L += pad * 0.05; R += np.roll(pad, 480) * 0.05
 # ---------------------------------------------------------------- master
 mx = np.stack([L, R], 1)
 mx = signal.sosfilt(signal.butter(2, 30, btype='high', fs=SR, output='sos'), mx, axis=0)
-mx = np.tanh(mx * 1.1)
+# small soft room: decaying, low-passed noise impulse per channel
+ir_n = int(1.2 * SR)
+for c in range(2):
+    ir = rng.standard_normal(ir_n) * np.exp(-np.arange(ir_n) / (0.32 * SR))
+    ir = signal.sosfilt(signal.butter(2, 3500, fs=SR, output='sos'), ir); ir /= np.sqrt(np.sum(ir ** 2))
+    wet = signal.fftconvolve(mx[:, c], ir)[:N]
+    mx[:, c] = mx[:, c] * 0.82 + wet * 0.28
+# warm top end: gentle low-pass to remove any remaining edge
+mx = signal.sosfilt(signal.butter(2, 6500, fs=SR, output='sos'), mx, axis=0)
 fade = np.clip((DUR - t) / 0.25, 0, 1)[:, None]   # avoid a click at the very end
 mx *= fade
 mx[:240] *= np.linspace(0, 1, 240)[:, None]
-mx *= 0.89 / np.max(np.abs(mx))
+mx *= 0.85 / np.max(np.abs(mx))
 with wave.open(sys.argv[1], 'wb') as wf:
     wf.setnchannels(2); wf.setsampwidth(2); wf.setframerate(SR)
     wf.writeframes((mx * 32767).astype('<i2').tobytes())
