@@ -1,0 +1,336 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Post</title>
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/Inter-Bold.otf'); }
+  @font-face { font-family: 'InterDisplay'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-Bold.otf'); }
+  @font-face { font-family: 'InterDisplay'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
+
+  :root {
+    --blue: #1C56DB; --purple: #7A4FB8; --red: #DC3547;
+    --ink: #14131C; --muted: #6E6A80;
+  }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; background: #000; overflow: hidden; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  #post { position: relative; width: 1080px; height: 1350px; overflow: hidden; }
+
+  /* ---------- the two fake "posts" share one studio backdrop ---------- */
+  .studio { position: absolute; left: 0; width: 1080px; overflow: hidden;
+    background: radial-gradient(120% 90% at 55% 35%, #FFFFFF 0%, #F6F4FA 55%, #ECE8F3 100%); }
+  #top { top: 0; height: 515px; }
+  #bottom { top: 785px; height: 565px;
+    background: radial-gradient(120% 90% at 50% 60%, #FFFFFF 0%, #F6F4FA 55%, #ECE8F3 100%); }
+
+  .tag { position: absolute; display: flex; align-items: center; gap: 10px; padding: 10px 18px 10px 14px; border-radius: 999px;
+    background: rgba(255,255,255,0.78); border: 1px solid rgba(122,79,184,0.18); box-shadow: 0 6px 18px rgba(60,40,120,0.08);
+    font: 700 19px 'Inter'; letter-spacing: 0.12em; color: #3B3850; text-transform: uppercase; }
+  .tag i { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--red)); }
+  .brandtag { text-transform: none; letter-spacing: 0; font: 700 22px 'Inter'; color: var(--ink); padding: 7px 20px 7px 8px; }
+  .brandtag img { width: 34px; height: 34px; border-radius: 50%; }
+  .tag span { font-weight: 500; letter-spacing: 0.02em; text-transform: none; color: var(--muted); }
+
+  /* ---------- phone ---------- */
+  #phone { position: absolute; left: 70px; top: -160px; width: 520px; height: 1040px; border-radius: 86px;
+    transform: rotate(9deg); transform-origin: 50% 50%;
+    background: linear-gradient(145deg, #3A3A44 0%, #101016 30%, #050507 60%, #24242C 100%);
+    box-shadow: 0 60px 90px -30px rgba(40,30,90,0.45), 0 20px 40px rgba(20,15,50,0.25), inset 0 0 0 2px rgba(255,255,255,0.12); }
+  #phone::after { content: ''; position: absolute; inset: 3px; border-radius: 83px; border: 2px solid rgba(255,255,255,0.06); pointer-events: none; }
+  #screen { position: absolute; inset: 16px; border-radius: 72px; overflow: hidden; background: #FAF9FC; }
+  .island { position: absolute; top: 18px; left: 50%; transform: translateX(-50%); width: 150px; height: 42px; border-radius: 22px; background: #000; }
+  .status { position: absolute; top: 22px; left: 52px; right: 44px; display: flex; justify-content: space-between; font: 600 26px 'Inter'; color: var(--ink); }
+  .status .icons { display: flex; gap: 8px; align-items: center; }
+  .url { position: absolute; top: 84px; left: 34px; right: 34px; height: 54px; border-radius: 16px; background: #EEECF3;
+    display: flex; align-items: center; justify-content: center; gap: 8px; font: 500 21px 'Inter'; color: #4A475A; }
+  .site { position: absolute; top: 154px; left: 0; right: 0; height: 92px; background: #0F1E46; display: flex; align-items: center; justify-content: space-between; padding: 0 32px; }
+  .site b { display: block; font: 800 25px 'InterDisplay'; color: #fff; letter-spacing: 0.04em; line-height: 1; }
+  .site small { display: block; font: 600 13px 'Inter'; color: #9FB2E8; letter-spacing: 0.22em; margin-top: 6px; }
+  .site .donate { font: 700 15px 'Inter'; color: #fff; background: #D63A3A; padding: 10px 16px; border-radius: 8px; letter-spacing: 0.06em; }
+  .chat { position: absolute; top: 262px; left: 22px; right: 22px; bottom: 0; }
+  .chathead { display: flex; align-items: center; gap: 14px; padding: 0 6px 18px; border-bottom: 1px solid #E7E4EE; }
+  .chathead .av { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2C4FB8, #7A4FB8); color: #fff; display: grid; place-items: center; font: 700 26px 'Inter'; }
+  .chathead h3 { font: 700 27px 'Inter'; color: var(--ink); }
+  .chathead p { font: 500 18px 'Inter'; color: var(--muted); display: flex; align-items: center; gap: 8px; margin-top: 3px; }
+  .chathead p em { font-style: normal; font: 700 13px 'Inter'; color: #5B3FA6; background: #EEE7FA; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.06em; }
+  .ts { text-align: center; font: 500 17px 'Inter'; color: #9A96AA; margin: 20px 0 14px; }
+  #ask { position: relative; margin-left: auto; width: 360px; padding: 22px 26px; border-radius: 30px 30px 8px 30px;
+    background: linear-gradient(135deg, #2A5BE0 0%, #5B4FD0 60%, #7A4FB8 100%); color: #fff; font: 600 31px/1.25 'Inter';
+    box-shadow: 0 10px 24px rgba(42,91,224,0.3); }
+  .reply { margin-top: 18px; width: 380px; padding: 20px 24px; border-radius: 30px 30px 30px 8px; background: #EFEDF5; color: var(--ink); font: 500 23px/1.38 'Inter'; }
+  .src { display: inline-flex; gap: 8px; align-items: center; margin-top: 12px; font: 600 17px 'Inter'; color: #5B3FA6; background: #fff; border: 1px solid #E1DAF2; padding: 7px 12px; border-radius: 10px; }
+
+  /* ---------- fake Instagram row ---------- */
+  #igbar { position: absolute; top: 515px; left: 0; width: 1080px; height: 270px; background: #0C0E13; color: #F5F5F5; }
+  .actions { position: absolute; top: 54px; left: 38px; right: 38px; display: flex; align-items: center; }
+  .act { display: flex; align-items: center; gap: 12px; margin-right: 46px; font: 500 30px 'Inter'; }
+  .act svg { width: 46px; height: 46px; }
+  .save { margin-left: auto; }
+  .save svg { width: 44px; height: 44px; }
+  .who { position: absolute; top: 140px; left: 32px; right: 40px; display: flex; align-items: center; gap: 22px; }
+  .ring { width: 104px; height: 104px; border-radius: 50%; padding: 4px; background: conic-gradient(from 200deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5, #FEDA75); }
+  .ring > div { width: 100%; height: 100%; border-radius: 50%; padding: 4px; background: #0C0E13; }
+  .ring img { width: 100%; height: 100%; border-radius: 50%; display: block; object-fit: cover; }
+  .who h4 { font: 700 28px 'Inter'; }
+  .who p { font: 400 28px 'Inter'; color: #E9E9EC; margin-top: 4px; }
+  .more { margin-left: auto; display: flex; gap: 7px; }
+  .more i { width: 8px; height: 8px; border-radius: 50%; background: #F5F5F5; }
+
+  /* ---------- insight chart card ---------- */
+  #card { position: absolute; left: 110px; top: 860px; width: 860px; height: 450px; border-radius: 36px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,248,253,0.96));
+    border: 1px solid rgba(122,79,184,0.14);
+    box-shadow: 0 50px 80px -30px rgba(60,40,130,0.35), 0 12px 30px rgba(60,40,130,0.10); }
+  .bars { position: absolute; left: 50px; right: 50px; top: 70px; height: 250px; }
+  .bar { position: absolute; bottom: 0; width: 104px; border-radius: 20px 20px 10px 10px; background: linear-gradient(180deg, #E9E4F3, #DCD5EB); }
+  .bar .pct { position: absolute; top: 14px; left: 0; right: 0; text-align: center; font: 700 22px 'Inter'; color: #5E5878; }
+  .lab { position: absolute; top: 372px; width: 150px; text-align: center; font: 600 19px/1.2 'Inter'; color: var(--muted); }
+  .foot { position: absolute; left: 40px; right: 40px; bottom: 26px; display: flex; justify-content: space-between; align-items: center;
+    padding-top: 0; font: 600 20px 'Inter'; color: var(--ink); }
+  .foot span { color: var(--muted); font-weight: 500; }
+  .foot .live { display: inline-block; width: 10px; height: 10px; border-radius: 50%; background: #27C281; margin-right: 10px; box-shadow: 0 0 0 5px rgba(39,194,129,0.15); vertical-align: middle; }
+  .most { position: absolute; left: 40px; top: 18px; width: 480px; padding: 18px 26px; border-radius: 24px; background: #fff;
+    border: 2px solid transparent;
+    background-image: linear-gradient(#fff, #fff), linear-gradient(120deg, var(--blue), var(--purple), var(--red));
+    background-origin: border-box; background-clip: padding-box, border-box;
+    box-shadow: 0 16px 34px rgba(122,79,184,0.18); }
+  .most small { font: 700 15px 'Inter'; letter-spacing: 0.16em; color: #7A4FB8; }
+  .most q { display: block; margin-top: 8px; font: 700 26px/1.25 'Inter'; color: var(--ink); quotes: '\201C' '\201D'; }
+  .most .count { margin-top: 12px; display: inline-flex; align-items: center; gap: 8px; font: 700 19px 'Inter'; color: #fff;
+    background: linear-gradient(120deg, var(--blue), var(--purple), var(--red)); padding: 7px 14px; border-radius: 999px; }
+
+  .brand { position: absolute; right: 36px; bottom: 26px; display: none; }
+
+  svg#fx { position: absolute; inset: 0; width: 1080px; height: 1350px; pointer-events: none; }
+</style>
+</head>
+<body>
+<div id="post">
+
+  <!-- TOP "POST": the voter -->
+  <div class="studio" id="top">
+    <div id="phone">
+      <div id="screen">
+        <div class="island"></div>
+        <div class="status"><span>11:47</span>
+          <span class="icons">
+            <svg width="34" height="22" viewBox="0 0 34 22"><rect x="0" y="14" width="6" height="8" rx="1.5" fill="#14131C"/><rect x="9" y="10" width="6" height="12" rx="1.5" fill="#14131C"/><rect x="18" y="5" width="6" height="17" rx="1.5" fill="#14131C"/><rect x="27" y="0" width="6" height="22" rx="1.5" fill="#14131C"/></svg>
+            <svg width="50" height="24" viewBox="0 0 50 24"><rect x="1" y="1" width="42" height="22" rx="7" fill="none" stroke="#14131C" stroke-opacity=".4" stroke-width="2"/><rect x="4" y="4" width="30" height="16" rx="4" fill="#14131C"/><rect x="45" y="8" width="3" height="8" rx="1.5" fill="#14131C" fill-opacity=".4"/></svg>
+          </span>
+        </div>
+        <div class="url">
+          <svg width="16" height="20" viewBox="0 0 16 20"><rect x="1" y="8" width="14" height="11" rx="3" fill="#6E6A80"/><path d="M4 8V5.5a4 4 0 0 1 8 0V8" fill="none" stroke="#6E6A80" stroke-width="2"/></svg>
+          alexriveraforcitycouncil.com
+        </div>
+        <div class="site"><div><b>ALEX RIVERA</b><small>FOR CITY COUNCIL</small></div><div class="donate">DONATE</div></div>
+        <div class="chat">
+          <div class="chathead"><div class="av">A</div><div><h3>Ask Alex Rivera</h3><p><em>AI</em>Answers from Alex's campaign</p></div></div>
+          <div class="ts">Today 11:47 PM</div>
+          <div id="ask">What will you do about rent increases?<i id="askCorner" style="position:absolute;right:14px;bottom:6px;width:1px;height:1px"></i><i id="d1" style="position:absolute;right:70px;bottom:0;width:1px;height:1px"></i><i id="d2" style="position:absolute;right:150px;bottom:0;width:1px;height:1px"></i></div>
+          <div class="reply">Alex's housing plan has three parts: more homes near transit, a renter relief fund, and faster permits for affordable units.
+            <div class="src"><svg width="14" height="17" viewBox="0 0 14 17"><path d="M2 1h7l4 4v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="none" stroke="#5B3FA6" stroke-width="1.8"/></svg>From Alex's Housing Plan</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="tag" style="right:34px; top:32px"><i></i>The voter <span>· 11:47 PM</span></div>
+  </div>
+
+  <!-- fake Instagram row -->
+  <div id="igbar">
+    <div class="actions">
+      <div class="act"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="#FF3040"/></svg>1,284</div>
+      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linejoin="round"><path d="M20.7 16.2A9.2 9.2 0 1 0 17 20l4.3 1.2z"/></svg>148</div>
+      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linejoin="round"><path d="M22 3 9.2 10.2M22 3l-7.5 18-5.3-10.8L2 6.4z"/></svg>64</div>
+      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V9a4 4 0 0 1 4-4h11M16 2l3 3-3 3M20 13v2a4 4 0 0 1-4 4H5M8 22l-3-3 3-3"/></svg>32</div>
+      <div class="save"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linejoin="round"><path d="M19 21l-7-5.5L5 21V3h14z"/></svg></div>
+    </div>
+    <div class="who">
+      <div class="ring"><div><img src="poli-orb.png"></div></div>
+      <div><h4>askpoli</h4><p>Asked at 11:47 PM. Answered at 11:47 PM.</p></div>
+      <div class="more"><i></i><i></i><i></i></div>
+    </div>
+  </div>
+
+  <!-- BOTTOM "POST": the campaign -->
+  <div class="studio" id="bottom">
+    <div class="tag" style="left:34px; top:26px"><i></i>The campaign <span>· same moment</span></div>
+    <div class="tag brandtag" style="left:520px; top:26px"><img src="poli-orb.png">Askpoli.us</div>
+  </div>
+  <div id="card">
+    <div class="bars" id="bars"></div>
+    <div class="most"><small>MOST ASKED</small><q>What will you do about rent increases?</q>
+      <div class="count"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 12V2M2.5 6.5 7 2l4.5 4.5" fill="none" stroke="#fff" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>Asked 148 times</div></div>
+    <div class="foot"><div><i class="live"></i>Voter insight <span>· Last 7 days</span></div><div>1,284 <span>questions answered</span></div></div>
+  </div>
+
+  <svg id="fx" viewBox="0 0 1080 1350"></svg>
+</div>
+
+<script>
+const NS = 'http://www.w3.org/2000/svg';
+const fx = document.getElementById('fx');
+const el = (tag, attrs, parent) => { const e = document.createElementNS(NS, tag); for (const k in attrs) e.setAttribute(k, attrs[k]); (parent || fx).appendChild(e); return e; };
+
+function build() {
+// ---------- chart bars ----------
+const DATA = [['Parks & youth', 8], ['Taxes & budget', 11], ['Roads & potholes', 15], ['Public safety', 21], ['Housing costs', 32]];
+const barsEl = document.getElementById('bars');
+const BAR_W = 104, GAP = (760 - BAR_W * 5) / 4, MAXH = 240;
+const barGeom = [];
+DATA.forEach(([name, v], i) => {
+  const x = i * (BAR_W + GAP), h = v / 32 * MAXH;
+  const b = document.createElement('div'); b.className = 'bar';
+  b.style.left = x + 'px'; b.style.height = h + 'px';
+  if (i < 4) b.innerHTML = `<div class="pct">${v}%</div>`;
+  barsEl.appendChild(b);
+  const lab = document.createElement('div'); lab.className = 'lab';
+  lab.style.left = (50 + x + BAR_W / 2 - 75) + 'px'; lab.textContent = name;
+  document.getElementById('card').appendChild(lab);
+  barGeom.push({ x: 110 + 50 + x, w: BAR_W, top: 860 + 70 + 250 - h, bottom: 860 + 70 + 250 });
+});
+// chart labels sit inside the bar area bottom; move the bar block up a little to make room
+document.querySelectorAll('.lab').forEach(l => l.style.top = '334px');
+
+// ---------- shared liquid gradient (blue at the phone -> purple through the bar -> red in the chart) ----------
+const defs = el('defs', {});
+const lg = el('linearGradient', { id: 'liq', gradientUnits: 'userSpaceOnUse', x1: 0, y1: 230, x2: 0, y2: 1230 }, defs);
+[['0', '#2A5BE0'], ['0.28', '#4B53C6'], ['0.5', '#7A4FB8'], ['0.75', '#B2407F'], ['1', '#DC3547']].forEach(([o, c]) => el('stop', { offset: o, 'stop-color': c }, lg));
+const blur = (id, s) => { const f = el('filter', { id, filterUnits: 'userSpaceOnUse', x: -100, y: -100, width: 1280, height: 1550 }, defs); el('feGaussianBlur', { stdDeviation: s }, f); };
+blur('b2', 2); blur('b4', 4); blur('b8', 8); blur('b16', 16); blur('b24', 24);
+const clipTop = el('clipPath', { id: 'clipTop' }, defs); el('rect', { x: 0, y: 0, width: 1080, height: 515 }, clipTop);
+
+// tapered ribbon along a cubic bezier: width w(t)
+function bez(p, t) { const a = 1 - t; return [0, 1].map(k => a*a*a*p[0][k] + 3*a*a*t*p[1][k] + 3*a*t*t*p[2][k] + t*t*t*p[3][k]); }
+function ribbon(p, wfn, wob = 0) {
+  const n = 120, L = [], R = [];
+  for (let i = 0; i <= n; i++) {
+    const t = i / n, c = bez(p, t), c2 = bez(p, Math.min(1, t + 0.001)), c1 = bez(p, Math.max(0, t - 0.001));
+    let dx = c2[0] - c1[0], dy = c2[1] - c1[1]; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
+    const w = wfn(t) / 2 + wob * Math.sin(t * 23) ;
+    L.push([c[0] - dy * w, c[1] + dx * w]); R.push([c[0] + dy * w, c[1] - dx * w]);
+  }
+  const pts = L.concat(R.reverse());
+  return 'M' + pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L') + ' Z';
+}
+function centerline(p, off = 0) {
+  let d = ''; for (let i = 0; i <= 80; i++) { const c = bez(p, i / 80); d += (i ? ' L' : 'M') + (c[0] + off).toFixed(1) + ' ' + c[1].toFixed(1); } return d;
+}
+
+// ---------- geometry from the laid-out page ----------
+const askR = document.getElementById('ask').getBoundingClientRect();
+const phoneR = document.getElementById('phone').getBoundingClientRect();
+const housing = barGeom[4];
+const SX = housing.x + housing.w / 2;           // stream x = centre of the Housing bar
+const PCX = 815, PCY = 446;                    // puddle centre
+
+// melting question bubble -> over the phone's left edge -> onto the table
+const pt_ = id => { const q = document.getElementById(id).getBoundingClientRect(); return [q.left, q.top]; };
+const D0 = pt_('askCorner');
+const drip = [D0, [D0[0] + 36, D0[1] + 26], [D0[0] + 80, 452], [PCX - 120, 446]];
+
+// ---------- puddle (behind the phone, on the top "post") ----------
+const gTop = el('g', { 'clip-path': 'url(#clipTop)' });   // drip (under the puddle)
+const gPour = el('g', {});                                 // pour (its top tucks under the puddle)
+const pl = el('g', { 'clip-path': 'url(#clipTop)' });     // puddle
+const pel = (tag, attrs, parent) => el(tag, attrs, parent || pl);
+const pdefs = pel('defs', {});
+const pg = pel('linearGradient', { id: 'pliq', gradientUnits: 'userSpaceOnUse', x1: 0, y1: 230, x2: 0, y2: 1230 }, pdefs);
+[['0', '#2A5BE0'], ['0.28', '#4B53C6'], ['0.5', '#7A4FB8'], ['0.75', '#B2407F'], ['1', '#DC3547']].forEach(([o, c]) => pel('stop', { offset: o, 'stop-color': c }, pg));
+const prg = pel('radialGradient', { id: 'pshine', cx: '40%', cy: '35%', r: '70%' }, pdefs);
+pel('stop', { offset: 0, 'stop-color': '#fff', 'stop-opacity': 0.45 }, prg); pel('stop', { offset: 1, 'stop-color': '#fff', 'stop-opacity': 0 }, prg);
+['pb3', 3, 'pb10', 10, 'pb18', 18].reduce((a, v, i, arr) => { if (i % 2 === 0) { const f = pel('filter', { id: arr[i], filterUnits: 'userSpaceOnUse', x: -100, y: -100, width: 1280, height: 1550 }, pdefs); pel('feGaussianBlur', { stdDeviation: arr[i + 1] }, f); } return a; }, 0);
+
+// organic puddle outline
+function blob(cx, cy, rx, ry, seed, lobes) {
+  let s = seed; const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
+  const amps = Array.from({ length: lobes }, () => [r() * 0.10, r() * Math.PI * 2]);
+  const pts = [];
+  for (let i = 0; i < 72; i++) {
+    const a = i / 72 * Math.PI * 2;
+    let k = 1; amps.forEach(([am, ph], j) => k += am * Math.sin(a * (j + 2) + ph));
+    pts.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k]);
+  }
+  // smooth closed path through points (Catmull-Rom -> bezier)
+  let d = `M${pts[0][0]} ${pts[0][1]}`;
+  for (let i = 0; i < pts.length; i++) {
+    const p0 = pts[(i - 1 + pts.length) % pts.length], p1 = pts[i], p2 = pts[(i + 1) % pts.length], p3 = pts[(i + 2) % pts.length];
+    d += ` C${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}`;
+  }
+  return d + 'Z';
+}
+const pud = blob(PCX, PCY, 228, 56, 23, 5);
+// tongue of liquid running off the bottom edge where the pour starts
+const tongue = ribbon([[SX - 24, 440], [SX - 8, 472], [SX, 496], [SX, 530]], t => 120 - 74 * t);
+pel('path', { d: pud, fill: 'rgba(40,20,90,0.35)', filter: 'url(#pb18)', transform: 'translate(0 16)' }); // contact shadow
+pel('path', { d: tongue, fill: 'rgba(40,20,90,0.30)', filter: 'url(#pb10)', transform: 'translate(0 10)' });
+pel('path', { d: pud, fill: 'url(#pliq)' });
+pel('path', { d: tongue, fill: 'url(#pliq)' });
+pel('path', { d: pud, fill: 'url(#pshine)' });
+// depth: darker meniscus just inside the edge, lighter thin rim right at the edge
+const pclip = pel('clipPath', { id: 'pclip' }, pdefs); pel('path', { d: pud }, pclip); pel('path', { d: tongue }, pclip);
+const pin = pel('g', { 'clip-path': 'url(#pclip)' });
+pel('path', { d: pud, fill: 'none', stroke: 'rgba(16,8,60,0.55)', 'stroke-width': 34, filter: 'url(#pb10)' }, pin);
+pel('path', { d: tongue, fill: 'none', stroke: 'rgba(16,8,60,0.45)', 'stroke-width': 26, filter: 'url(#pb10)' }, pin);
+pel('path', { d: pud, fill: 'none', stroke: 'rgba(255,255,255,0.55)', 'stroke-width': 2.5, filter: 'url(#pb3)', transform: 'translate(0 -2)' }, pin);
+// softbox reflection: long soft white streak across the surface
+pel('path', { d: `M${PCX - 190} ${PCY - 18} Q${PCX} ${PCY - 44} ${PCX + 170} ${PCY - 26}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.75, 'stroke-width': 10, 'stroke-linecap': 'round', filter: 'url(#pb3)' }, pin);
+pel('path', { d: `M${PCX - 120} ${PCY + 22} Q${PCX + 10} ${PCY + 8} ${PCX + 120} ${PCY + 20}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.25, 'stroke-width': 14, 'stroke-linecap': 'round', filter: 'url(#pb10)' }, pin);
+pel('path', { d: pud, fill: 'none', stroke: 'rgba(20,10,70,0.35)', 'stroke-width': 2, filter: 'url(#pb3)' });
+// glossy highlights + a few bubbles on the surface
+[[PCX - 160, PCY - 8, 22, 4, .8], [PCX + 120, PCY - 30, 30, 4, .7]].forEach(([x, y, rx, ry, o]) =>
+  pel('ellipse', { cx: x, cy: y, rx, ry, fill: '#fff', opacity: o, filter: 'url(#pb3)' }));
+[[PCX - 60, PCY - 4, 7], [PCX - 30, PCY + 6, 4], [PCX + 90, PCY - 10, 5], [PCX + 110, PCY + 2, 3], [PCX - 200, PCY + 10, 5], [PCX + 6, PCY - 14, 3]].forEach(([x, y, r]) => {
+  pel('circle', { cx: x, cy: y, r, fill: 'none', stroke: 'rgba(255,255,255,0.75)', 'stroke-width': 1.6 });
+  pel('circle', { cx: x - r * 0.35, cy: y - r * 0.35, r: r * 0.28, fill: '#fff', opacity: 0.9 });
+});
+
+// ---------- foreground liquid: the melting bubble drip (clipped to top post) + the pour through the fake bar ----------
+const dg = el('linearGradient', { id: 'dripg', gradientUnits: 'userSpaceOnUse', x1: D0[0], y1: D0[1], x2: PCX - 120, y2: 446 }, defs);
+[['0', '#6E4FC2'], ['0.5', '#5552CB'], ['1', '#3D55CF']].forEach(([o, c]) => el('stop', { offset: o, 'stop-color': c }, dg));
+const dripD = ribbon(drip, t => 30 + 4 * Math.sin(t * Math.PI) + 34 * t * t);
+el('path', { d: dripD, fill: 'rgba(40,20,90,0.25)', filter: 'url(#b8)', transform: 'translate(6 10)' }, gTop);
+el('path', { d: dripD, fill: 'url(#dripg)' }, gTop);
+el('circle', { cx: D0[0], cy: D0[1], r: 15, fill: '#6E4FC2' }, gTop);
+el('path', { d: centerline(drip, -8), fill: 'none', stroke: '#fff', 'stroke-opacity': 0.55, 'stroke-width': 4, 'stroke-linecap': 'round', filter: 'url(#b2)' }, gTop);
+// little drips hanging off the bubble's lower edge
+[['d1', 34], ['d2', 22]].forEach(([id, len]) => {
+  const [x, y0] = pt_(id);
+  const p = [[x, y0 - 4], [x, y0 + len * 0.4], [x, y0 + len * 0.8], [x, y0 + len]];
+  el('path', { d: ribbon(p, t => 16 - 7 * t), fill: '#5D4BC4' }, gTop);
+  el('circle', { cx: x, cy: y0 + len + 3, r: 7, fill: '#5D4BC4' }, gTop);
+  el('circle', { cx: x - 2, cy: y0 + len + 1, r: 2, fill: '#fff', opacity: 0.8 }, gTop);
+});
+
+// the pour: off the table edge, through the fake Instagram row, into the Housing bar
+const pour = [[SX, 486], [SX + 2, 640], [SX - 1, 820], [SX, housing.top + 6]];
+const pourD = ribbon(pour, t => 30 * Math.pow(1 - t, 2.5) + 20 + 3 * Math.sin(t * 40) * t, 0.6);
+el('path', { d: pourD, fill: 'url(#liq)', opacity: 0.55, filter: 'url(#b16)' }, gPour);       // glow
+el('path', { d: pourD, fill: 'url(#liq)' }, gPour);
+el('path', { d: centerline(pour, -5), fill: 'none', stroke: '#fff', 'stroke-opacity': 0.5, 'stroke-width': 3, filter: 'url(#b2)' }, gPour);
+el('path', { d: centerline(pour, 6), fill: 'none', stroke: 'rgba(20,0,60,0.25)', 'stroke-width': 3, filter: 'url(#b2)' }, gPour);
+
+// Housing bar filled with the liquid (the "cup")
+const hb = housing, r = 20;
+const barPath = `M${hb.x} ${hb.top + r} Q${hb.x} ${hb.top} ${hb.x + r} ${hb.top} L${hb.x + hb.w - r} ${hb.top} Q${hb.x + hb.w} ${hb.top} ${hb.x + hb.w} ${hb.top + r} L${hb.x + hb.w} ${hb.bottom - 10} Q${hb.x + hb.w} ${hb.bottom} ${hb.x + hb.w - 10} ${hb.bottom} L${hb.x + 10} ${hb.bottom} Q${hb.x} ${hb.bottom} ${hb.x} ${hb.bottom - 10} Z`;
+el('path', { d: barPath, fill: 'url(#liq)', opacity: 0.45, filter: 'url(#b24)', transform: 'translate(0 18)' });
+el('path', { d: barPath, fill: 'url(#liq)' });
+const gloss = el('linearGradient', { id: 'gloss', x1: 0, y1: 0, x2: 1, y2: 0 }, defs);
+[['0', 'rgba(255,255,255,0.0)'], ['0.18', 'rgba(255,255,255,0.45)'], ['0.32', 'rgba(255,255,255,0.0)'], ['0.85', 'rgba(255,255,255,0.0)'], ['1', 'rgba(255,255,255,0.18)']].forEach(([o, c]) => el('stop', { offset: o, 'stop-color': c }, gloss));
+el('path', { d: barPath, fill: 'url(#gloss)' });
+// splash + ripples where the pour lands
+el('ellipse', { cx: SX, cy: hb.top + 8, rx: 46, ry: 7, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.7, 'stroke-width': 2.5 });
+el('ellipse', { cx: SX, cy: hb.top + 9, rx: 30, ry: 4, fill: '#fff', opacity: 0.35, filter: 'url(#b2)' });
+[[-30, -16, 4], [26, -22, 5], [40, -8, 3], [-44, -6, 3]].forEach(([dx, dy, rr]) => el('circle', { cx: SX + dx, cy: hb.top + dy, r: rr, fill: 'url(#liq)' }));
+// percentage label for the liquid bar, in white inside the bar
+const pt = el('text', { x: SX, y: hb.top + 60, 'text-anchor': 'middle', fill: '#fff', 'font-family': 'Inter', 'font-weight': 700, 'font-size': 30 });
+pt.textContent = '32%';
+
+}
+window.ready = document.fonts.ready.then(() => { build(); return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); });
+</script>
+</body>
+</html>
