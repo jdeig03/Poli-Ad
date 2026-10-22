@@ -26,13 +26,13 @@
   #bottom { top: 812px; height: 538px;
     background: radial-gradient(120% 90% at 50% 60%, #FFFFFF 0%, #F6F4FA 55%, #ECE8F3 100%); }
 
-  .tag { position: absolute; display: flex; align-items: center; gap: 10px; padding: 10px 18px 10px 14px; border-radius: 999px;
+  .tag { position: absolute; display: flex; align-items: center; gap: 12px; padding: 13px 24px 13px 18px; border-radius: 999px;
     background: rgba(255,255,255,0.78); border: 1px solid rgba(122,79,184,0.18); box-shadow: 0 6px 18px rgba(60,40,120,0.08);
-    font: 700 19px 'Inter'; letter-spacing: 0.12em; color: #3B3850; text-transform: uppercase; }
-  .tag i { width: 10px; height: 10px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--red)); }
+    font: 800 25px 'InterDisplay'; letter-spacing: 0.1em; color: #14131C; text-transform: uppercase; }
+  .tag i { width: 14px; height: 14px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--red)); }
   .brandtag { text-transform: none; letter-spacing: 0; font: 700 22px 'Inter'; color: var(--ink); padding: 7px 20px 7px 8px; }
   .brandtag img { width: 34px; height: 34px; border-radius: 50%; }
-  .tag span { font-weight: 500; letter-spacing: 0.02em; text-transform: none; color: var(--muted); }
+  .tag span { font: 500 22px 'Inter'; letter-spacing: 0.01em; text-transform: none; color: var(--muted); }
 
   /* ---------- phone ---------- */
   #phone { position: absolute; left: 70px; top: -160px; width: 520px; height: 1040px; border-radius: 86px;
@@ -165,8 +165,8 @@
 
   <!-- BOTTOM "POST": the campaign -->
   <div class="studio" id="bottom">
-    <div class="tag" style="left:34px; top:18px"><i></i>The campaign <span>· same moment</span></div>
-    <div class="tag brandtag" style="left:520px; top:18px"><img src="poli-orb.png">Askpoli.us</div>
+    <div class="tag" style="left:34px; top:9px"><i></i>The campaign <span>· same moment</span></div>
+    <div class="tag brandtag" style="left:590px; top:12px"><img src="poli-orb.png">Askpoli.us</div>
   </div>
   <div id="card">
     <div class="bars" id="bars"></div>
@@ -324,7 +324,7 @@ el('path', { d: tongue, fill: 'url(#liq)' }, gOut);
 el('path', { d: pourD, fill: 'url(#liq)' }, gOut);
 el('path', { d: barD, fill: 'url(#liq)' }, gOut);
 // splash droplets thrown up where the stream lands
-[[-34, -22, 6], [30, -30, 7], [46, -12, 4], [-50, -8, 4], [12, -44, 4]].forEach(([dx, dy, rr]) => el('circle', { cx: SX + dx, cy: hb.top + dy, r: rr, fill: 'url(#liq)' }, gOut));
+[[-62, -20, 8], [58, -30, 9], [76, -8, 6], [-44, -46, 6], [36, -58, 5]].forEach(([dx, dy, rr]) => el('circle', { cx: SX + dx, cy: hb.top + dy, r: rr, fill: 'url(#liq)' }, gOut));
 // surface reflections (studio softbox) + thin, see-through edges, clipped to the liquid
 const cp = el('clipPath', { id: 'pudClip' }, defs); el('path', { d: pud }, cp); el('path', { d: spillD }, cp); el('path', { d: tongue }, cp);
 const refl = el('g', { 'clip-path': 'url(#pudClip)' });
