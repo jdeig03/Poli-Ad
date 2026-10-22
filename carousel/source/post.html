@@ -57,10 +57,11 @@
   .chathead p { font: 500 18px 'Inter'; color: var(--muted); display: flex; align-items: center; gap: 8px; margin-top: 3px; }
   .chathead p em { font-style: normal; font: 700 13px 'Inter'; color: #5B3FA6; background: #EEE7FA; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.06em; }
   .ts { text-align: center; font: 500 17px 'Inter'; color: #9A96AA; margin: 20px 0 14px; }
-  #ask { position: relative; margin-left: auto; width: 360px; padding: 22px 26px; border-radius: 30px 30px 8px 30px;
-    background: linear-gradient(135deg, #2A5BE0 0%, #5B4FD0 60%, #7A4FB8 100%); color: #fff; font: 600 31px/1.25 'Inter';
-    box-shadow: 0 10px 24px rgba(42,91,224,0.3); }
-  .reply { margin-top: 18px; width: 380px; padding: 20px 24px; border-radius: 30px 30px 30px 8px; background: #EFEDF5; color: var(--ink); font: 500 23px/1.38 'Inter'; }
+  #ask { position: relative; z-index: 3; margin-left: auto; width: 360px; padding: 22px 26px; border-radius: 30px 30px 8px 30px;
+    background: transparent; color: #fff; font: 600 31px/1.25 'Inter'; text-shadow: 0 1px 2px rgba(20,10,80,0.25); }
+  .reply { position: relative; }
+  #meltIn { position: absolute; left: 0; top: 0; }
+  .reply { margin-top: 46px; width: 380px; padding: 20px 24px; border-radius: 30px 30px 30px 8px; background: #EFEDF5; color: var(--ink); font: 500 23px/1.38 'Inter'; }
   .src { display: inline-flex; gap: 8px; align-items: center; margin-top: 12px; font: 600 17px 'Inter'; color: #5B3FA6; background: #fff; border: 1px solid #E1DAF2; padding: 7px 12px; border-radius: 10px; }
 
   /* ---------- fake Instagram row ---------- */
@@ -127,9 +128,10 @@
         </div>
         <div class="site"><div><b>ALEX RIVERA</b><small>FOR CITY COUNCIL</small></div><div class="donate">DONATE</div></div>
         <div class="chat">
+          <svg id="meltIn" width="488" height="1008" style="position:absolute;left:-22px;top:-262px;z-index:2;pointer-events:none"></svg>
           <div class="chathead"><div class="av">A</div><div><h3>Ask Alex Rivera</h3><p><em>AI</em>Answers from Alex's campaign</p></div></div>
           <div class="ts">Today 11:47 PM</div>
-          <div id="ask">What will you do about rent increases?<i id="askCorner" style="position:absolute;right:14px;bottom:6px;width:1px;height:1px"></i><i id="d1" style="position:absolute;right:70px;bottom:0;width:1px;height:1px"></i><i id="d2" style="position:absolute;right:150px;bottom:0;width:1px;height:1px"></i></div>
+          <div id="ask">What will you do about rent increases?</div>
           <div class="reply">Alex's housing plan has three parts: more homes near transit, a renter relief fund, and faster permits for affordable units.
             <div class="src"><svg width="14" height="17" viewBox="0 0 14 17"><path d="M2 1h7l4 4v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="none" stroke="#5B3FA6" stroke-width="1.8"/></svg>From Alex's Housing Plan</div>
           </div>
@@ -150,7 +152,7 @@
     </div>
     <div class="who">
       <div class="ring"><div><img src="poli-orb.png"></div></div>
-      <div><h4>askpoli</h4><p>Asked at 11:47 PM. Answered at 11:47 PM.</p></div>
+      <div><h4>askpolius</h4><p>Asked at 11:47 PM. Answered at 11:47 PM.</p></div>
       <div class="more"><i></i><i></i><i></i></div>
     </div>
   </div>
@@ -195,140 +197,159 @@ DATA.forEach(([name, v], i) => {
 // chart labels sit inside the bar area bottom; move the bar block up a little to make room
 document.querySelectorAll('.lab').forEach(l => l.style.top = '334px');
 
-// ---------- shared liquid gradient (blue at the phone -> purple through the bar -> red in the chart) ----------
-const defs = el('defs', {});
-const lg = el('linearGradient', { id: 'liq', gradientUnits: 'userSpaceOnUse', x1: 0, y1: 230, x2: 0, y2: 1230 }, defs);
-[['0', '#2A5BE0'], ['0.28', '#4B53C6'], ['0.5', '#7A4FB8'], ['0.75', '#B2407F'], ['1', '#DC3547']].forEach(([o, c]) => el('stop', { offset: o, 'stop-color': c }, lg));
-const blur = (id, s) => { const f = el('filter', { id, filterUnits: 'userSpaceOnUse', x: -100, y: -100, width: 1280, height: 1550 }, defs); el('feGaussianBlur', { stdDeviation: s }, f); };
-blur('b2', 2); blur('b4', 4); blur('b8', 8); blur('b16', 16); blur('b24', 24);
-const clipTop = el('clipPath', { id: 'clipTop' }, defs); el('rect', { x: 0, y: 0, width: 1080, height: 515 }, clipTop);
+// ---------- liquid rendering ----------
+// One "goo" body per layer (pieces fuse with natural necks) lit as a 3D surface:
+// the alpha is blurred into a height map, then diffuse + specular lighting give it real gloss and depth.
+function liquidFilter(parent, id, w, h) {
+  const f = el('filter', { id, filterUnits: 'userSpaceOnUse', x: -60, y: -60, width: w + 120, height: h + 120, 'color-interpolation-filters': 'sRGB' }, parent);
+  el('feGaussianBlur', { in: 'SourceGraphic', stdDeviation: 6, result: 'b' }, f);
+  el('feColorMatrix', { in: 'b', type: 'matrix', values: '1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 30 -13', result: 'goo' }, f);
+  el('feGaussianBlur', { in: 'goo', stdDeviation: 5, result: 'hm' }, f);
+  const d = el('feDiffuseLighting', { in: 'hm', surfaceScale: 5, diffuseConstant: 1.15, 'lighting-color': '#ffffff', result: 'diff' }, f);
+  el('feDistantLight', { azimuth: 225, elevation: 52 }, d);
+  el('feComposite', { in: 'goo', in2: 'diff', operator: 'arithmetic', k1: 0.78, k2: 0.16, k3: 0, k4: 0, result: 'shaded' }, f);
+  const sp = el('feSpecularLighting', { in: 'hm', surfaceScale: 6, specularConstant: 0.75, specularExponent: 45, 'lighting-color': '#ffffff', result: 'spec' }, f);
+  el('feDistantLight', { azimuth: 225, elevation: 48 }, sp);
+  el('feComposite', { in: 'spec', in2: 'goo', operator: 'in', result: 'specIn' }, f);
+  // a second, tighter highlight = the sharp "wet" glint
+  const sp2 = el('feSpecularLighting', { in: 'hm', surfaceScale: 8, specularConstant: 1.0, specularExponent: 110, 'lighting-color': '#ffffff', result: 'spec2' }, f);
+  el('fePointLight', { x: w * 0.25, y: -h * 0.2, z: 500 }, sp2);
+  el('feComposite', { in: 'spec2', in2: 'goo', operator: 'in', result: 'spec2In' }, f);
+  el('feComposite', { in: 'shaded', in2: 'specIn', operator: 'arithmetic', k1: 0, k2: 1, k3: 0.55, k4: 0, result: 'lit' }, f);
+  el('feComposite', { in: 'lit', in2: 'spec2In', operator: 'arithmetic', k1: 0, k2: 1, k3: 0.6, k4: 0 }, f);
+}
+function grad(parent, id, x1, y1, x2, y2, stops) {
+  const g = el('linearGradient', { id, gradientUnits: 'userSpaceOnUse', x1, y1, x2, y2 }, parent);
+  stops.forEach(([o, c]) => el('stop', { offset: o, 'stop-color': c }, g));
+}
+const blurF = (parent, id, s) => { const f = el('filter', { id, filterUnits: 'userSpaceOnUse', x: -100, y: -100, width: 1300, height: 1600 }, parent); el('feGaussianBlur', { stdDeviation: s }, f); };
 
-// tapered ribbon along a cubic bezier: width w(t)
 function bez(p, t) { const a = 1 - t; return [0, 1].map(k => a*a*a*p[0][k] + 3*a*a*t*p[1][k] + 3*a*t*t*p[2][k] + t*t*t*p[3][k]); }
 function ribbon(p, wfn, wob = 0) {
   const n = 120, L = [], R = [];
   for (let i = 0; i <= n; i++) {
     const t = i / n, c = bez(p, t), c2 = bez(p, Math.min(1, t + 0.001)), c1 = bez(p, Math.max(0, t - 0.001));
     let dx = c2[0] - c1[0], dy = c2[1] - c1[1]; const len = Math.hypot(dx, dy) || 1; dx /= len; dy /= len;
-    const w = wfn(t) / 2 + wob * Math.sin(t * 23) ;
+    const w = wfn(t) / 2 + wob * Math.sin(t * 23);
     L.push([c[0] - dy * w, c[1] + dx * w]); R.push([c[0] + dy * w, c[1] - dx * w]);
   }
-  const pts = L.concat(R.reverse());
-  return 'M' + pts.map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L') + ' Z';
+  return 'M' + L.concat(R.reverse()).map(q => q[0].toFixed(1) + ' ' + q[1].toFixed(1)).join(' L') + ' Z';
 }
-function centerline(p, off = 0) {
-  let d = ''; for (let i = 0; i <= 80; i++) { const c = bez(p, i / 80); d += (i ? ' L' : 'M') + (c[0] + off).toFixed(1) + ' ' + c[1].toFixed(1); } return d;
-}
-
-// ---------- geometry from the laid-out page ----------
-const askR = document.getElementById('ask').getBoundingClientRect();
-const phoneR = document.getElementById('phone').getBoundingClientRect();
-const housing = barGeom[4];
-const SX = housing.x + housing.w / 2;           // stream x = centre of the Housing bar
-const PCX = 815, PCY = 446;                    // puddle centre
-
-// melting question bubble -> over the phone's left edge -> onto the table
-const pt_ = id => { const q = document.getElementById(id).getBoundingClientRect(); return [q.left, q.top]; };
-const D0 = pt_('askCorner');
-const drip = [D0, [D0[0] + 36, D0[1] + 26], [D0[0] + 80, 452], [PCX - 120, 446]];
-
-// ---------- puddle (behind the phone, on the top "post") ----------
-const gTop = el('g', { 'clip-path': 'url(#clipTop)' });   // drip (under the puddle)
-const gPour = el('g', {});                                 // pour (its top tucks under the puddle)
-const pl = el('g', { 'clip-path': 'url(#clipTop)' });     // puddle
-const pel = (tag, attrs, parent) => el(tag, attrs, parent || pl);
-const pdefs = pel('defs', {});
-const pg = pel('linearGradient', { id: 'pliq', gradientUnits: 'userSpaceOnUse', x1: 0, y1: 230, x2: 0, y2: 1230 }, pdefs);
-[['0', '#2A5BE0'], ['0.28', '#4B53C6'], ['0.5', '#7A4FB8'], ['0.75', '#B2407F'], ['1', '#DC3547']].forEach(([o, c]) => pel('stop', { offset: o, 'stop-color': c }, pg));
-const prg = pel('radialGradient', { id: 'pshine', cx: '40%', cy: '35%', r: '70%' }, pdefs);
-pel('stop', { offset: 0, 'stop-color': '#fff', 'stop-opacity': 0.45 }, prg); pel('stop', { offset: 1, 'stop-color': '#fff', 'stop-opacity': 0 }, prg);
-['pb3', 3, 'pb10', 10, 'pb18', 18].reduce((a, v, i, arr) => { if (i % 2 === 0) { const f = pel('filter', { id: arr[i], filterUnits: 'userSpaceOnUse', x: -100, y: -100, width: 1280, height: 1550 }, pdefs); pel('feGaussianBlur', { stdDeviation: arr[i + 1] }, f); } return a; }, 0);
-
-// organic puddle outline
-function blob(cx, cy, rx, ry, seed, lobes) {
+function blob(cx, cy, rx, ry, seed, lobes, amp = 0.10) {
   let s = seed; const r = () => { s = (s * 9301 + 49297) % 233280; return s / 233280; };
-  const amps = Array.from({ length: lobes }, () => [r() * 0.10, r() * Math.PI * 2]);
+  const amps = Array.from({ length: lobes }, () => [r() * amp, r() * Math.PI * 2]);
   const pts = [];
   for (let i = 0; i < 72; i++) {
-    const a = i / 72 * Math.PI * 2;
-    let k = 1; amps.forEach(([am, ph], j) => k += am * Math.sin(a * (j + 2) + ph));
+    const a = i / 72 * Math.PI * 2; let k = 1;
+    amps.forEach(([am, ph], j) => k += am * Math.sin(a * (j + 2) + ph));
     pts.push([cx + Math.cos(a) * rx * k, cy + Math.sin(a) * ry * k]);
   }
-  // smooth closed path through points (Catmull-Rom -> bezier)
   let d = `M${pts[0][0]} ${pts[0][1]}`;
   for (let i = 0; i < pts.length; i++) {
-    const p0 = pts[(i - 1 + pts.length) % pts.length], p1 = pts[i], p2 = pts[(i + 1) % pts.length], p3 = pts[(i + 2) % pts.length];
+    const p0 = pts[(i - 1 + 72) % 72], p1 = pts[i], p2 = pts[(i + 1) % 72], p3 = pts[(i + 2) % 72];
     d += ` C${p1[0] + (p2[0] - p0[0]) / 6} ${p1[1] + (p2[1] - p0[1]) / 6} ${p2[0] - (p3[0] - p1[0]) / 6} ${p2[1] - (p3[1] - p1[1]) / 6} ${p2[0]} ${p2[1]}`;
   }
   return d + 'Z';
 }
-const pud = blob(PCX, PCY, 228, 56, 23, 5);
-// tongue of liquid running off the bottom edge where the pour starts
-const tongue = ribbon([[SX - 24, 440], [SX - 8, 472], [SX, 496], [SX, 530]], t => 120 - 74 * t);
-pel('path', { d: pud, fill: 'rgba(40,20,90,0.35)', filter: 'url(#pb18)', transform: 'translate(0 16)' }); // contact shadow
-pel('path', { d: tongue, fill: 'rgba(40,20,90,0.30)', filter: 'url(#pb10)', transform: 'translate(0 10)' });
-pel('path', { d: pud, fill: 'url(#pliq)' });
-pel('path', { d: tongue, fill: 'url(#pliq)' });
-pel('path', { d: pud, fill: 'url(#pshine)' });
-// depth: darker meniscus just inside the edge, lighter thin rim right at the edge
-const pclip = pel('clipPath', { id: 'pclip' }, pdefs); pel('path', { d: pud }, pclip); pel('path', { d: tongue }, pclip);
-const pin = pel('g', { 'clip-path': 'url(#pclip)' });
-pel('path', { d: pud, fill: 'none', stroke: 'rgba(16,8,60,0.55)', 'stroke-width': 34, filter: 'url(#pb10)' }, pin);
-pel('path', { d: tongue, fill: 'none', stroke: 'rgba(16,8,60,0.45)', 'stroke-width': 26, filter: 'url(#pb10)' }, pin);
-pel('path', { d: pud, fill: 'none', stroke: 'rgba(255,255,255,0.55)', 'stroke-width': 2.5, filter: 'url(#pb3)', transform: 'translate(0 -2)' }, pin);
-// softbox reflection: long soft white streak across the surface
-pel('path', { d: `M${PCX - 190} ${PCY - 18} Q${PCX} ${PCY - 44} ${PCX + 170} ${PCY - 26}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.75, 'stroke-width': 10, 'stroke-linecap': 'round', filter: 'url(#pb3)' }, pin);
-pel('path', { d: `M${PCX - 120} ${PCY + 22} Q${PCX + 10} ${PCY + 8} ${PCX + 120} ${PCY + 20}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.25, 'stroke-width': 14, 'stroke-linecap': 'round', filter: 'url(#pb10)' }, pin);
-pel('path', { d: pud, fill: 'none', stroke: 'rgba(20,10,70,0.35)', 'stroke-width': 2, filter: 'url(#pb3)' });
-// glossy highlights + a few bubbles on the surface
-[[PCX - 160, PCY - 8, 22, 4, .8], [PCX + 120, PCY - 30, 30, 4, .7]].forEach(([x, y, rx, ry, o]) =>
-  pel('ellipse', { cx: x, cy: y, rx, ry, fill: '#fff', opacity: o, filter: 'url(#pb3)' }));
-[[PCX - 60, PCY - 4, 7], [PCX - 30, PCY + 6, 4], [PCX + 90, PCY - 10, 5], [PCX + 110, PCY + 2, 3], [PCX - 200, PCY + 10, 5], [PCX + 6, PCY - 14, 3]].forEach(([x, y, r]) => {
-  pel('circle', { cx: x, cy: y, r, fill: 'none', stroke: 'rgba(255,255,255,0.75)', 'stroke-width': 1.6 });
-  pel('circle', { cx: x - r * 0.35, cy: y - r * 0.35, r: r * 0.28, fill: '#fff', opacity: 0.9 });
+const drop = (x, y0, len, w, parent, fill) => {                  // a hanging drip: neck + rounded bead
+  el('path', { d: ribbon([[x, y0 - 12], [x, y0 + len * 0.35], [x + 1, y0 + len * 0.75], [x, y0 + len]], t => w * (1 - 0.45 * t)), fill }, parent);
+  el('circle', { cx: x, cy: y0 + len, r: w * 0.62, fill }, parent);
+};
+
+// ---------- layer 1: the bubble melting, inside the phone screen (screen-local coordinates) ----------
+const mi = document.getElementById('meltIn');
+const ask = document.getElementById('ask'), chat = ask.parentElement;
+const bx = chat.offsetLeft + ask.offsetLeft, by = chat.offsetTop + ask.offsetTop, bw = ask.offsetWidth, bh = ask.offsetHeight;
+const SW = 488;
+const mdefs = el('defs', {}, mi);
+grad(mdefs, 'bub', bx, by, bx + bw, by + bh, [['0', '#2A5BE0'], ['0.6', '#5B4FD0'], ['1', '#7A4FB8']]);
+liquidFilter(mdefs, 'liqIn', 488, 1008);
+blurF(mdefs, 'sIn', 10);
+const bubD = `M${bx + 30} ${by} H${bx + bw - 30} Q${bx + bw} ${by} ${bx + bw} ${by + 30} V${bx ? by + bh - 8 : 0} Q${bx + bw} ${by + bh} ${bx + bw - 8} ${by + bh} H${bx + 30} Q${bx} ${by + bh} ${bx} ${by + bh - 30} V${by + 30} Q${bx} ${by} ${bx + 30} ${by} Z`;
+// soft coloured shadow on the screen under the bubble and its drips
+const shIn = el('g', { filter: 'url(#sIn)', opacity: 0.35, transform: 'translate(0 10)' }, mi);
+el('path', { d: bubD, fill: '#2A4FD0' }, shIn);
+const gIn = el('g', { filter: 'url(#liqIn)' }, mi);
+el('path', { d: bubD, fill: 'url(#bub)' }, gIn);
+// the lower edge sags: soft bulges just below it
+[[0.18, 7, 12], [0.40, 10, 15], [0.62, 6, 12], [0.80, 9, 14]].forEach(([f, dy, rr]) => el('ellipse', { cx: bx + bw * f, cy: by + bh + dy - 6, rx: rr * 1.8, ry: rr, fill: 'url(#bub)' }, gIn));
+// hanging drips of different lengths, one letting go of a droplet
+drop(bx + bw * 0.24, by + bh, 20, 20, gIn, 'url(#bub)');
+drop(bx + bw * 0.47, by + bh, 36, 24, gIn, 'url(#bub)');
+el('ellipse', { cx: bx + bw * 0.47 + 1, cy: by + bh + 66, rx: 8, ry: 10, fill: 'url(#bub)' }, gIn);
+drop(bx + bw * 0.66, by + bh, 14, 18, gIn, 'url(#bub)');
+// the bottom-right corner spills sideways off the screen edge
+el('path', { d: ribbon([[bx + bw - 40, by + bh - 20], [bx + bw, by + bh + 4], [SW - 14, by + bh + 22], [SW + 20, by + bh + 46]], t => 46 + 10 * t), fill: 'url(#bub)' }, gIn);
+
+// screen-local -> page coordinates (phone: left 70, top -160, 520x1040, rotated 9deg about its centre)
+const PH = { x: 70, y: -160, w: 520, h: 1040, a: 9 * Math.PI / 180 };
+const toPage = (sx, sy) => { const px = sx + 16 - PH.w / 2, py = sy + 16 - PH.h / 2;
+  return [PH.x + PH.w / 2 + px * Math.cos(PH.a) - py * Math.sin(PH.a), PH.y + PH.h / 2 + px * Math.sin(PH.a) + py * Math.cos(PH.a)]; };
+
+// ---------- layer 2: spill over the bezel, puddle, pour, filled bar (page coordinates) ----------
+const housing = barGeom[4];
+const SX = housing.x + housing.w / 2;
+const PCX = 815, PCY = 448;
+const defs = el('defs', {});
+// colour follows the liquid's journey: the bubble's purple -> indigo puddle -> purple pour -> red in the chart
+grad(defs, 'liq', 0, 330, 0, 1190, [['0', '#6B4FC3'], ['0.16', '#5352CA'], ['0.34', '#6450C3'], ['0.56', '#9A4590'], ['0.78', '#C23C62'], ['1', '#DC3547']]);
+liquidFilter(defs, 'liqOut', 1080, 1350);
+blurF(defs, 'b2x', 1.5); blurF(defs, 'b6', 6); blurF(defs, 'b14', 14); blurF(defs, 'b22', 22);
+
+const S0 = toPage(SW - 30, by + bh + 30);      // starts just inside the screen so it overlaps the in-screen spill
+const spill = [S0, [S0[0] + 40, S0[1] + 18], [PCX - 175, PCY - 26], [PCX - 110, PCY - 4]];
+const spillD = ribbon(spill, t => 44 + 4 * Math.sin(t * Math.PI) + 26 * t * t);
+const pud = blob(PCX, PCY, 222, 54, 23, 5, 0.09);
+const tongue = ribbon([[SX - 24, PCY - 6], [SX - 8, 474], [SX, 496], [SX, 528]], t => 110 - 64 * t);
+const pour = [[SX, 480], [SX + 2, 640], [SX - 1, 820], [SX, housing.top + 4]];
+const pourD = ribbon(pour, t => 28 * Math.pow(1 - t, 2.5) + 22 + 2.5 * Math.sin(t * 38) * t, 0.5);
+const hb = housing;
+// liquid filling the Housing bar, with a meniscus and a raised crown where the pour hits
+let barD = `M${hb.x} ${hb.top + 14}`;
+for (let i = 0; i <= 24; i++) { const x = hb.x + hb.w * i / 24, dx = (x - SX) / 34; barD += ` L${x.toFixed(1)} ${(hb.top + 10 - 9 * Math.exp(-dx * dx) + 2 * Math.sin(i * 1.3)).toFixed(1)}`; }
+barD += ` L${hb.x + hb.w} ${hb.bottom - 12} Q${hb.x + hb.w} ${hb.bottom} ${hb.x + hb.w - 12} ${hb.bottom} L${hb.x + 12} ${hb.bottom} Q${hb.x} ${hb.bottom} ${hb.x} ${hb.bottom - 12} Z`;
+
+// coloured, translucent shadows: light passing through tinted liquid onto the white table / card
+const shOut = el('g', { opacity: 0.42 });
+el('path', { d: pud, fill: '#4B3FD0', filter: 'url(#b14)', transform: 'translate(10 20)' }, shOut);
+el('path', { d: spillD, fill: '#4B3FD0', filter: 'url(#b14)', transform: 'translate(10 18)' }, shOut);
+el('path', { d: pud, fill: '#1E1550', filter: 'url(#b6)', transform: 'translate(3 6)', opacity: 0.55 }, shOut);
+el('ellipse', { cx: PCX - 20, cy: PCY + 40, rx: 120, ry: 12, fill: '#9C8CFF', filter: 'url(#b14)', opacity: 0.6 }, shOut);   // caustic
+el('path', { d: barD, fill: '#C23C62', filter: 'url(#b22)', transform: 'translate(0 20)', opacity: 0.6 });
+el('path', { d: pourD, fill: '#7A4FB8', filter: 'url(#b22)', opacity: 0.55 });   // glow of the stream over the dark row
+
+const gOut = el('g', { filter: 'url(#liqOut)' });
+el('path', { d: spillD, fill: 'url(#liq)' }, gOut);
+el('path', { d: pud, fill: 'url(#liq)' }, gOut);
+el('path', { d: tongue, fill: 'url(#liq)' }, gOut);
+el('path', { d: pourD, fill: 'url(#liq)' }, gOut);
+el('path', { d: barD, fill: 'url(#liq)' }, gOut);
+// splash droplets thrown up where the stream lands
+[[-34, -22, 6], [30, -30, 7], [46, -12, 4], [-50, -8, 4], [12, -44, 4]].forEach(([dx, dy, rr]) => el('circle', { cx: SX + dx, cy: hb.top + dy, r: rr, fill: 'url(#liq)' }, gOut));
+// surface reflections (studio softbox) + thin, see-through edges, clipped to the liquid
+const cp = el('clipPath', { id: 'pudClip' }, defs); el('path', { d: pud }, cp); el('path', { d: spillD }, cp); el('path', { d: tongue }, cp);
+const refl = el('g', { 'clip-path': 'url(#pudClip)' });
+el('path', { d: pud, fill: 'none', stroke: '#ffffff', 'stroke-opacity': 0.35, 'stroke-width': 22, filter: 'url(#b6)' }, refl);     // thin edge lets the table show through
+el('path', { d: `M${PCX - 175} ${PCY - 14} C${PCX - 80} ${PCY - 40} ${PCX + 60} ${PCY - 42} ${PCX + 175} ${PCY - 22}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.8, 'stroke-width': 9, 'stroke-linecap': 'round', filter: 'url(#b6)' }, refl);
+el('path', { d: `M${PCX - 120} ${PCY + 18} C${PCX - 40} ${PCY + 8} ${PCX + 40} ${PCY + 8} ${PCX + 130} ${PCY + 16}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.28, 'stroke-width': 16, 'stroke-linecap': 'round', filter: 'url(#b14)' }, refl);
+el('ellipse', { cx: PCX + 40, cy: PCY + 4, rx: 150, ry: 26, fill: '#241a6e', opacity: 0.22, filter: 'url(#b14)' }, refl);           // deeper colour in the middle
+// the bar: a tall softbox reflection down its left side, like a glass of liquid
+const cb = el('clipPath', { id: 'barClip' }, defs); el('path', { d: barD }, cb);
+const rb = el('g', { 'clip-path': 'url(#barClip)' });
+el('rect', { x: hb.x + 16, y: hb.top + 26, width: 12, height: hb.bottom - hb.top - 46, rx: 6, fill: '#fff', opacity: 0.55, filter: 'url(#b6)' }, rb);
+el('rect', { x: hb.x + hb.w - 22, y: hb.top + 30, width: 8, height: hb.bottom - hb.top - 60, rx: 4, fill: '#fff', opacity: 0.22, filter: 'url(#b6)' }, rb);
+// the stream: a fine bright core highlight
+const cs = el('clipPath', { id: 'streamClip' }, defs); el('rect', { x: 0, y: 522, width: 1080, height: 900 }, cs);
+el('path', { d: ribbon(pour, t => 3 + 2 * (1 - t)), fill: '#fff', opacity: 0.45, filter: 'url(#b2x)', transform: 'translate(-6 0)', 'clip-path': 'url(#streamClip)' });
+// a few tiny air bubbles trapped in the puddle
+[[PCX - 70, PCY - 6, 5], [PCX + 80, PCY - 12, 4], [PCX + 104, PCY - 2, 2.5], [PCX - 170, PCY + 6, 3.5]].forEach(([x, y, rr]) => {
+  el('circle', { cx: x, cy: y, r: rr, fill: 'none', stroke: 'rgba(255,255,255,0.6)', 'stroke-width': 1.3 });
+  el('circle', { cx: x - rr * 0.35, cy: y - rr * 0.35, r: rr * 0.3, fill: '#fff', opacity: 0.85 });
 });
 
-// ---------- foreground liquid: the melting bubble drip (clipped to top post) + the pour through the fake bar ----------
-const dg = el('linearGradient', { id: 'dripg', gradientUnits: 'userSpaceOnUse', x1: D0[0], y1: D0[1], x2: PCX - 120, y2: 446 }, defs);
-[['0', '#6E4FC2'], ['0.5', '#5552CB'], ['1', '#3D55CF']].forEach(([o, c]) => el('stop', { offset: o, 'stop-color': c }, dg));
-const dripD = ribbon(drip, t => 30 + 4 * Math.sin(t * Math.PI) + 34 * t * t);
-el('path', { d: dripD, fill: 'rgba(40,20,90,0.25)', filter: 'url(#b8)', transform: 'translate(6 10)' }, gTop);
-el('path', { d: dripD, fill: 'url(#dripg)' }, gTop);
-el('circle', { cx: D0[0], cy: D0[1], r: 15, fill: '#6E4FC2' }, gTop);
-el('path', { d: centerline(drip, -8), fill: 'none', stroke: '#fff', 'stroke-opacity': 0.55, 'stroke-width': 4, 'stroke-linecap': 'round', filter: 'url(#b2)' }, gTop);
-// little drips hanging off the bubble's lower edge
-[['d1', 34], ['d2', 22]].forEach(([id, len]) => {
-  const [x, y0] = pt_(id);
-  const p = [[x, y0 - 4], [x, y0 + len * 0.4], [x, y0 + len * 0.8], [x, y0 + len]];
-  el('path', { d: ribbon(p, t => 16 - 7 * t), fill: '#5D4BC4' }, gTop);
-  el('circle', { cx: x, cy: y0 + len + 3, r: 7, fill: '#5D4BC4' }, gTop);
-  el('circle', { cx: x - 2, cy: y0 + len + 1, r: 2, fill: '#fff', opacity: 0.8 }, gTop);
-});
-
-// the pour: off the table edge, through the fake Instagram row, into the Housing bar
-const pour = [[SX, 486], [SX + 2, 640], [SX - 1, 820], [SX, housing.top + 6]];
-const pourD = ribbon(pour, t => 30 * Math.pow(1 - t, 2.5) + 20 + 3 * Math.sin(t * 40) * t, 0.6);
-el('path', { d: pourD, fill: 'url(#liq)', opacity: 0.55, filter: 'url(#b16)' }, gPour);       // glow
-el('path', { d: pourD, fill: 'url(#liq)' }, gPour);
-el('path', { d: centerline(pour, -5), fill: 'none', stroke: '#fff', 'stroke-opacity': 0.5, 'stroke-width': 3, filter: 'url(#b2)' }, gPour);
-el('path', { d: centerline(pour, 6), fill: 'none', stroke: 'rgba(20,0,60,0.25)', 'stroke-width': 3, filter: 'url(#b2)' }, gPour);
-
-// Housing bar filled with the liquid (the "cup")
-const hb = housing, r = 20;
-const barPath = `M${hb.x} ${hb.top + r} Q${hb.x} ${hb.top} ${hb.x + r} ${hb.top} L${hb.x + hb.w - r} ${hb.top} Q${hb.x + hb.w} ${hb.top} ${hb.x + hb.w} ${hb.top + r} L${hb.x + hb.w} ${hb.bottom - 10} Q${hb.x + hb.w} ${hb.bottom} ${hb.x + hb.w - 10} ${hb.bottom} L${hb.x + 10} ${hb.bottom} Q${hb.x} ${hb.bottom} ${hb.x} ${hb.bottom - 10} Z`;
-el('path', { d: barPath, fill: 'url(#liq)', opacity: 0.45, filter: 'url(#b24)', transform: 'translate(0 18)' });
-el('path', { d: barPath, fill: 'url(#liq)' });
-const gloss = el('linearGradient', { id: 'gloss', x1: 0, y1: 0, x2: 1, y2: 0 }, defs);
-[['0', 'rgba(255,255,255,0.0)'], ['0.18', 'rgba(255,255,255,0.45)'], ['0.32', 'rgba(255,255,255,0.0)'], ['0.85', 'rgba(255,255,255,0.0)'], ['1', 'rgba(255,255,255,0.18)']].forEach(([o, c]) => el('stop', { offset: o, 'stop-color': c }, gloss));
-el('path', { d: barPath, fill: 'url(#gloss)' });
-// splash + ripples where the pour lands
-el('ellipse', { cx: SX, cy: hb.top + 8, rx: 46, ry: 7, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.7, 'stroke-width': 2.5 });
-el('ellipse', { cx: SX, cy: hb.top + 9, rx: 30, ry: 4, fill: '#fff', opacity: 0.35, filter: 'url(#b2)' });
-[[-30, -16, 4], [26, -22, 5], [40, -8, 3], [-44, -6, 3]].forEach(([dx, dy, rr]) => el('circle', { cx: SX + dx, cy: hb.top + dy, r: rr, fill: 'url(#liq)' }));
-// percentage label for the liquid bar, in white inside the bar
-const pt = el('text', { x: SX, y: hb.top + 60, 'text-anchor': 'middle', fill: '#fff', 'font-family': 'Inter', 'font-weight': 700, 'font-size': 30 });
+// percentage label inside the liquid bar
+const pt = el('text', { x: SX, y: hb.top + 64, 'text-anchor': 'middle', fill: '#fff', 'font-family': 'Inter', 'font-weight': 700, 'font-size': 30 });
 pt.textContent = '32%';
-
 }
 window.ready = document.fonts.ready.then(() => { build(); return new Promise(r => requestAnimationFrame(() => requestAnimationFrame(r))); });
 </script>

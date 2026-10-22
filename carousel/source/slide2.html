@@ -1,0 +1,114 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Slide 2</title>
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/Inter-Bold.otf'); }
+  @font-face { font-family: 'InterDisplay'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
+
+  :root { --blue: #1C56DB; --purple: #7A4FB8; --red: #DC3547; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; background: #04050B; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; color: #fff; }
+  #slide { position: relative; width: 1080px; height: 1350px; overflow: hidden;
+    background:
+      radial-gradient(640px 640px at 120px 330px, rgba(28,86,219,0.30), transparent 70%),
+      radial-gradient(600px 600px at 560px 820px, rgba(122,79,184,0.20), transparent 70%),
+      radial-gradient(700px 700px at 980px 1300px, rgba(220,53,71,0.20), transparent 70%),
+      #04050B; }
+  .grid { position: absolute; inset: 0; opacity: 0.09;
+    background-image: radial-gradient(circle, #fff 1.3px, transparent 1.6px); background-size: 40px 40px; background-position: 20px 0;
+    -webkit-mask-image: radial-gradient(ellipse 70% 60% at 50% 40%, #000 30%, transparent 80%); }
+  .vignette { position: absolute; inset: 0; background: radial-gradient(ellipse at 50% 45%, transparent 55%, rgba(0,0,0,0.55) 100%); }
+
+  /* orb + orbit rings */
+  .orbwrap { position: absolute; left: 50%; top: 96px; width: 260px; height: 260px; transform: translateX(-50%); }
+  .halo { position: absolute; inset: -110px; border-radius: 50%; background: radial-gradient(circle, rgba(150,110,255,0.42) 0%, rgba(110,80,220,0.14) 38%, transparent 68%); }
+  .orb { position: absolute; inset: 0; border-radius: 50%; overflow: hidden; box-shadow: inset 0 0 0 1.5px rgba(215,200,245,0.7); }
+  .orb img { width: 100%; height: 100%; display: block; }
+  svg.orbits { position: absolute; left: -120px; top: -120px; width: 500px; height: 500px; }
+
+  .eyebrow { position: absolute; top: 418px; left: 0; right: 0; text-align: center; font: 700 20px 'Inter'; letter-spacing: 0.22em; color: #B9A8F0; }
+  h1 { position: absolute; top: 456px; left: 0; right: 0; text-align: center; font: 800 70px/1.08 'InterDisplay'; letter-spacing: -0.01em; }
+  h1 span { display: block; background: linear-gradient(90deg, #3E6BF0 0%, #8A5BE0 50%, #E8506A 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+
+  .rows { position: absolute; top: 688px; left: 110px; right: 110px; display: flex; flex-direction: column; gap: 34px; }
+  .row { display: flex; gap: 26px; align-items: flex-start; }
+  .ic { flex: none; width: 64px; height: 64px; border-radius: 20px; display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(28,86,219,0.9), rgba(122,79,184,0.9) 55%, rgba(220,53,71,0.9));
+    box-shadow: 0 10px 30px rgba(122,79,184,0.35), inset 0 1px 0 rgba(255,255,255,0.35); }
+  .ic svg { width: 32px; height: 32px; }
+  .row h3 { font: 700 30px 'Inter'; margin-top: 2px; }
+  .row p { font: 400 23px/1.4 'Inter'; color: #B8B6C8; margin-top: 6px; }
+
+  /* chat bar (same as the video end card) */
+  .pill { position: absolute; left: 50%; top: 1060px; transform: translateX(-50%); width: 780px; height: 132px; border-radius: 66px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.10), rgba(255,255,255,0.03)), rgba(14,14,30,0.86);
+    box-shadow: 0 0 60px rgba(120,90,255,0.45); }
+  .pill::before { content: ''; position: absolute; inset: 0; border-radius: 66px; padding: 2.5px;
+    background: linear-gradient(110deg, rgba(28,86,219,0.75), rgba(255,255,255,0.9) 30%, rgba(122,79,184,0.6) 55%, rgba(220,53,71,0.8));
+    -webkit-mask: linear-gradient(#000 0 0) content-box, linear-gradient(#000 0 0); -webkit-mask-composite: xor; mask-composite: exclude; }
+  .pill .mini { position: absolute; left: 36px; top: 32px; width: 68px; height: 68px; border-radius: 50%; overflow: hidden; }
+  .pill .mini img { width: 100%; height: 100%; }
+  .pill .txt { position: absolute; left: 132px; top: 0; height: 132px; display: flex; align-items: center; font: 600 76px 'Inter'; letter-spacing: -0.01em; }
+  .pill .caret { display: inline-block; width: 5px; height: 76px; margin-left: 8px; border-radius: 3px; background: linear-gradient(180deg, var(--blue), var(--red)); }
+  .pill .send { position: absolute; right: 28px; top: 20px; width: 92px; height: 92px; border-radius: 50%;
+    background: linear-gradient(135deg, var(--blue), var(--purple) 50%, var(--red)); box-shadow: 0 0 30px rgba(200,70,140,0.55); display: grid; place-items: center; }
+
+  .foot { position: absolute; top: 1238px; left: 0; right: 0; text-align: center; font: 500 24px 'Inter'; color: #A9A6BC; }
+  .foot b { color: #fff; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="slide">
+  <div class="grid"></div>
+
+  <div class="orbwrap">
+    <div class="halo"></div>
+    <svg class="orbits" viewBox="0 0 500 500">
+      <defs>
+        <linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1C56DB"/><stop offset=".5" stop-color="#7A4FB8"/><stop offset="1" stop-color="#DC3547"/></linearGradient>
+      </defs>
+      <circle cx="250" cy="250" r="168" fill="none" stroke="url(#og)" stroke-opacity=".22" stroke-width="1.4"/>
+      <path d="M 250 82 A 168 168 0 0 1 404 183" fill="none" stroke="url(#og)" stroke-width="3" stroke-linecap="round" stroke-opacity=".8"/>
+      <path d="M 96 317 A 168 168 0 0 1 82 250" fill="none" stroke="url(#og)" stroke-width="3" stroke-linecap="round" stroke-opacity=".55"/>
+      <circle cx="250" cy="250" r="205" fill="none" stroke="url(#og)" stroke-opacity=".12" stroke-width="1.2"/>
+      <path d="M 120 418 A 205 205 0 0 1 60 330" fill="none" stroke="url(#og)" stroke-width="2.5" stroke-linecap="round" stroke-opacity=".5"/>
+      <circle cx="404" cy="183" r="6" fill="#fff"/>
+    </svg>
+    <div class="orb"><img src="poli-orb-hi.png"></div>
+  </div>
+
+  <div class="eyebrow">MEET POLI</div>
+  <h1>Ask candidates anything.<span>Get answers in their words.</span></h1>
+
+  <div class="rows">
+    <div class="row">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3l7 3v5c0 4.5-3 8.3-7 10-4-1.7-7-5.5-7-10V6z"/><path d="M8.5 12l2.5 2.5L15.5 10"/></svg></div>
+      <div><h3>Straight from the candidate</h3><p>Only what the campaign shared. If it isn't there, it says so.</p></div>
+    </div>
+    <div class="row">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 2"/></svg></div>
+      <div><h3>Ask anything, 24/7</h3><p>No account needed. Look for &ldquo;Ask [Candidate]&rdquo; on their site.</p></div>
+    </div>
+    <div class="row">
+      <div class="ic"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+      <div><h3>Campaigns hear what you care about</h3><p>Your questions shape their priorities. Never sold.</p></div>
+    </div>
+  </div>
+
+  <div class="pill">
+    <div class="mini"><img src="poli-orb-hi.png"></div>
+    <div class="txt">Askpoli.us<span class="caret"></span></div>
+    <div class="send"><svg width="40" height="40" viewBox="0 0 40 40" fill="none" stroke="#fff" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M20 33V8M8 19L20 7l12 12"/></svg></div>
+  </div>
+
+  <div class="foot">Running for office? <b>Try it free at Askpoli.us</b></div>
+  <div class="vignette"></div>
+</div>
+<script>window.ready = document.fonts.ready;</script>
+</body>
+</html>
