@@ -22,8 +22,8 @@
   /* ---------- the two fake "posts" share one studio backdrop ---------- */
   .studio { position: absolute; left: 0; width: 1080px; overflow: hidden;
     background: radial-gradient(120% 90% at 55% 35%, #FFFFFF 0%, #F6F4FA 55%, #ECE8F3 100%); }
-  #top { top: 0; height: 515px; }
-  #bottom { top: 785px; height: 565px;
+  #top { top: 0; height: 500px; }
+  #bottom { top: 812px; height: 538px;
     background: radial-gradient(120% 90% at 50% 60%, #FFFFFF 0%, #F6F4FA 55%, #ECE8F3 100%); }
 
   .tag { position: absolute; display: flex; align-items: center; gap: 10px; padding: 10px 18px 10px 14px; border-radius: 999px;
@@ -60,28 +60,31 @@
   #ask { position: relative; z-index: 3; margin-left: auto; width: 360px; padding: 22px 26px; border-radius: 30px 30px 8px 30px;
     background: transparent; color: #fff; font: 600 31px/1.25 'Inter'; text-shadow: 0 1px 2px rgba(20,10,80,0.25); }
   .reply { position: relative; }
-  #meltIn { position: absolute; left: 0; top: 0; }
   .reply { margin-top: 46px; width: 380px; padding: 20px 24px; border-radius: 30px 30px 30px 8px; background: #EFEDF5; color: var(--ink); font: 500 23px/1.38 'Inter'; }
   .src { display: inline-flex; gap: 8px; align-items: center; margin-top: 12px; font: 600 17px 'Inter'; color: #5B3FA6; background: #fff; border: 1px solid #E1DAF2; padding: 7px 12px; border-radius: 10px; }
 
   /* ---------- fake Instagram row ---------- */
-  #igbar { position: absolute; top: 515px; left: 0; width: 1080px; height: 270px; background: #0C0E13; color: #F5F5F5; }
-  .actions { position: absolute; top: 54px; left: 38px; right: 38px; display: flex; align-items: center; }
-  .act { display: flex; align-items: center; gap: 12px; margin-right: 46px; font: 500 30px 'Inter'; }
-  .act svg { width: 46px; height: 46px; }
+  /* sized from a real iPhone Instagram screenshot (UI scaled to a 1080-wide image) */
+  #igbar { position: absolute; top: 500px; left: 0; width: 1080px; height: 312px; background: #000; color: #F5F5F5; }
+  .actions { position: absolute; top: 26px; left: 34px; right: 40px; height: 62px; display: flex; align-items: center; }
+  .act { display: flex; align-items: center; gap: 12px; margin-right: 40px; font: 600 37px 'Inter'; letter-spacing: -0.01em; }
+  .act svg { width: 58px; height: 58px; }
   .save { margin-left: auto; }
-  .save svg { width: 44px; height: 44px; }
-  .who { position: absolute; top: 140px; left: 32px; right: 40px; display: flex; align-items: center; gap: 22px; }
-  .ring { width: 104px; height: 104px; border-radius: 50%; padding: 4px; background: conic-gradient(from 200deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5, #FEDA75); }
-  .ring > div { width: 100%; height: 100%; border-radius: 50%; padding: 4px; background: #0C0E13; }
+  .save svg { width: 56px; height: 56px; }
+  .cap { position: absolute; top: 106px; left: 34px; right: 230px; font: 400 34px/1.25 'Inter'; white-space: nowrap; overflow: hidden; }
+  .cap b { font-weight: 700; }
+  .cap span { color: #A8A8A8; margin-left: 4px; }
+  .date { position: absolute; top: 158px; left: 34px; font: 400 29px 'Inter'; color: #A8A8A8; }
+  .who { position: absolute; top: 216px; left: 28px; right: 40px; height: 90px; display: flex; align-items: center; gap: 22px; }
+  .ring { width: 90px; height: 90px; border-radius: 50%; padding: 4px; background: conic-gradient(from 200deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5, #FEDA75); }
+  .ring > div { width: 100%; height: 100%; border-radius: 50%; padding: 4px; background: #000; }
   .ring img { width: 100%; height: 100%; border-radius: 50%; display: block; object-fit: cover; }
-  .who h4 { font: 700 28px 'Inter'; }
-  .who p { font: 400 28px 'Inter'; color: #E9E9EC; margin-top: 4px; }
-  .more { margin-left: auto; display: flex; gap: 7px; }
-  .more i { width: 8px; height: 8px; border-radius: 50%; background: #F5F5F5; }
+  .who h4 { font: 600 35px 'Inter'; letter-spacing: -0.01em; }
+  .more { margin-left: auto; display: flex; gap: 8px; }
+  .more i { width: 9px; height: 9px; border-radius: 50%; background: #F5F5F5; }
 
   /* ---------- insight chart card ---------- */
-  #card { position: absolute; left: 110px; top: 860px; width: 860px; height: 450px; border-radius: 36px;
+  #card { position: absolute; left: 110px; top: 880px; width: 860px; height: 450px; border-radius: 36px;
     background: linear-gradient(180deg, rgba(255,255,255,0.96), rgba(250,248,253,0.96));
     border: 1px solid rgba(122,79,184,0.14);
     box-shadow: 0 50px 80px -30px rgba(60,40,130,0.35), 0 12px 30px rgba(60,40,130,0.10); }
@@ -128,7 +131,6 @@
         </div>
         <div class="site"><div><b>ALEX RIVERA</b><small>FOR CITY COUNCIL</small></div><div class="donate">DONATE</div></div>
         <div class="chat">
-          <svg id="meltIn" width="488" height="1008" style="position:absolute;left:-22px;top:-262px;z-index:2;pointer-events:none"></svg>
           <div class="chathead"><div class="av">A</div><div><h3>Ask Alex Rivera</h3><p><em>AI</em>Answers from Alex's campaign</p></div></div>
           <div class="ts">Today 11:47 PM</div>
           <div id="ask">What will you do about rent increases?</div>
@@ -143,24 +145,28 @@
 
   <!-- fake Instagram row -->
   <div id="igbar">
+    <!-- post 1 footer: like, comment, repost, share ... save (Instagram's order) -->
     <div class="actions">
       <div class="act"><svg viewBox="0 0 24 24"><path d="M12 21s-7.5-4.6-9.6-9.2C.9 8.4 3 4.5 6.8 4.5c2.2 0 3.9 1.2 5.2 3 1.3-1.8 3-3 5.2-3 3.8 0 5.9 3.9 4.4 7.3C19.5 16.4 12 21 12 21z" fill="#FF3040"/></svg>1,284</div>
-      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linejoin="round"><path d="M20.7 16.2A9.2 9.2 0 1 0 17 20l4.3 1.2z"/></svg>148</div>
-      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linejoin="round"><path d="M22 3 9.2 10.2M22 3l-7.5 18-5.3-10.8L2 6.4z"/></svg>64</div>
-      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V9a4 4 0 0 1 4-4h11M16 2l3 3-3 3M20 13v2a4 4 0 0 1-4 4H5M8 22l-3-3 3-3"/></svg>32</div>
-      <div class="save"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="2" stroke-linejoin="round"><path d="M19 21l-7-5.5L5 21V3h14z"/></svg></div>
+      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="1.9" stroke-linejoin="round"><path d="M20.7 16.2A9.2 9.2 0 1 0 17 20l4.3 1.2z"/></svg>148</div>
+      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="1.9" stroke-linecap="round" stroke-linejoin="round"><path d="M4 11V9a4 4 0 0 1 4-4h11M16 2l3 3-3 3M20 13v2a4 4 0 0 1-4 4H5M8 22l-3-3 3-3"/></svg>32</div>
+      <div class="act"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="1.9" stroke-linejoin="round"><path d="M22 3 9.2 10.2M22 3l-7.5 18-5.3-10.8L2 6.4z"/></svg>64</div>
+      <div class="save"><svg viewBox="0 0 24 24" fill="none" stroke="#F5F5F5" stroke-width="1.9" stroke-linejoin="round"><path d="M19 21l-7-5.5L5 21V3h14z"/></svg></div>
     </div>
+    <div class="cap"><b>askpolius</b> Some questions are worth asking.</div>
+    <div class="date">October 22</div>
+    <!-- post 2 header -->
     <div class="who">
       <div class="ring"><div><img src="poli-orb.png"></div></div>
-      <div><h4>askpolius</h4><p>Asked at 11:47 PM. Answered at 11:47 PM.</p></div>
+      <h4>askpolius</h4>
       <div class="more"><i></i><i></i><i></i></div>
     </div>
   </div>
 
   <!-- BOTTOM "POST": the campaign -->
   <div class="studio" id="bottom">
-    <div class="tag" style="left:34px; top:26px"><i></i>The campaign <span>· same moment</span></div>
-    <div class="tag brandtag" style="left:520px; top:26px"><img src="poli-orb.png">Askpoli.us</div>
+    <div class="tag" style="left:34px; top:18px"><i></i>The campaign <span>· same moment</span></div>
+    <div class="tag brandtag" style="left:520px; top:18px"><img src="poli-orb.png">Askpoli.us</div>
   </div>
   <div id="card">
     <div class="bars" id="bars"></div>
@@ -192,7 +198,7 @@ DATA.forEach(([name, v], i) => {
   const lab = document.createElement('div'); lab.className = 'lab';
   lab.style.left = (50 + x + BAR_W / 2 - 75) + 'px'; lab.textContent = name;
   document.getElementById('card').appendChild(lab);
-  barGeom.push({ x: 110 + 50 + x, w: BAR_W, top: 860 + 70 + 250 - h, bottom: 860 + 70 + 250 });
+  barGeom.push({ x: 110 + 50 + x, w: BAR_W, top: 880 + 70 + 250 - h, bottom: 880 + 70 + 250 });
 });
 // chart labels sit inside the bar area bottom; move the bar block up a little to make room
 document.querySelectorAll('.lab').forEach(l => l.style.top = '334px');
@@ -207,7 +213,7 @@ function liquidFilter(parent, id, w, h) {
   el('feGaussianBlur', { in: 'goo', stdDeviation: 5, result: 'hm' }, f);
   const d = el('feDiffuseLighting', { in: 'hm', surfaceScale: 5, diffuseConstant: 1.15, 'lighting-color': '#ffffff', result: 'diff' }, f);
   el('feDistantLight', { azimuth: 225, elevation: 52 }, d);
-  el('feComposite', { in: 'goo', in2: 'diff', operator: 'arithmetic', k1: 0.78, k2: 0.16, k3: 0, k4: 0, result: 'shaded' }, f);
+  el('feComposite', { in: 'goo', in2: 'diff', operator: 'arithmetic', k1: 0.8, k2: 0.2, k3: 0, k4: 0, result: 'shaded' }, f);
   const sp = el('feSpecularLighting', { in: 'hm', surfaceScale: 6, specularConstant: 0.75, specularExponent: 45, 'lighting-color': '#ffffff', result: 'spec' }, f);
   el('feDistantLight', { azimuth: 225, elevation: 48 }, sp);
   el('feComposite', { in: 'spec', in2: 'goo', operator: 'in', result: 'specIn' }, f);
@@ -256,49 +262,30 @@ const drop = (x, y0, len, w, parent, fill) => {                  // a hanging dr
   el('circle', { cx: x, cy: y0 + len, r: w * 0.62, fill }, parent);
 };
 
-// ---------- layer 1: the bubble melting, inside the phone screen (screen-local coordinates) ----------
-const mi = document.getElementById('meltIn');
+// ---------- geometry: the question bubble, in phone-screen coordinates ----------
 const ask = document.getElementById('ask'), chat = ask.parentElement;
 const bx = chat.offsetLeft + ask.offsetLeft, by = chat.offsetTop + ask.offsetTop, bw = ask.offsetWidth, bh = ask.offsetHeight;
-const SW = 488;
-const mdefs = el('defs', {}, mi);
-grad(mdefs, 'bub', bx, by, bx + bw, by + bh, [['0', '#2A5BE0'], ['0.6', '#5B4FD0'], ['1', '#7A4FB8']]);
-liquidFilter(mdefs, 'liqIn', 488, 1008);
-blurF(mdefs, 'sIn', 10);
-const bubD = `M${bx + 30} ${by} H${bx + bw - 30} Q${bx + bw} ${by} ${bx + bw} ${by + 30} V${bx ? by + bh - 8 : 0} Q${bx + bw} ${by + bh} ${bx + bw - 8} ${by + bh} H${bx + 30} Q${bx} ${by + bh} ${bx} ${by + bh - 30} V${by + 30} Q${bx} ${by} ${bx + 30} ${by} Z`;
-// soft coloured shadow on the screen under the bubble and its drips
-const shIn = el('g', { filter: 'url(#sIn)', opacity: 0.35, transform: 'translate(0 10)' }, mi);
-el('path', { d: bubD, fill: '#2A4FD0' }, shIn);
-const gIn = el('g', { filter: 'url(#liqIn)' }, mi);
-el('path', { d: bubD, fill: 'url(#bub)' }, gIn);
-// the lower edge sags: soft bulges just below it
-[[0.18, 7, 12], [0.40, 10, 15], [0.62, 6, 12], [0.80, 9, 14]].forEach(([f, dy, rr]) => el('ellipse', { cx: bx + bw * f, cy: by + bh + dy - 6, rx: rr * 1.8, ry: rr, fill: 'url(#bub)' }, gIn));
-// hanging drips of different lengths, one letting go of a droplet
-drop(bx + bw * 0.24, by + bh, 20, 20, gIn, 'url(#bub)');
-drop(bx + bw * 0.47, by + bh, 36, 24, gIn, 'url(#bub)');
-el('ellipse', { cx: bx + bw * 0.47 + 1, cy: by + bh + 66, rx: 8, ry: 10, fill: 'url(#bub)' }, gIn);
-drop(bx + bw * 0.66, by + bh, 14, 18, gIn, 'url(#bub)');
-// the bottom-right corner spills sideways off the screen edge
-el('path', { d: ribbon([[bx + bw - 40, by + bh - 20], [bx + bw, by + bh + 4], [SW - 14, by + bh + 22], [SW + 20, by + bh + 46]], t => 46 + 10 * t), fill: 'url(#bub)' }, gIn);
-
-// screen-local -> page coordinates (phone: left 70, top -160, 520x1040, rotated 9deg about its centre)
+// screen-local -> page (phone: left 70, top -160, 520x1040, rotated 9deg about its centre; screen inset 16)
 const PH = { x: 70, y: -160, w: 520, h: 1040, a: 9 * Math.PI / 180 };
-const toPage = (sx, sy) => { const px = sx + 16 - PH.w / 2, py = sy + 16 - PH.h / 2;
-  return [PH.x + PH.w / 2 + px * Math.cos(PH.a) - py * Math.sin(PH.a), PH.y + PH.h / 2 + px * Math.sin(PH.a) + py * Math.cos(PH.a)]; };
+const ca = Math.cos(PH.a), sa = Math.sin(PH.a), ox = 16 - PH.w / 2, oy = 16 - PH.h / 2;
+const toPage = (sx, sy) => [PH.x + PH.w / 2 + (sx + ox) * ca - (sy + oy) * sa, PH.y + PH.h / 2 + (sx + ox) * sa + (sy + oy) * ca];
+const SCREEN = `matrix(${ca} ${sa} ${-sa} ${ca} ${PH.x + PH.w / 2 + ox * ca - oy * sa} ${PH.y + PH.h / 2 + ox * sa + oy * ca})`;
 
-// ---------- layer 2: spill over the bezel, puddle, pour, filled bar (page coordinates) ----------
 const housing = barGeom[4];
 const SX = housing.x + housing.w / 2;
 const PCX = 815, PCY = 448;
 const defs = el('defs', {});
-// colour follows the liquid's journey: the bubble's purple -> indigo puddle -> purple pour -> red in the chart
+// colour follows the liquid's journey: indigo puddle -> purple pour -> red in the chart
 grad(defs, 'liq', 0, 330, 0, 1190, [['0', '#6B4FC3'], ['0.16', '#5352CA'], ['0.34', '#6450C3'], ['0.56', '#9A4590'], ['0.78', '#C23C62'], ['1', '#DC3547']]);
+grad(defs, 'bub', bx, by, bx + bw, by + bh, [['0', '#2A5BE0'], ['0.6', '#5B4FD0'], ['1', '#7A4FB8']]);   // used in screen space
 liquidFilter(defs, 'liqOut', 1080, 1350);
-blurF(defs, 'b2x', 1.5); blurF(defs, 'b6', 6); blurF(defs, 'b14', 14); blurF(defs, 'b22', 22);
-
-const S0 = toPage(SW - 30, by + bh + 30);      // starts just inside the screen so it overlaps the in-screen spill
-const spill = [S0, [S0[0] + 40, S0[1] + 18], [PCX - 175, PCY - 26], [PCX - 110, PCY - 4]];
-const spillD = ribbon(spill, t => 44 + 4 * Math.sin(t * Math.PI) + 26 * t * t);
+blurF(defs, 'b2x', 1.5); blurF(defs, 'b6', 6); blurF(defs, 'b10', 10); blurF(defs, 'b14', 14); blurF(defs, 'b22', 22);
+const bubD = `M${bx + 30} ${by} H${bx + bw - 30} Q${bx + bw} ${by} ${bx + bw} ${by + 30} V${by + bh - 8} Q${bx + bw} ${by + bh} ${bx + bw - 8} ${by + bh} H${bx + 30} Q${bx} ${by + bh} ${bx} ${by + bh - 30} V${by + 30} Q${bx} ${by} ${bx + 30} ${by} Z`;
+const S0 = toPage(bx + bw - 34, by + bh - 26);                 // deep inside the bubble's lower-right corner
+const S1 = toPage(bx + bw + 30, by + bh + 20);                 // over the screen edge and bezel
+const spill = [S0, S1, [PCX - 190, PCY - 30], [PCX - 105, PCY - 2]];
+const spillD = ribbon(spill, t => 50 - 10 * Math.sin(t * Math.PI) + 36 * t * t);
+grad(defs, 'spillg', S0[0], S0[1], PCX - 105, PCY, [['0', '#7A4FB8'], ['0.45', '#664FC2'], ['1', '#5752C9']]);
 const pud = blob(PCX, PCY, 222, 54, 23, 5, 0.09);
 const tongue = ribbon([[SX - 24, PCY - 6], [SX - 8, 474], [SX, 496], [SX, 528]], t => 110 - 64 * t);
 const pour = [[SX, 480], [SX + 2, 640], [SX - 1, 820], [SX, housing.top + 4]];
@@ -310,6 +297,8 @@ for (let i = 0; i <= 24; i++) { const x = hb.x + hb.w * i / 24, dx = (x - SX) / 
 barD += ` L${hb.x + hb.w} ${hb.bottom - 12} Q${hb.x + hb.w} ${hb.bottom} ${hb.x + hb.w - 12} ${hb.bottom} L${hb.x + 12} ${hb.bottom} Q${hb.x} ${hb.bottom} ${hb.x} ${hb.bottom - 12} Z`;
 
 // coloured, translucent shadows: light passing through tinted liquid onto the white table / card
+const shB = el('g', { transform: SCREEN, opacity: 0.32 });
+el('path', { d: bubD, fill: '#2A4FD0', filter: 'url(#b10)', transform: 'translate(0 10)' }, shB);
 const shOut = el('g', { opacity: 0.42 });
 el('path', { d: pud, fill: '#4B3FD0', filter: 'url(#b14)', transform: 'translate(10 20)' }, shOut);
 el('path', { d: spillD, fill: '#4B3FD0', filter: 'url(#b14)', transform: 'translate(10 18)' }, shOut);
@@ -319,7 +308,17 @@ el('path', { d: barD, fill: '#C23C62', filter: 'url(#b22)', transform: 'translat
 el('path', { d: pourD, fill: '#7A4FB8', filter: 'url(#b22)', opacity: 0.55 });   // glow of the stream over the dark row
 
 const gOut = el('g', { filter: 'url(#liqOut)' });
-el('path', { d: spillD, fill: 'url(#liq)' }, gOut);
+// the bubble and its sagging, dripping lower edge (screen space, same goo body as everything else)
+const gB = el('g', { transform: SCREEN }, gOut);
+el('path', { d: bubD, fill: 'url(#bub)' }, gB);
+[[0.18, 7, 12], [0.40, 10, 15], [0.62, 6, 12], [0.80, 9, 14]].forEach(([f, dy, rr]) => el('ellipse', { cx: bx + bw * f, cy: by + bh + dy - 6, rx: rr * 1.8, ry: rr, fill: 'url(#bub)' }, gB));
+drop(bx + bw * 0.24, by + bh, 20, 20, gB, 'url(#bub)');
+drop(bx + bw * 0.47, by + bh, 36, 24, gB, 'url(#bub)');
+el('ellipse', { cx: bx + bw * 0.47 + 1, cy: by + bh + 66, rx: 8, ry: 10, fill: 'url(#bub)' }, gB);
+drop(bx + bw * 0.66, by + bh, 14, 18, gB, 'url(#bub)');
+// the corner pours out sideways: a single body from inside the bubble to the puddle
+el('path', { d: spillD, fill: 'url(#spillg)' }, gOut);
+el('circle', { cx: S0[0], cy: S0[1], r: 25, fill: '#7A4FB8' }, gOut);
 el('path', { d: pud, fill: 'url(#liq)' }, gOut);
 el('path', { d: tongue, fill: 'url(#liq)' }, gOut);
 el('path', { d: pourD, fill: 'url(#liq)' }, gOut);
@@ -329,7 +328,6 @@ el('path', { d: barD, fill: 'url(#liq)' }, gOut);
 // surface reflections (studio softbox) + thin, see-through edges, clipped to the liquid
 const cp = el('clipPath', { id: 'pudClip' }, defs); el('path', { d: pud }, cp); el('path', { d: spillD }, cp); el('path', { d: tongue }, cp);
 const refl = el('g', { 'clip-path': 'url(#pudClip)' });
-el('path', { d: pud, fill: 'none', stroke: '#ffffff', 'stroke-opacity': 0.35, 'stroke-width': 22, filter: 'url(#b6)' }, refl);     // thin edge lets the table show through
 el('path', { d: `M${PCX - 175} ${PCY - 14} C${PCX - 80} ${PCY - 40} ${PCX + 60} ${PCY - 42} ${PCX + 175} ${PCY - 22}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.8, 'stroke-width': 9, 'stroke-linecap': 'round', filter: 'url(#b6)' }, refl);
 el('path', { d: `M${PCX - 120} ${PCY + 18} C${PCX - 40} ${PCY + 8} ${PCX + 40} ${PCY + 8} ${PCX + 130} ${PCY + 16}`, fill: 'none', stroke: '#fff', 'stroke-opacity': 0.28, 'stroke-width': 16, 'stroke-linecap': 'round', filter: 'url(#b14)' }, refl);
 el('ellipse', { cx: PCX + 40, cy: PCY + 4, rx: 150, ry: 26, fill: '#241a6e', opacity: 0.22, filter: 'url(#b14)' }, refl);           // deeper colour in the middle
@@ -339,7 +337,7 @@ const rb = el('g', { 'clip-path': 'url(#barClip)' });
 el('rect', { x: hb.x + 16, y: hb.top + 26, width: 12, height: hb.bottom - hb.top - 46, rx: 6, fill: '#fff', opacity: 0.55, filter: 'url(#b6)' }, rb);
 el('rect', { x: hb.x + hb.w - 22, y: hb.top + 30, width: 8, height: hb.bottom - hb.top - 60, rx: 4, fill: '#fff', opacity: 0.22, filter: 'url(#b6)' }, rb);
 // the stream: a fine bright core highlight
-const cs = el('clipPath', { id: 'streamClip' }, defs); el('rect', { x: 0, y: 522, width: 1080, height: 900 }, cs);
+const cs = el('clipPath', { id: 'streamClip' }, defs); el('rect', { x: 0, y: 506, width: 1080, height: 900 }, cs);
 el('path', { d: ribbon(pour, t => 3 + 2 * (1 - t)), fill: '#fff', opacity: 0.45, filter: 'url(#b2x)', transform: 'translate(-6 0)', 'clip-path': 'url(#streamClip)' });
 // a few tiny air bubbles trapped in the puddle
 [[PCX - 70, PCY - 6, 5], [PCX + 80, PCY - 12, 4], [PCX + 104, PCY - 2, 2.5], [PCX - 170, PCY + 6, 3.5]].forEach(([x, y, rr]) => {
@@ -347,6 +345,13 @@ el('path', { d: ribbon(pour, t => 3 + 2 * (1 - t)), fill: '#fff', opacity: 0.45,
   el('circle', { cx: x - rr * 0.35, cy: y - rr * 0.35, r: rr * 0.3, fill: '#fff', opacity: 0.85 });
 });
 
+// the bubble's words float on top of the liquid: a text-only clone of the phone
+const ghost = document.getElementById('phone').cloneNode(true);
+ghost.removeAttribute('id');
+Object.assign(ghost.style, { position: 'absolute', left: PH.x + 'px', top: PH.y + 'px', width: PH.w + 'px', height: PH.h + 'px',
+  transform: 'rotate(9deg)', visibility: 'hidden', background: 'none', boxShadow: 'none', zIndex: 5 });
+ghost.querySelector('#ask').style.visibility = 'visible';   // ids kept so the same CSS lays the text out identically
+document.getElementById('post').appendChild(ghost);
 // percentage label inside the liquid bar
 const pt = el('text', { x: SX, y: hb.top + 64, 'text-anchor': 'middle', fill: '#fff', 'font-family': 'Inter', 'font-weight': 700, 'font-size': 30 });
 pt.textContent = '32%';
