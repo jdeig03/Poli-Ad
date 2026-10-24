@@ -1,0 +1,456 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>How Poli Works</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@700;800&family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;1,9..40,400&display=swap">
+<style>
+:root {
+  color-scheme: dark;
+  --bg: #05090E;
+  --card: #0B1825;
+  --card-inner: #0F2035;
+  --border: rgba(0,215,185,0.14);
+  --teal: #00D9B8;
+  --teal-glow: rgba(0,217,184,0.32);
+  --teal-dim: rgba(0,217,184,0.08);
+  --teal-mid: rgba(0,217,184,0.16);
+  --fg: #EAF0F7;
+  --fg-2: #A8C0D0;
+  --fg-3: #567085;
+  --fg-4: #2A3F52;
+  --voter-bg: #152538;
+  --stamp: #C42030;
+  --step-blue: #3B82F6;
+  --step-purple: #8B5CF6;
+}
+*, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+  background: var(--bg);
+  color: var(--fg);
+  font-family: 'DM Sans', system-ui, sans-serif;
+  font-size: 15px;
+  line-height: 1.5;
+  padding-left: max(20px, env(safe-area-inset-left, 0px));
+  padding-right: max(20px, env(safe-area-inset-right, 0px));
+  padding-block: 44px 64px;
+  min-height: 100%;
+}
+body::before {
+  content: "";
+  position: fixed;
+  inset: 0;
+  background: radial-gradient(ellipse 80% 40% at 50% 0%, rgba(0,100,80,0.06) 0%, transparent 70%);
+  pointer-events: none;
+  z-index: 0;
+}
+.page { position: relative; z-index: 1; max-width: 480px; margin: 0 auto; display: flex; flex-direction: column; gap: 28px; }
+.hdr { display: flex; flex-direction: column; gap: 12px; }
+.brand-row { display: flex; align-items: center; gap: 10px; }
+.brand-p {
+  width: 32px; height: 32px; border-radius: 50%;
+  background: var(--teal-mid); border: 1px solid var(--border);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: 16px; color: var(--teal); letter-spacing: 0.04em;
+}
+.brand-name {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: 18px; letter-spacing: 0.12em; color: var(--teal); text-transform: uppercase;
+}
+.draft-badge {
+  margin-left: auto;
+  font-size: 9px; font-weight: 600; letter-spacing: 0.12em; text-transform: uppercase;
+  color: var(--stamp); border: 1px solid var(--stamp);
+  padding: 2px 7px; border-radius: 4px; opacity: 0.85;
+}
+.page-title {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: clamp(36px, 8vw, 48px); line-height: 1.0; text-transform: uppercase;
+  letter-spacing: 0.01em; text-wrap: balance;
+}
+.page-meta { font-size: 12px; color: var(--fg-3); letter-spacing: 0.02em; }
+.carousel-wrap {
+  border-radius: 28px;
+  border: 1.5px solid var(--border);
+  background: var(--card);
+  overflow: hidden;
+  position: relative;
+  aspect-ratio: 1 / 1;
+}
+.slides-viewport { width: 100%; height: 100%; overflow: hidden; }
+.slides-strip {
+  display: flex;
+  width: 600%;
+  height: 100%;
+  transition: transform 0.44s cubic-bezier(0.42, 0, 0.22, 1);
+}
+@media (prefers-reduced-motion: reduce) { .slides-strip { transition: none; } }
+.slide {
+  width: calc(100% / 6);
+  height: 100%;
+  flex-shrink: 0;
+  padding: 24px;
+  display: flex;
+  flex-direction: column;
+  gap: 10px;
+  position: relative;
+  overflow: hidden;
+}
+.slide::before {
+  content: "";
+  position: absolute;
+  top: 0; left: 0;
+  width: 180px; height: 180px;
+  background: radial-gradient(ellipse at 0% 0%, var(--teal-dim) 0%, transparent 70%);
+  pointer-events: none;
+}
+@media (max-width: 440px) { .slide { padding: 18px; } }
+.slide-eyebrow { font-size: 10px; font-weight: 600; letter-spacing: 0.14em; display: flex; align-items: center; gap: 4px; }
+.slide-eyebrow .num { color: var(--teal); }
+.slide-eyebrow .denom { color: var(--fg-4); }
+.slide-title {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: clamp(16px, 4.5vw, 22px);
+  line-height: 1.05; text-transform: uppercase; letter-spacing: 0.01em;
+  text-wrap: balance;
+}
+.slide-subtitle { font-size: 11px; color: var(--fg-2); line-height: 1.4; max-width: 90%; }
+.slide-visual { flex: 1; min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+.chat { display: flex; flex-direction: column; height: 100%; overflow: hidden; }
+.chat-header {
+  display: flex; align-items: center; gap: 7px;
+  padding: 7px 10px;
+  background: var(--card-inner);
+  border-radius: 10px 10px 0 0;
+  border: 1px solid var(--border);
+  border-bottom: none;
+  flex-shrink: 0;
+}
+.chat-avatar {
+  width: 22px; height: 22px; border-radius: 50%;
+  background: var(--teal-mid); border: 1px solid var(--teal-glow);
+  display: flex; align-items: center; justify-content: center;
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: 11px; color: var(--teal);
+}
+.chat-name { font-size: 11px; font-weight: 600; color: var(--fg); flex: 1; }
+.sample-stamp {
+  font-size: 8px; font-weight: 700; letter-spacing: 0.1em;
+  color: var(--stamp); border: 1px solid var(--stamp);
+  padding: 1px 5px; border-radius: 3px;
+}
+.chat-body {
+  flex: 1; min-height: 0; overflow: hidden;
+  background: var(--card-inner);
+  border: 1px solid var(--border);
+  border-top: none;
+  border-radius: 0 0 10px 10px;
+  padding: 10px;
+  display: flex; flex-direction: column; gap: 8px; justify-content: flex-end;
+}
+.msg { max-width: 88%; font-size: 11.5px; line-height: 1.45; padding: 7px 10px; border-radius: 10px; }
+.msg-voter { background: var(--voter-bg); color: var(--fg); align-self: flex-end; border-radius: 10px 10px 2px 10px; }
+.msg-poli { background: var(--teal-dim); color: var(--fg-2); align-self: flex-start; border: 1px solid var(--teal-mid); border-radius: 10px 10px 10px 2px; }
+.flow { display: flex; flex-direction: column; gap: 0; justify-content: center; flex: 1; padding: 4px 0; }
+.flow-step { display: flex; align-items: flex-start; gap: 12px; }
+.flow-icon-col { display: flex; flex-direction: column; align-items: center; flex-shrink: 0; }
+.flow-circle { width: 30px; height: 30px; border-radius: 50%; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
+.flow-line { width: 2px; height: 20px; background: linear-gradient(to bottom, var(--teal-mid), transparent); flex-shrink: 0; }
+.flow-text { padding-top: 4px; }
+.flow-label { font-size: 12px; font-weight: 600; color: var(--fg); line-height: 1.2; }
+.flow-desc { font-size: 10.5px; color: var(--fg-3); margin-top: 2px; }
+.flow-icon-svg { width: 14px; height: 14px; }
+.end-card { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 8px; min-height: 0; }
+.end-poli {
+  font-family: 'Barlow Condensed', sans-serif; font-weight: 800;
+  font-size: clamp(56px, 15vw, 80px);
+  line-height: 1; color: var(--teal); letter-spacing: 0.06em; text-transform: uppercase;
+  text-shadow: 0 0 48px var(--teal-glow), 0 0 16px var(--teal-glow);
+}
+.end-rule { width: 48px; height: 2px; background: var(--teal); border-radius: 1px; margin: 2px 0; }
+.end-url { font-size: 13px; font-weight: 500; letter-spacing: 0.06em; color: var(--fg); }
+.end-tagline { font-size: 11px; color: var(--fg-2); font-style: italic; }
+.nav-row { display: flex; align-items: center; justify-content: center; gap: 14px; }
+.nav-btn {
+  width: 38px; height: 38px; border-radius: 50%;
+  background: var(--card); border: 1px solid var(--border);
+  color: var(--fg-3); cursor: pointer;
+  display: flex; align-items: center; justify-content: center;
+  transition: color 0.18s, border-color 0.18s;
+  flex-shrink: 0;
+}
+.nav-btn:hover:not(:disabled) { color: var(--teal); border-color: var(--teal-mid); }
+.nav-btn:disabled { opacity: 0.28; cursor: default; }
+.nav-btn svg { width: 16px; height: 16px; }
+.dots { display: flex; align-items: center; gap: 5px; }
+.dot { height: 6px; border-radius: 3px; background: var(--fg-4); cursor: pointer; transition: width 0.28s, background 0.28s; width: 6px; border: none; }
+.dot.active { width: 22px; background: var(--teal); }
+@media (prefers-reduced-motion: reduce) { .dot { transition: none; } }
+.caption-panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; gap: 8px; }
+.panel-eyebrow { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--fg-3); }
+.caption-text { font-size: 13px; line-height: 1.6; color: var(--fg-2); }
+.hashtags { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 4px; }
+.hashtag { font-size: 12px; font-weight: 500; color: var(--teal); }
+.alt-panel { background: var(--card); border: 1px solid var(--border); border-radius: 16px; padding: 18px 20px; display: flex; flex-direction: column; gap: 12px; }
+.alt-heading { font-size: 9px; font-weight: 700; letter-spacing: 0.18em; text-transform: uppercase; color: var(--teal); }
+.alt-list { display: flex; flex-direction: column; gap: 8px; }
+.alt-row { display: flex; gap: 12px; align-items: baseline; }
+.alt-num { font-size: 11px; font-weight: 600; color: var(--teal); flex-shrink: 0; width: 16px; font-variant-numeric: tabular-nums; }
+.alt-copy { font-size: 12px; color: var(--fg-2); line-height: 1.45; min-width: 0; }
+</style>
+</head>
+<body>
+
+<div class="page">
+  <header class="hdr">
+    <div class="brand-row">
+      <div class="brand-p">P</div>
+      <span class="brand-name">Poli</span>
+      <span class="draft-badge">Draft for Approval</span>
+    </div>
+    <h1 class="page-title">How Poli Works</h1>
+    <p class="page-meta">6-slide Instagram carousel &middot; Posts Monday, Oct 26</p>
+  </header>
+
+  <div class="carousel-wrap" id="carousel">
+    <div class="slides-viewport">
+      <div class="slides-strip" id="strip">
+
+        <div class="slide">
+          <div class="slide-eyebrow"><span class="num">01</span><span class="denom">&nbsp;/ 06</span></div>
+          <h2 class="slide-title">Meet Poli. Your Personal Town Hall.</h2>
+          <p class="slide-subtitle">An AI assistant on your candidate's website that answers your questions in their own words.</p>
+          <div class="slide-visual">
+            <div class="chat">
+              <div class="chat-header">
+                <div class="chat-avatar">P</div>
+                <span class="chat-name">Maya's AI assistant</span>
+                <span class="sample-stamp">SAMPLE</span>
+              </div>
+              <div class="chat-body">
+                <div class="msg msg-voter">Where does Maya stand on property taxes?</div>
+                <div class="msg msg-poli">Maya supports capping annual increases for primary homeowners and opposes assessment spikes. Her full housing position is on her website under Housing &amp; Affordability.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-eyebrow"><span class="num">02</span><span class="denom">&nbsp;/ 06</span></div>
+          <h2 class="slide-title">Ask Anything, Any Hour.</h2>
+          <p class="slide-subtitle">Poli lives on your candidate's website. No rally, no phone bank, no waiting.</p>
+          <div class="slide-visual">
+            <div class="chat">
+              <div class="chat-header">
+                <div class="chat-avatar">P</div>
+                <span class="chat-name">Maya's AI assistant</span>
+                <span class="sample-stamp">SAMPLE</span>
+              </div>
+              <div class="chat-body">
+                <div class="msg msg-voter">It's 11 PM and I still don't know where she stands on school funding.</div>
+                <div class="msg msg-poli">Happy to help at any hour. Maya supports restoring the per-pupil formula cut in 2019, which shortchanged our district by over $2 million annually. She's also backed universal pre-K as a budget priority.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-eyebrow"><span class="num">03</span><span class="denom">&nbsp;/ 06</span></div>
+          <h2 class="slide-title">Answers in the Candidate's Own Words.</h2>
+          <p class="slide-subtitle">Poli only uses what your candidate has actually said and published. No spin.</p>
+          <div class="slide-visual">
+            <div class="chat">
+              <div class="chat-header">
+                <div class="chat-avatar">P</div>
+                <span class="chat-name">Maya's AI assistant</span>
+                <span class="sample-stamp">SAMPLE</span>
+              </div>
+              <div class="chat-body">
+                <div class="msg msg-voter">Did she really vote to cut the library budget?</div>
+                <div class="msg msg-poli">In 2020 Maya voted to reduce the library system's capital budget by 12%, redirecting those funds to deferred maintenance. She has since said she'd restore capital funding if re-elected.</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-eyebrow"><span class="num">04</span><span class="denom">&nbsp;/ 06</span></div>
+          <h2 class="slide-title">If It Doesn't Know, It Says So.</h2>
+          <p class="slide-subtitle">Poli would rather say "I don't know" than make something up.</p>
+          <div class="slide-visual">
+            <div class="chat">
+              <div class="chat-header">
+                <div class="chat-avatar">P</div>
+                <span class="chat-name">Maya's AI assistant</span>
+                <span class="sample-stamp">SAMPLE</span>
+              </div>
+              <div class="chat-body">
+                <div class="msg msg-voter">What's her plan for the county fairgrounds?</div>
+                <div class="msg msg-poli">I don't have specific information on that yet. Maya's published materials haven't addressed the fairgrounds. Want to ask about her economic development priorities instead?</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-eyebrow"><span class="num">05</span><span class="denom">&nbsp;/ 06</span></div>
+          <h2 class="slide-title">Your Questions Shape the Campaign.</h2>
+          <p class="slide-subtitle">Poli tells the campaign what voters are asking about, in aggregate. No names, no details.</p>
+          <div class="slide-visual">
+            <div class="flow">
+              <div class="flow-step">
+                <div class="flow-icon-col">
+                  <div class="flow-circle" style="background:var(--teal-dim);border:1.5px solid var(--teal);">
+                    <svg class="flow-icon-svg" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                      <circle cx="7" cy="5" r="2.5" fill="var(--teal)"/>
+                      <path d="M2 12c0-2.76 2.24-5 5-5s5 2.24 5 5" stroke="var(--teal)" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                  </div>
+                  <div class="flow-line"></div>
+                </div>
+                <div class="flow-text">
+                  <div class="flow-label">Voters ask questions</div>
+                  <div class="flow-desc">On the candidate's website, any time</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="flow-icon-col">
+                  <div class="flow-circle" style="background:rgba(59,130,246,0.1);border:1.5px solid rgba(59,130,246,0.5);">
+                    <svg class="flow-icon-svg" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                      <rect x="2" y="3" width="10" height="7" rx="1.5" stroke="var(--step-blue)" stroke-width="1.5"/>
+                      <path d="M5 8.5l2-2 2 2" stroke="var(--step-blue)" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                  <div class="flow-line" style="background:linear-gradient(to bottom,rgba(139,92,246,0.3),transparent);"></div>
+                </div>
+                <div class="flow-text">
+                  <div class="flow-label">Poli listens</div>
+                  <div class="flow-desc">Topics tracked in aggregate, no names attached</div>
+                </div>
+              </div>
+              <div class="flow-step">
+                <div class="flow-icon-col">
+                  <div class="flow-circle" style="background:rgba(139,92,246,0.1);border:1.5px solid rgba(139,92,246,0.5);">
+                    <svg class="flow-icon-svg" viewBox="0 0 14 14" fill="none" aria-hidden="true">
+                      <polygon points="7,2 9,6 13,6.5 10,9.5 10.5,13 7,11 3.5,13 4,9.5 1,6.5 5,6" fill="rgba(139,92,246,0.4)" stroke="var(--step-purple)" stroke-width="1.2" stroke-linejoin="round"/>
+                    </svg>
+                  </div>
+                </div>
+                <div class="flow-text">
+                  <div class="flow-label">Candidate hears what matters</div>
+                  <div class="flow-desc">Real voter priorities surface to the campaign</div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="slide">
+          <div class="slide-eyebrow"><span class="num">06</span><span class="denom">&nbsp;/ 06</span></div>
+          <h2 class="slide-title">Your Personal Town Hall Is Open.</h2>
+          <p class="slide-subtitle">Look for Poli on your candidate's website. Ask anything. Get a direct answer.</p>
+          <div class="slide-visual">
+            <div class="end-card">
+              <div class="end-poli">POLI</div>
+              <div class="end-rule"></div>
+              <div class="end-url">askpoli.us</div>
+              <div class="end-tagline">See through it.</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+
+  <div class="nav-row">
+    <button class="nav-btn" id="btn-prev" aria-label="Previous slide">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M10 12L6 8l4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+    <div class="dots" id="dots" role="tablist"></div>
+    <button class="nav-btn" id="btn-next" aria-label="Next slide">
+      <svg viewBox="0 0 16 16" fill="none" aria-hidden="true"><path d="M6 4l4 4-4 4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>
+    </button>
+  </div>
+
+  <div class="caption-panel">
+    <div class="panel-eyebrow">Caption</div>
+    <p class="caption-text" id="caption-text"></p>
+    <div class="hashtags" id="hashtags" hidden>
+      <span class="hashtag">#AskPoli</span>
+      <span class="hashtag">#YourPersonalTownHall</span>
+      <span class="hashtag">#Voters</span>
+      <span class="hashtag">#AskAnything</span>
+    </div>
+  </div>
+
+  <div class="alt-panel">
+    <div class="alt-heading">Alt Text Reference</div>
+    <div class="alt-list">
+      <div class="alt-row"><span class="alt-num">1</span><span class="alt-copy">A sample chat showing a voter asking about property taxes and Poli answering in the candidate's voice.</span></div>
+      <div class="alt-row"><span class="alt-num">2</span><span class="alt-copy">A sample late-night chat with a voter asking about school funding.</span></div>
+      <div class="alt-row"><span class="alt-num">3</span><span class="alt-copy">A sample chat where a voter checks a candidate's voting record and gets a plain answer.</span></div>
+      <div class="alt-row"><span class="alt-num">4</span><span class="alt-copy">A sample chat where Poli honestly says it does not know an answer yet.</span></div>
+      <div class="alt-row"><span class="alt-num">5</span><span class="alt-copy">A simple three-step graphic: voters ask, Poli listens, the candidate hears what matters most.</span></div>
+      <div class="alt-row"><span class="alt-num">6</span><span class="alt-copy">The Poli logo with the words your personal town hall is open and the site askpoli.us.</span></div>
+    </div>
+  </div>
+</div>
+
+<script>
+const TOTAL = 6;
+const captions = [
+  "This is Poli. An AI chatbot that lives on your candidate's own website. Ask any question, get a direct answer in the candidate's own words. Think of it as your personal town hall, open any hour.",
+  "Poli is an AI chatbot for your candidate. It lives right on their campaign website, so you can ask questions at midnight or at noon. Look for Poli on your candidate's website.",
+  "Poli is an AI chatbot for your candidate. Every answer comes from the candidate's own words, their site, their statements, their record. No spin, no guessing, no outside noise.",
+  "Poli is an AI chatbot for your candidate. When it doesn't know an answer, it tells you straight instead of guessing. That honesty is the whole point.",
+  "Poli is an AI chatbot for your candidate. In aggregate, it shows the campaign what voters are asking about most, so the candidate hears what actually matters to you. Your name and details are never attached.",
+  "Poli is an AI chatbot for every political candidate. Your personal town hall: ask any question on your candidate's website, get a direct answer in their own words. What would you ask first?"
+];
+const strip = document.getElementById('strip');
+const dotsEl = document.getElementById('dots');
+const btnPrev = document.getElementById('btn-prev');
+const btnNext = document.getElementById('btn-next');
+const captionText = document.getElementById('caption-text');
+const hashtags = document.getElementById('hashtags');
+for (let i = 0; i < TOTAL; i++) {
+  const d = document.createElement('button');
+  d.className = 'dot';
+  d.setAttribute('role', 'tab');
+  d.setAttribute('aria-label', 'Slide ' + (i + 1));
+  d.addEventListener('click', () => goTo(i));
+  dotsEl.appendChild(d);
+}
+let current = 0;
+function goTo(n) {
+  current = Math.max(0, Math.min(TOTAL - 1, n));
+  strip.style.transform = 'translateX(-' + (current / TOTAL * 100) + '%)';
+  dotsEl.querySelectorAll('.dot').forEach((d, i) => d.classList.toggle('active', i === current));
+  btnPrev.disabled = current === 0;
+  btnNext.disabled = current === TOTAL - 1;
+  captionText.textContent = captions[current];
+  hashtags.hidden = current !== TOTAL - 1;
+}
+btnPrev.addEventListener('click', () => goTo(current - 1));
+btnNext.addEventListener('click', () => goTo(current + 1));
+document.addEventListener('keydown', e => {
+  if (e.key === 'ArrowLeft') goTo(current - 1);
+  if (e.key === 'ArrowRight') goTo(current + 1);
+});
+let touchX = null;
+const carousel = document.getElementById('carousel');
+carousel.addEventListener('touchstart', e => { touchX = e.touches[0].clientX; }, { passive: true });
+carousel.addEventListener('touchend', e => {
+  if (touchX === null) return;
+  const dx = e.changedTouches[0].clientX - touchX;
+  if (Math.abs(dx) > 40) goTo(dx < 0 ? current + 1 : current - 1);
+  touchX = null;
+});
+goTo(0);
+</script>
+</body>
+</html>
