@@ -52,7 +52,8 @@
   .site .donate { font: 700 15px 'Inter'; color: #fff; background: #D63A3A; padding: 10px 16px; border-radius: 8px; letter-spacing: 0.06em; }
   .chat { position: absolute; top: 262px; left: 22px; right: 22px; bottom: 0; }
   .chathead { display: flex; align-items: center; gap: 14px; padding: 0 6px 18px; border-bottom: 1px solid #E7E4EE; }
-  .chathead .av { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, #2C4FB8, #7A4FB8); color: #fff; display: grid; place-items: center; font: 700 26px 'Inter'; }
+  .chathead .av { width: 56px; height: 56px; border-radius: 50%; overflow: hidden; box-shadow: 0 0 0 1px #E1DAF2; }
+  .chathead .av img { width: 100%; height: 100%; display: block; }
   .chathead h3 { font: 700 27px 'Inter'; color: var(--ink); }
   .chathead p { font: 500 18px 'Inter'; color: var(--muted); display: flex; align-items: center; gap: 8px; margin-top: 3px; }
   .chathead p em { font-style: normal; font: 700 13px 'Inter'; color: #5B3FA6; background: #EEE7FA; padding: 3px 8px; border-radius: 6px; letter-spacing: 0.06em; }
@@ -131,12 +132,10 @@
         </div>
         <div class="site"><div><b>ALEX RIVERA</b><small>FOR CITY COUNCIL</small></div><div class="donate">DONATE</div></div>
         <div class="chat">
-          <div class="chathead"><div class="av">A</div><div><h3>Ask Alex Rivera</h3><p><em>AI</em>Answers from Alex's campaign</p></div></div>
+          <div class="chathead"><div class="av"><img src="poli-orb.png"></div><div><h3>Ask Alex Rivera</h3><p><em>AI</em>Answers from Alex's campaign</p></div></div>
           <div class="ts">Today 11:47 PM</div>
           <div id="ask">What will you do about rent increases?</div>
-          <div class="reply">Alex's housing plan has three parts: more homes near transit, a renter relief fund, and faster permits for affordable units.
-            <div class="src"><svg width="14" height="17" viewBox="0 0 14 17"><path d="M2 1h7l4 4v10a1 1 0 0 1-1 1H2a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1z" fill="none" stroke="#5B3FA6" stroke-width="1.8"/></svg>From Alex's Housing Plan</div>
-          </div>
+          <div class="reply">Alex's housing plan has three parts: more homes near transit, a renter relief fund, and faster permits for affordable units.</div>
         </div>
       </div>
     </div>

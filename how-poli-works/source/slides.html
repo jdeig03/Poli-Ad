@@ -1,0 +1,194 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>How Poli Works</title>
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/Inter-Bold.otf'); }
+  @font-face { font-family: 'InterDisplay'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
+
+  :root { --blue: #1C56DB; --purple: #7A4FB8; --red: #DC3547; --ink: #14131C; --muted: #6E6A80; }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; background: #04050B; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; color: #fff; }
+  #slide { position: relative; width: 1080px; height: 1350px; overflow: hidden;
+    background:
+      radial-gradient(700px 700px at 80px 240px, rgba(28,86,219,0.30), transparent 70%),
+      radial-gradient(640px 640px at 560px 900px, rgba(122,79,184,0.20), transparent 70%),
+      radial-gradient(760px 760px at 1040px 1320px, rgba(220,53,71,0.20), transparent 70%),
+      #04050B; }
+  #slide.night { background:
+      radial-gradient(700px 700px at 900px 160px, rgba(110,90,230,0.22), transparent 70%),
+      radial-gradient(760px 760px at 120px 1300px, rgba(28,86,219,0.24), transparent 70%),
+      #03040A; }
+  .grid { position: absolute; inset: 0; opacity: 0.08; background-image: radial-gradient(circle, #fff 1.3px, transparent 1.6px); background-size: 40px 40px; background-position: 20px 0;
+    -webkit-mask-image: radial-gradient(ellipse 75% 55% at 50% 35%, #000 25%, transparent 80%); }
+  .vignette { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 58%, rgba(0,0,0,0.5) 100%); }
+
+  /* header: brand + page */
+  .top { position: absolute; top: 64px; left: 84px; right: 84px; display: flex; justify-content: space-between; align-items: center; }
+  .brand { display: flex; align-items: center; gap: 14px; font: 800 34px 'InterDisplay'; letter-spacing: -0.01em; }
+  .brand img { width: 46px; height: 46px; border-radius: 50%; }
+  .brand b { background: linear-gradient(90deg, #3E6BF0, #8A5BE0 55%, #E8506A); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .page { font: 600 22px 'Inter'; color: #9C99B0; letter-spacing: 0.08em; }
+
+  h1 { position: absolute; top: 158px; left: 84px; right: 84px; font: 800 70px/1.06 'InterDisplay'; letter-spacing: -0.015em; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, #3E6BF0 0%, #8A5BE0 50%, #E8506A 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .sub { position: absolute; left: 84px; right: 120px; font: 400 31px/1.38 'Inter'; color: #C3C0D6; }
+
+  /* ---------- chat mockup ---------- */
+  .chat { position: absolute; left: 84px; right: 84px; border-radius: 44px; background: #FBFAFE; color: var(--ink); overflow: hidden;
+    box-shadow: 0 60px 120px -40px rgba(90,60,220,0.55), 0 0 0 1px rgba(255,255,255,0.08); }
+  .chat .head { display: flex; align-items: center; gap: 18px; padding: 30px 34px 24px; border-bottom: 1px solid #ECE9F3; }
+  .chat .head img { width: 72px; height: 72px; border-radius: 50%; box-shadow: 0 0 0 1px #E4DEF2; }
+  .chat .head h3 { font: 700 31px 'Inter'; }
+  .chat .head p { margin-top: 5px; display: flex; align-items: center; gap: 10px; font: 500 21px 'Inter'; color: var(--muted); }
+  .badge { font: 700 15px 'Inter'; letter-spacing: 0.08em; color: #5B3FA6; background: #EEE7FA; padding: 4px 9px; border-radius: 7px; }
+  .chat .body { padding: 26px 34px 30px; display: flex; flex-direction: column; gap: 20px; }
+  .ts { text-align: center; font: 500 20px 'Inter'; color: #9A96AA; }
+  .me { align-self: flex-end; max-width: 650px; padding: 24px 28px; border-radius: 34px 34px 10px 34px; font: 600 31px/1.32 'Inter'; color: #fff;
+    background: linear-gradient(135deg, #2A5BE0 0%, #5B4FD0 60%, #7A4FB8 100%); box-shadow: 0 12px 26px rgba(42,91,224,0.28); }
+  .bot { display: flex; gap: 14px; align-items: flex-end; }
+  .bot img { width: 50px; height: 50px; border-radius: 50%; flex: none; box-shadow: 0 0 0 1px #E4DEF2; }
+  .bot .b { max-width: 690px; padding: 24px 28px; border-radius: 34px 34px 34px 10px; background: #EFEDF5; font: 500 28px/1.42 'Inter'; color: #1C1B26; }
+  .input { margin: 0 34px 32px; height: 84px; border-radius: 42px; background: #F1EFF6; border: 1px solid #E5E1EE; display: flex; align-items: center; padding: 0 12px 0 30px;
+    font: 500 26px 'Inter'; color: #9A96AA; }
+  .input .send { margin-left: auto; width: 62px; height: 62px; border-radius: 50%; background: linear-gradient(135deg, var(--blue), var(--purple) 50%, var(--red)); display: grid; place-items: center; }
+  .stamp { position: absolute; z-index: 4; font: 700 17px 'Inter'; letter-spacing: 0.18em; color: #E9E4FF; padding: 9px 16px; border-radius: 10px;
+    background: rgba(20,16,44,0.82); border: 1.5px dashed rgba(190,170,255,0.6); backdrop-filter: blur(6px); }
+
+  /* night variant of the chat */
+  .night .chat { background: #12131D; color: #F1EFF8; box-shadow: 0 60px 120px -40px rgba(90,70,230,0.6), 0 0 0 1px rgba(255,255,255,0.10); }
+  .night .chat .head { border-bottom-color: #23243A; }
+  .night .chat .head p { color: #9C99B0; }
+  .night .badge { color: #CDBBFF; background: #2A2347; }
+  .night .bot .b { background: #23243A; color: #ECEAF6; }
+  .night .input { background: #1A1B29; border-color: #2A2B40; color: #77748C; }
+  .night .ts { color: #77748C; }
+
+  /* ---------- slide 5 flow ---------- */
+  .flow { position: absolute; left: 84px; right: 84px; top: 480px; }
+  .step { position: relative; display: flex; gap: 34px; align-items: center; height: 214px; padding: 0 40px; margin-bottom: 52px; border-radius: 36px;
+    background: linear-gradient(180deg, rgba(255,255,255,0.08), rgba(255,255,255,0.03)); border: 1px solid rgba(255,255,255,0.10);
+    box-shadow: 0 30px 70px -30px rgba(90,60,220,0.45); }
+  .step .ic { flex: none; width: 120px; height: 120px; border-radius: 34px; display: grid; place-items: center;
+    background: linear-gradient(135deg, rgba(28,86,219,0.95), rgba(122,79,184,0.95) 55%, rgba(220,53,71,0.95)); box-shadow: inset 0 1px 0 rgba(255,255,255,0.35), 0 14px 34px rgba(122,79,184,0.4); }
+  .step .ic.orb { background: none; box-shadow: 0 0 50px rgba(150,110,255,0.55); border-radius: 50%; overflow: hidden; }
+  .step .ic.orb img { width: 100%; height: 100%; }
+  .step small { font: 700 19px 'Inter'; letter-spacing: 0.16em; color: #B9A8F0; }
+  .step h3 { margin-top: 8px; font: 700 38px/1.15 'Inter'; }
+  .step p { margin-top: 10px; font: 400 25px/1.35 'Inter'; color: #B8B6C8; }
+  .step .q { display: inline-block; margin-top: 12px; font: 600 23px 'Inter'; color: #fff; padding: 10px 18px; border-radius: 22px 22px 6px 22px; background: linear-gradient(135deg, #2A5BE0, #7A4FB8); }
+  .mini { display: flex; gap: 10px; align-items: flex-end; margin-top: 14px; height: 54px; }
+  .mini i { width: 34px; border-radius: 8px 8px 4px 4px; background: rgba(255,255,255,0.16); }
+  .mini i.hot { background: linear-gradient(180deg, #E8506A, #B2407F); box-shadow: 0 0 20px rgba(232,80,106,0.5); }
+  svg.link { position: absolute; left: 84px; top: 480px; width: 912px; height: 850px; pointer-events: none; }
+  .fine { position: absolute; left: 84px; right: 84px; bottom: 64px; font: 500 22px/1.4 'Inter'; color: #8F8CA3; }
+
+  /* ---------- slide 6 lockup ---------- */
+  .lock { position: absolute; left: 0; right: 0; top: 520px; display: flex; flex-direction: column; align-items: center; }
+  .orbwrap { position: relative; width: 300px; height: 300px; }
+  .halo { position: absolute; inset: -130px; border-radius: 50%; background: radial-gradient(circle, rgba(150,110,255,0.45) 0%, rgba(110,80,220,0.14) 38%, transparent 68%); }
+  .orbwrap img { position: relative; width: 100%; height: 100%; border-radius: 50%; box-shadow: inset 0 0 0 1.5px rgba(215,200,245,0.7); }
+  svg.orbits { position: absolute; left: -130px; top: -130px; width: 560px; height: 560px; }
+  .word { margin-top: 64px; font: 800 150px/1 'InterDisplay'; letter-spacing: -0.03em; background: linear-gradient(100deg, #1E55D8 0%, #5E50C2 38%, #8E47A6 68%, #D23A55 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .url { margin-top: 26px; font: 600 50px 'Inter'; letter-spacing: -0.01em; color: #fff; }
+  .push { position: absolute; left: 0; right: 0; bottom: 70px; text-align: center; font: 500 25px 'Inter'; color: #A9A6BC; }
+  .push b { color: #fff; font-weight: 700; }
+</style>
+</head>
+<body>
+<div id="slide"><div class="grid"></div><div id="content"></div><div class="vignette"></div></div>
+
+<script>
+const ORB = 'poli-orb-hi.png';
+const SEND = '<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 23V6M6 13l8-8 8 8"/></svg>';
+const MOON = '<svg width="22" height="22" viewBox="0 0 24 24" style="vertical-align:-4px;margin-right:8px"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" fill="#B9A8F0"/></svg>';
+
+// One sample candidate across the carousel (fictional, like the demo on askpoli.us).
+const CAND = { name: 'Maya', full: 'Maya Ellison' };
+
+function chat({ top, time, q, a, night }) {
+  return `
+  <div class="stamp" style="right:118px; top:${top - 22}px">SAMPLE CONVERSATION</div>
+  <div class="chat" style="top:${top}px">
+    <div class="head"><img src="${ORB}"><div><h3>${CAND.name}'s AI Representative</h3>
+      <p><span class="badge">AI</span>Answers only from ${CAND.full}'s campaign</p></div></div>
+    <div class="body">
+      <div class="ts">${night ? MOON : ''}${time}</div>
+      <div class="me">${q}</div>
+      <div class="bot"><img src="${ORB}"><div class="b">${a}</div></div>
+    </div>
+    <div class="input">Ask ${CAND.name} anything&hellip;<div class="send">${SEND}</div></div>
+  </div>`;
+}
+const head = n => `<div class="top"><div class="brand"><img src="${ORB}"><b>Poli</b></div><div class="page">${n} / 6</div></div>`;
+
+const SLIDES = {
+  1: () => head(1) + `
+    <h1>Meet Poli.<br><em>Your personal town hall.</em></h1>
+    <div class="sub" style="top:330px">An AI Representative on your candidate's website that answers your questions using their own words.</div>` +
+    chat({ top: 556, time: 'Today 2:14 PM', q: `Where does ${CAND.name} stand on property taxes?`,
+      a: `${CAND.name} wants to hold the county property tax rate flat for the next two years and expand the exemption for seniors on fixed incomes. Want to hear how she plans to pay for it?` }),
+
+  2: () => head(2) + `
+    <h1>Ask anything,<br><em>any hour.</em></h1>
+    <div class="sub" style="top:330px">No rally, no phone bank, no waiting. Just ask.</div>` +
+    chat({ top: 536, time: 'Tonight 11:04 PM', night: true, q: `It's 11 PM and I still don't know where ${CAND.name} stands on school funding.`,
+      a: `Happy to help, any time! ${CAND.name} supports restoring the county's share of school building funds and adding counselors at every middle school. Anything else before you vote?` }),
+
+  3: () => head(3) + `
+    <h1>Answers in the<br><em>candidate's own words.</em></h1>
+    <div class="sub" style="top:330px">Poli only uses what your candidate has shared. No spin.</div>` +
+    chat({ top: 556, time: 'Today 9:31 AM', q: `How did ${CAND.name} vote on the 2025 transit levy?`,
+      a: `${CAND.name} voted yes on the 2025 transit levy. Her campaign says she backed it to extend weekend bus service to Eastgate and Cedar Hill.` }),
+
+  4: () => head(4) + `
+    <h1>If it doesn't know,<br><em>it says so.</em></h1>
+    <div class="sub" style="top:330px">Poli would rather say &ldquo;I don&rsquo;t know&rdquo; than guess.</div>` +
+    chat({ top: 556, time: 'Today 6:48 PM', q: `What's ${CAND.name}'s plan for the county fairgrounds?`,
+      a: `I don't know yet. ${CAND.name}'s campaign hasn't shared a plan for the fairgrounds. I can tell you about her plans for parks and recreation, or you can contact the campaign directly.` }),
+
+  5: () => head(5) + `
+    <h1>Your questions<br><em>shape the campaign.</em></h1>
+    <div class="sub" style="top:330px">The campaign sees what voters ask, so they learn what matters most.</div>
+    <svg class="link" viewBox="0 0 912 850"><defs><linearGradient id="lk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3E6BF0"/><stop offset=".5" stop-color="#8A5BE0"/><stop offset="1" stop-color="#E8506A"/></linearGradient>
+      <filter id="gl" x="-50%" y="-10%" width="200%" height="120%"><feGaussianBlur stdDeviation="6"/></filter></defs>
+      <path d="M100 210 V 286 M100 476 V 552" stroke="url(#lk)" stroke-width="10" stroke-linecap="round" filter="url(#gl)" opacity=".8"/>
+      <path d="M100 210 V 286 M100 476 V 552" stroke="url(#lk)" stroke-width="4" stroke-linecap="round"/></svg>
+    <div class="flow">
+      <div class="step"><div class="ic"><svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linejoin="round"><path d="M20.7 16.2A9.2 9.2 0 1 0 17 20l4.3 1.2z"/></svg></div>
+        <div><small>STEP 1</small><h3>You ask</h3><div class="q">&ldquo;How will you fix Route 9?&rdquo;</div></div></div>
+      <div class="step"><div class="ic orb"><img src="${ORB}"></div>
+        <div><small>STEP 2</small><h3>Poli answers</h3><p>Using only what the candidate has shared.</p></div></div>
+      <div class="step"><div class="ic"><svg width="58" height="58" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="1.8" stroke-linecap="round"><path d="M4 20V10M10 20V4M16 20v-7M22 20H2"/></svg></div>
+        <div><small>STEP 3</small><h3>The campaign hears what matters</h3><div class="mini"><i style="height:22px"></i><i style="height:30px"></i><i style="height:38px"></i><i class="hot" style="height:54px"></i><i style="height:26px"></i></div></div></div>
+    </div>
+    <div class="fine">Don't share sensitive personal details. Your personal information is never sold.</div>`,
+
+  6: () => head(6) + `
+    <h1>Your personal town hall<br><em>is open.</em></h1>
+    <div class="sub" style="top:330px">Look for &ldquo;Ask [Candidate]&rdquo; on your candidate&rsquo;s website. Ask anything.</div>
+    <div class="lock">
+      <div class="orbwrap"><div class="halo"></div>
+        <svg class="orbits" viewBox="0 0 560 560"><defs><linearGradient id="og" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1C56DB"/><stop offset=".5" stop-color="#7A4FB8"/><stop offset="1" stop-color="#DC3547"/></linearGradient></defs>
+          <circle cx="280" cy="280" r="196" fill="none" stroke="url(#og)" stroke-opacity=".22" stroke-width="1.4"/>
+          <path d="M 280 84 A 196 196 0 0 1 459 200" fill="none" stroke="url(#og)" stroke-width="3" stroke-linecap="round" stroke-opacity=".85"/>
+          <path d="M 99 356 A 196 196 0 0 1 84 280" fill="none" stroke="url(#og)" stroke-width="3" stroke-linecap="round" stroke-opacity=".55"/>
+          <circle cx="459" cy="200" r="6" fill="#fff"/></svg>
+        <img src="${ORB}"></div>
+      <div class="word">Poli</div>
+      <div class="url">askpoli.us</div>
+    </div>
+    <div class="push">Candidate not on Poli yet? <b>Ask them to join at askpoli.us</b></div>`,
+};
+
+const n = Number(new URLSearchParams(location.search).get('n') || 1);
+if (n === 2) document.getElementById('slide').classList.add('night');
+document.getElementById('content').innerHTML = SLIDES[n]();
+window.ready = Promise.all([document.fonts.ready, ...[...document.images].map(i => i.decode().catch(() => {}))]);
+</script>
+</body>
+</html>
