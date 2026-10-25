@@ -31,11 +31,11 @@
   .top { position: absolute; top: 64px; left: 84px; right: 84px; display: flex; justify-content: space-between; align-items: center; }
   .brand { display: flex; align-items: center; gap: 14px; font: 800 34px 'InterDisplay'; letter-spacing: -0.01em; }
   .brand img { width: 46px; height: 46px; border-radius: 50%; }
-  .brand b { background: linear-gradient(90deg, #3E6BF0, #8A5BE0 55%, #E8506A); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .brand b { background: linear-gradient(90deg, #1E55D8 0%, #5E50C2 38%, #8E47A6 68%, #D23A55 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .page { font: 600 22px 'Inter'; color: #9C99B0; letter-spacing: 0.08em; }
 
   h1 { position: absolute; top: 158px; left: 84px; right: 84px; font: 800 70px/1.06 'InterDisplay'; letter-spacing: -0.015em; }
-  h1 em { font-style: normal; background: linear-gradient(90deg, #3E6BF0 0%, #8A5BE0 50%, #E8506A 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  h1 em { font-style: normal; background: linear-gradient(90deg, #1E55D8 0%, #5E50C2 38%, #8E47A6 68%, #D23A55 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .sub { position: absolute; left: 84px; right: 120px; font: 400 31px/1.38 'Inter'; color: #C3C0D6; }
 
   /* ---------- chat mockup ---------- */
@@ -83,7 +83,7 @@
   .step .q { display: inline-block; margin-top: 12px; font: 600 23px 'Inter'; color: #fff; padding: 10px 18px; border-radius: 22px 22px 6px 22px; background: linear-gradient(135deg, #2A5BE0, #7A4FB8); }
   .mini { display: flex; gap: 10px; align-items: flex-end; margin-top: 14px; height: 54px; }
   .mini i { width: 34px; border-radius: 8px 8px 4px 4px; background: rgba(255,255,255,0.16); }
-  .mini i.hot { background: linear-gradient(180deg, #E8506A, #B2407F); box-shadow: 0 0 20px rgba(232,80,106,0.5); }
+  .mini i.hot { background: linear-gradient(180deg, #D23A55, #8E47A6); box-shadow: 0 0 20px rgba(210,58,85,0.55); }
   svg.link { position: absolute; left: 84px; top: 480px; width: 912px; height: 850px; pointer-events: none; }
   .fine { position: absolute; left: 84px; right: 84px; bottom: 64px; font: 500 22px/1.4 'Inter'; color: #8F8CA3; }
 
@@ -107,15 +107,15 @@ const ORB = 'poli-orb-hi.png';
 const SEND = '<svg width="28" height="28" viewBox="0 0 28 28" fill="none" stroke="#fff" stroke-width="3.6" stroke-linecap="round" stroke-linejoin="round"><path d="M14 23V6M6 13l8-8 8 8"/></svg>';
 const MOON = '<svg width="22" height="22" viewBox="0 0 24 24" style="vertical-align:-4px;margin-right:8px"><path d="M20 14.5A8 8 0 0 1 9.5 4 8 8 0 1 0 20 14.5z" fill="#B9A8F0"/></svg>';
 
-// One sample candidate across the carousel (fictional, like the demo on askpoli.us).
+// One sample candidate across the carousel (fictional, like the demo on Askpoli.us).
 const CAND = { name: 'Maya', full: 'Maya Ellison' };
 
 function chat({ top, time, q, a, night }) {
   return `
   <div class="stamp" style="right:118px; top:${top - 22}px">SAMPLE CONVERSATION</div>
   <div class="chat" style="top:${top}px">
-    <div class="head"><img src="${ORB}"><div><h3>${CAND.name}'s AI Representative</h3>
-      <p><span class="badge">AI</span>Answers only from ${CAND.full}'s campaign</p></div></div>
+    <div class="head"><img src="${ORB}"><div><h3>Ask ${CAND.full}</h3>
+      <p><span class="badge">AI</span>AI Representative for ${CAND.name}'s campaign</p></div></div>
     <div class="body">
       <div class="ts">${night ? MOON : ''}${time}</div>
       <div class="me">${q}</div>
@@ -154,7 +154,7 @@ const SLIDES = {
   5: () => head(5) + `
     <h1>Your questions<br><em>shape the campaign.</em></h1>
     <div class="sub" style="top:330px">The campaign sees what voters ask, so they learn what matters most.</div>
-    <svg class="link" viewBox="0 0 912 850"><defs><linearGradient id="lk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#3E6BF0"/><stop offset=".5" stop-color="#8A5BE0"/><stop offset="1" stop-color="#E8506A"/></linearGradient>
+    <svg class="link" viewBox="0 0 912 850"><defs><linearGradient id="lk" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="#1E55D8"/><stop offset=".38" stop-color="#5E50C2"/><stop offset=".68" stop-color="#8E47A6"/><stop offset="1" stop-color="#D23A55"/></linearGradient>
       <filter id="gl" x="-50%" y="-10%" width="200%" height="120%"><feGaussianBlur stdDeviation="6"/></filter></defs>
       <path d="M100 210 V 286 M100 476 V 552" stroke="url(#lk)" stroke-width="10" stroke-linecap="round" filter="url(#gl)" opacity=".8"/>
       <path d="M100 210 V 286 M100 476 V 552" stroke="url(#lk)" stroke-width="4" stroke-linecap="round"/></svg>
@@ -180,9 +180,9 @@ const SLIDES = {
           <circle cx="459" cy="200" r="6" fill="#fff"/></svg>
         <img src="${ORB}"></div>
       <div class="word">Poli</div>
-      <div class="url">askpoli.us</div>
+      <div class="url">Askpoli.us</div>
     </div>
-    <div class="push">Candidate not on Poli yet? <b>Ask them to join at askpoli.us</b></div>`,
+    <div class="push">Candidate not on Poli yet? <b>Ask them to join at Askpoli.us</b></div>`,
 };
 
 const n = Number(new URLSearchParams(location.search).get('n') || 1);

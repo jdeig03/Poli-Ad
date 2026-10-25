@@ -3,8 +3,9 @@
 Revised Oct 25, 2026. Nothing posts until "approved" is written on this exact copy.
 
 Decisions applied (from review):
+- Brand: headline gradients use the exact Poli wordmark colors (#1E55D8, #5E50C2, #8E47A6, #D23A55); the URL is written "Askpoli.us" everywhere, matching the video end card.
 - Path B: no claim that answers show sources. Uses "only uses what the candidate has shared" and "says I don't know instead of guessing."
-- Product name matches the site: "AI Representative" (mockups: "Maya's AI Representative").
+- Product name matches the site: "AI Representative". Chat headers follow the real widget: "Ask Maya Ellison" / "AI Representative for Maya's campaign".
 - Placement line matches the product: "Look for 'Ask [Candidate]' on your candidate's website."
 - The assistant talks about the candidate, never as the candidate (site promise: "Clearly an AI").
 - Privacy wording matches the site: the campaign sees voters' questions; personal information is never sold.
@@ -19,7 +20,7 @@ Files: `How-Poli-Works-1..6-2160x2700.png` (upload these; 1080x1350 copies inclu
 ## Slide 1
 **Title:** Meet Poli. Your personal town hall.
 **Subtitle:** An AI Representative on your candidate's website that answers your questions using their own words.
-**Mockup (SAMPLE CONVERSATION, "Maya's AI Representative"):**
+**Mockup (SAMPLE CONVERSATION, header "Ask Maya Ellison"):**
 - Voter: Where does Maya stand on property taxes?
 - AI: Maya wants to hold the county property tax rate flat for the next two years and expand the exemption for seniors on fixed incomes. Want to hear how she plans to pay for it?
 
@@ -53,8 +54,8 @@ Files: `How-Poli-Works-1..6-2160x2700.png` (upload these; 1080x1350 copies inclu
 ## Slide 6
 **Title:** Your personal town hall is open.
 **Subtitle:** Look for "Ask [Candidate]" on your candidate's website. Ask anything.
-**Visual:** Poli orb + wordmark + askpoli.us (no button look).
-**Footer:** Candidate not on Poli yet? Ask them to join at askpoli.us
+**Visual:** Poli orb + wordmark + Askpoli.us (no button look).
+**Footer:** Candidate not on Poli yet? Ask them to join at Askpoli.us
 
 ---
 
@@ -66,7 +67,7 @@ Poli is an AI Representative that lives on a candidate's own campaign website. A
 
 Your questions count. The campaign sees what voters are asking, so they learn what matters most to you. Please don't share sensitive personal details. Your personal information is never sold.
 
-Look for "Ask [Candidate]" on your candidate's website. Candidate not using Poli yet? Ask them to join at askpoli.us (link in bio).
+Look for "Ask [Candidate]" on your candidate's website. Candidate not using Poli yet? Ask them to join at Askpoli.us (link in bio).
 
 What would you ask first? 👇
 
@@ -76,12 +77,12 @@ What would you ask first? 👇
 
 ## Alt text (add per image in Instagram's Advanced settings)
 
-1. Slide titled "Meet Poli. Your personal town hall." A sample chat with Maya's AI Representative: a voter asks where Maya stands on property taxes, and the AI explains her plan to hold the rate flat and expand the senior exemption.
+1. Slide titled "Meet Poli. Your personal town hall." A sample chat with Maya Ellison's AI Representative: a voter asks where Maya stands on property taxes, and the AI explains her plan to hold the rate flat and expand the senior exemption.
 2. Slide titled "Ask anything, any hour." A sample late-night chat at 11:04 PM: a voter asks about school funding, and the AI cheerfully answers with Maya's position.
 3. Slide titled "Answers in the candidate's own words." A sample chat: a voter asks how Maya voted on the 2025 transit levy, and the AI answers plainly that she voted yes and why, per her campaign.
 4. Slide titled "If it doesn't know, it says so." A sample chat: a voter asks about the county fairgrounds, and the AI says it doesn't know yet because the campaign hasn't shared a plan, then offers related topics.
 5. Slide titled "Your questions shape the campaign." Three steps: you ask, Poli answers using only what the candidate has shared, and the campaign hears what matters. Fine print says not to share sensitive details and that personal information is never sold.
-6. Slide titled "Your personal town hall is open." The Poli logo and the website askpoli.us, with a note to look for "Ask [Candidate]" on a candidate's website.
+6. Slide titled "Your personal town hall is open." The Poli logo and the website Askpoli.us, with a note to look for "Ask [Candidate]" on a candidate's website.
 
 ---
 
