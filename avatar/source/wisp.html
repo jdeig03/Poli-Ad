@@ -1,0 +1,212 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Wisp</title>
+<style>html,body{margin:0;background:#fff;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// -----------------------------------------------------------------------------------------------
+// Poli "Wisp". Head and body share one pearl material and one light, so they read as one being.
+// The smile is the logo's own smile (extracted from the logo file) printed on the sphere's front,
+// unlit, so its colors are exactly the logo's. ?p=hero|happy|listening|unsure  ?bg=light|dark
+// -----------------------------------------------------------------------------------------------
+const Q = new URLSearchParams(location.search);
+const P = Q.get('p') || 'hero', BG = Q.get('bg') || 'light', SIZE = Number(Q.get('size') || 1024);
+const DARK = BG === 'dark';
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(2); renderer.setSize(SIZE, SIZE);
+renderer.toneMapping = THREE.NoToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = DARK ? 0.3 : 0.34;
+
+{ // backdrop: soft, warm studio (light) or the brand night sky (dark)
+  const c = document.createElement('canvas'); c.width = c.height = 1024; const g = c.getContext('2d');
+  if (DARK) {
+    g.fillStyle = '#05060D'; g.fillRect(0, 0, 1024, 1024);
+    [[170, 250, 640, 'rgba(28,86,219,0.26)'], [520, 600, 560, 'rgba(122,79,184,0.20)'], [900, 920, 640, 'rgba(220,53,71,0.17)']].forEach(([x, y, r, col]) => {
+      const rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, 1024, 1024); });
+  } else {
+    const rg = g.createRadialGradient(512, 400, 40, 512, 520, 800);
+    rg.addColorStop(0, '#F3EEF4'); rg.addColorStop(0.5, '#E4DDEC'); rg.addColorStop(1, '#C9C0DC');
+    g.fillStyle = rg; g.fillRect(0, 0, 1024, 1024);
+    const w = g.createRadialGradient(700, 260, 0, 700, 260, 520); w.addColorStop(0, 'rgba(255,214,200,0.22)'); w.addColorStop(1, 'rgba(255,214,200,0)');
+    g.fillStyle = w; g.fillRect(0, 0, 1024, 1024);       // a warm window-light glow
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; scene.background = t;
+}
+
+const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 100);
+// warm key from above-front (puts the soft highlight near the top of the orb, like the logo)
+const key = new THREE.DirectionalLight(0xfff4ec, 0.62); key.position.set(-0.9, 3.2, 5.6); scene.add(key);
+const fill = new THREE.DirectionalLight(0xe8ecff, 0.14); fill.position.set(4, 1, 3); scene.add(fill);
+const rim = new THREE.DirectionalLight(0xc7b6ff, DARK ? 0.9 : 0.45); rim.position.set(0, -0.6, -5); scene.add(rim);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xa996e0, 0.34));   // lavender bounce from below, like the logo
+
+const BLUE = new THREE.Color(0x1C56DB), PURPLE = new THREE.Color(0x7A4FB8), RED = new THREE.Color(0xDC3547);
+
+// ---------------------------------------------------------------- one pearl for head and body
+const smileTex = await new THREE.TextureLoader().loadAsync('poli-smile-map.png');
+smileTex.colorSpace = THREE.SRGBColorSpace; smileTex.anisotropy = 8; smileTex.generateMipmaps = false; smileTex.minFilter = THREE.LinearFilter;
+const R = 0.62, ORB_IN_PNG = 384 / 1344, SOBJ = R / ORB_IN_PNG;   // object-space width of the logo image
+
+function pearl({ smile = false, glow = 0 } = {}) {
+  const m = new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.3, clearcoat: 1, clearcoatRoughness: 0.08,
+    iridescence: 0.14, iridescenceIOR: 1.33, iridescenceThicknessRange: [200, 420], sheen: 0.22, sheenColor: new THREE.Color(0xeadfff), sheenRoughness: 0.55 });
+  const id = 'pearl-' + Math.random(); m.customProgramCacheKey = () => id;
+  m.onBeforeCompile = sh => {
+    sh.uniforms.uSmile = { value: smileTex }; sh.uniforms.uS = { value: SOBJ }; sh.uniforms.uOn = { value: smile ? 1 : 0 }; sh.uniforms.uGlow = { value: glow };
+    sh.vertexShader = sh.vertexShader.replace('#include <common>', '#include <common>\nvarying vec3 vObjP;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvObjP = position;');
+    sh.fragmentShader = sh.fragmentShader.replace('#include <common>', `#include <common>
+varying vec3 vObjP; uniform sampler2D uSmile; uniform float uS, uOn, uGlow;`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+// the logo orb's pearl: white with a faint lavender settling toward the underside
+vec3 nO = normalize(vObjP);
+diffuseColor.rgb *= mix(vec3(1.0), vec3(0.905, 0.875, 0.965), smoothstep(0.15, -0.95, uOn > 0.5 ? nO.y : (vObjP.y + 0.9) * 0.9));
+vec4 sm = vec4(0.0);
+if (uOn > 0.5) { vec2 uv = vObjP.xy / uS + 0.5; sm = texture2D(uSmile, uv) * smoothstep(0.0, 0.2, nO.z); }
+float core = smoothstep(0.3, 0.72, sm.a);
+vec3 pearlRef = pow(vec3(248.0, 245.0, 253.0) / 255.0, vec3(2.2));
+diffuseColor.rgb *= (1.0 - core);`)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+totalEmissiveRadiance += sm.rgb * core;                        // smile stroke: exact logo colors, independent of lighting
+totalEmissiveRadiance += sm.rgb * sm.a * (1.0 - core) * 0.85;   // its soft glow: colored light on the pearl, like the logo
+totalEmissiveRadiance += vec3(0.93, 0.91, 1.0) * 0.16 * (1.0 - sm.a);   // inner luminance: the pearl glows softly from within
+totalEmissiveRadiance += vec3(0.62, 0.52, 0.95) * uGlow * pow(1.0 - abs(dot(normalize(vNormal), vec3(0.0, 0.0, 1.0))), 2.0) * (1.0 - core);`)
+      .replace('#include <lights_physical_fragment>', `#include <lights_physical_fragment>
+#ifdef USE_SHEEN
+material.sheenColor *= (1.0 - core);
+#endif`)
+      .replace('#include <lights_fragment_end>', `#include <lights_fragment_end>
+reflectedLight.directSpecular *= (1.0 - core); reflectedLight.indirectSpecular *= (1.0 - core);
+#ifdef USE_CLEARCOAT
+clearcoatSpecularDirect *= (1.0 - core); clearcoatSpecularIndirect *= (1.0 - core);
+#endif`);
+  };
+  return m;
+}
+
+// ---------------------------------------------------------------- geometry
+function lathe(profile, seg = 200) {
+  const curve = new THREE.SplineCurve(profile.map(([r, y]) => new THREE.Vector2(r, y)));
+  const pts = curve.getPoints(220); pts[0].x = 0; pts[pts.length - 1].x = 0;
+  const g = new THREE.LatheGeometry(pts, seg); g.computeVertexNormals(); return g;
+}
+const UP = new THREE.Vector3(0, 1, 0);
+// a soft petal limb: rounded at both ends, fuller near the shoulder, gently curved
+function petalArm(from, dir, len, r0, r1, curl, mat) {
+  const g = new THREE.CapsuleGeometry(1, 1, 24, 64);
+  const pos = g.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const t = THREE.MathUtils.clamp((pos.getY(i) + 1.5) / 3, 0, 1);
+    const rr = THREE.MathUtils.lerp(r0, r1, Math.pow(t, 1.3)) * (0.9 + 0.25 * Math.sin(Math.PI * Math.min(1, t * 1.6)));
+    const y = t * len, bend = curl * t * t * len;           // curl toward the front, like a relaxed hand
+    pos.setXYZ(i, pos.getX(i) * rr, y, pos.getZ(i) * rr * 0.82 + bend);
+  }
+  g.computeVertexNormals();
+  const m = new THREE.Mesh(g, mat);
+  const d = new THREE.Vector3(...dir).normalize();
+  m.quaternion.setFromUnitVectors(UP, d); m.position.set(...from); return m;
+}
+
+// ---------------------------------------------------------------- poses
+// arm directions are unit-ish vectors from the shoulder; head tilt and body sway add life
+const POSE = {
+  hero:      { L: [-0.62, -0.72, 0.28], R: [0.5, 0.86, 0.12], tilt: -0.10, sway: 0.10, lift: 0.0 },
+  happy:     { L: [-0.66, 0.72, 0.2], R: [0.66, 0.72, 0.2], tilt: 0.0, sway: 0.0, lift: 0.08 },
+  listening: { L: [0.38, -0.55, 0.75], R: [-0.38, -0.55, 0.75], tilt: 0.14, sway: -0.06, lift: -0.02, lean: 0.08 },
+  unsure:    { L: [-0.86, -0.42, 0.38], R: [0.86, -0.42, 0.38], tilt: 0.13, sway: 0.0, lift: 0.0, palms: true },
+};
+const pose = POSE[P] || POSE.hero;
+
+// ---------------------------------------------------------------- Poli
+const poli = new THREE.Group(); scene.add(poli);
+const bodyMat = pearl({ glow: 0.06 });
+
+// body: one flowing form from a soft neck to a rounded, curling tail (no points anywhere)
+const prof = [[0, -2.5], [0.05, -2.49], [0.085, -2.44], [0.11, -2.34], [0.16, -2.12], [0.24, -1.86], [0.32, -1.58], [0.385, -1.32], [0.42, -1.12], [0.42, -0.98], [0.36, -0.86], [0.24, -0.76], [0.16, -0.66], [0.14, -0.55], [0.0, -0.45]];
+const bgeo = lathe(prof);
+{ const pos = bgeo.attributes.position;
+  for (let i = 0; i < pos.count; i++) { const y = pos.getY(i); const k = Math.max(0, (-1.3 - y) / 1.2);
+    pos.setX(i, pos.getX(i) + 0.46 * k * k + pose.sway * k); pos.setZ(i, pos.getZ(i) - 0.22 * k * k * k); }
+  bgeo.computeVertexNormals(); }
+const bodyMesh = new THREE.Mesh(bgeo, bodyMat); poli.add(bodyMesh);
+
+// arms: soft petals floating just off the shoulders
+for (const side of [-1, 1]) {
+  const d = side < 0 ? pose.L : pose.R;
+  const s = [side * 0.5, -0.97, 0.06];
+  poli.add(petalArm(s, d, 0.78, 0.1, 0.055, pose.palms ? -0.25 : 0.18, bodyMat));
+}
+
+// head: the logo orb, brought to life (same pearl, real light, exact smile)
+const headMat = pearl({ smile: true, glow: 0.04 }); headMat.roughness = 0.38; headMat.clearcoatRoughness = 0.22;
+const head = new THREE.Mesh(new THREE.SphereGeometry(R, 256, 128), headMat);
+const headPivot = new THREE.Group(); headPivot.add(head); poli.add(headPivot);
+headPivot.position.set(0, 0.0, 0.0);
+head.rotation.set(-0.05, 0.06, 0);                     // turned a touch toward the viewer
+headPivot.rotation.z = pose.tilt;                     // a gentle, kind head tilt
+
+// the logo's soft lavender halo, as light around the head
+{ const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+  const rg = g.createRadialGradient(256, 256, 150, 256, 256, 256);
+  rg.addColorStop(0, DARK ? 'rgba(170,140,255,0.42)' : 'rgba(120,95,200,0.18)'); rg.addColorStop(1, 'rgba(120,95,200,0)');
+  g.fillStyle = rg; g.fillRect(0, 0, 512, 512);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const halo = new THREE.Mesh(new THREE.PlaneGeometry(R * 3.4, R * 3.4), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: DARK ? THREE.AdditiveBlending : THREE.NormalBlending }));
+  halo.position.z = -0.3; headPivot.add(halo); }
+
+// Poli's own warm light: blue and red from the smile, a soft lavender heart-glow inside the chest
+const rimB = new THREE.DirectionalLight(0x4a74ff, DARK ? 0.75 : 0.45); rimB.position.set(-4, 0.5, -3); scene.add(rimB);
+const rimR = new THREE.DirectionalLight(0xff566e, DARK ? 0.7 : 0.4); rimR.position.set(4, 0.2, -3); scene.add(rimR);
+
+
+// floating light motes: tiny soft orbs drifting around Poli (alive, never busy)
+const rnd = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(31);
+for (let i = 0; i < 22; i++) {
+  const a = rnd() * Math.PI * 2, r = 1.0 + rnd() * 1.1, y = -2.2 + rnd() * 3.0;
+  const t = rnd(); const col = t < 0.5 ? BLUE.clone().lerp(PURPLE, t * 2) : PURPLE.clone().lerp(RED, (t - 0.5) * 2);
+  const s = 0.008 + rnd() * 0.018;
+  const m = new THREE.Mesh(new THREE.SphereGeometry(s, 16, 12), new THREE.MeshBasicMaterial({ color: col.clone().lerp(new THREE.Color(1, 1, 1), 0.3).multiplyScalar(DARK ? 1.5 : 1.1), transparent: true, opacity: DARK ? 0.7 : 0.6 }));
+  m.position.set(Math.cos(a) * r, y, Math.sin(a) * r * 0.6 - 0.2); poli.add(m);
+}
+
+// hover: soft shadow + light pool under the tail
+{ const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+  const rg = g.createRadialGradient(256, 256, 0, 256, 256, 256);
+  rg.addColorStop(0, DARK ? 'rgba(150,115,255,0.5)' : 'rgba(80,55,160,0.26)'); rg.addColorStop(0.45, DARK ? 'rgba(110,80,230,0.15)' : 'rgba(80,55,160,0.08)'); rg.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = rg; g.fillRect(0, 0, 512, 512);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(2.4, 1.0), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, blending: DARK ? THREE.AdditiveBlending : THREE.NormalBlending }));
+  m.rotation.x = -Math.PI / 2; m.position.set(0.35, -2.85, 0); scene.add(m); }
+
+poli.position.y = pose.lift; poli.rotation.y = -0.16; poli.rotation.x = pose.lean || 0;
+camera.position.set(0, 0.15, 9.0); camera.lookAt(0.12, -0.95, 0);
+
+const rt = new THREE.WebGLRenderTarget(SIZE * 2, SIZE * 2, { samples: 4, type: THREE.HalfFloatType });
+const composer = new EffectComposer(renderer, rt); composer.setPixelRatio(2); composer.setSize(SIZE, SIZE);
+composer.addPass(new RenderPass(scene, camera));
+if (!Q.get('nobloom')) composer.addPass(new UnrealBloomPass(new THREE.Vector2(SIZE * 2, SIZE * 2), 0.22, 0.3, 1.35));
+composer.addPass(new OutputPass());
+composer.render();
+window.done = true;
+</script>
+</body>
+</html>
