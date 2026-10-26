@@ -25,7 +25,7 @@ const server = http.createServer((req, res) => {
     const page = await browser.newPage({ viewport: { width: 1024, height: 1024 }, deviceScaleFactor: 1 });
     page.on('console', m => { if (m.type() === 'error') console.error(name, m.text()); });
     page.on('pageerror', e => console.error(name, e.message));
-    await page.goto(`http://127.0.0.1:${port}/avatar.html?${query}`);
+    await page.goto(`http://127.0.0.1:${port}/${process.env.PAGE || 'avatar.html'}?${query}`);
     await page.waitForFunction(() => window.done === true, null, { timeout: 600000 });
     const data = await page.evaluate(() => document.querySelector('canvas').toDataURL('image/png'));
     fs.writeFileSync(path.join(out, name + '.png'), Buffer.from(data.split(',')[1], 'base64'));

@@ -1,0 +1,279 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Avatar v2</title>
+<style>html,body{margin:0;background:#fff;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// -----------------------------------------------------------------------------------------------
+// Poli avatar, v2. The logo orb is the ACTUAL logo artwork, untouched (exact smile, proportions,
+// colors, halo). Personality comes only from what surrounds it and how it moves: hover, light,
+// companions, posture. Variants: ?v=hover | gyro | satellites | aura | glide ; poses: ?p=...
+// -----------------------------------------------------------------------------------------------
+const Q = new URLSearchParams(location.search);
+const V = Q.get('v') || 'hover';
+const P = Q.get('p') || 'hero';
+const BG = Q.get('bg') || 'light';
+const SIZE = Number(Q.get('size') || 1024);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true });
+renderer.setPixelRatio(2); renderer.setSize(SIZE, SIZE);
+renderer.toneMapping = THREE.NeutralToneMapping;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = BG === 'dark' ? 0.45 : 0.7;
+
+function backdrop() {
+  const c = document.createElement('canvas'); c.width = c.height = 1024; const g = c.getContext('2d');
+  if (BG === 'dark') {
+    g.fillStyle = '#05060D'; g.fillRect(0, 0, 1024, 1024);
+    [[170, 250, 640, 'rgba(28,86,219,0.26)'], [520, 640, 560, 'rgba(122,79,184,0.18)'], [900, 920, 640, 'rgba(220,53,71,0.17)']].forEach(([x, y, r, col]) => {
+      const rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, 1024, 1024); });
+  } else {
+    const rg = g.createRadialGradient(512, 440, 60, 512, 520, 780);
+    rg.addColorStop(0, '#ECE8F3'); rg.addColorStop(0.55, '#DFD9EA'); rg.addColorStop(1, '#C6BEDA');
+    g.fillStyle = rg; g.fillRect(0, 0, 1024, 1024);
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+scene.background = backdrop();
+
+const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 100);
+const key = new THREE.DirectionalLight(0xffffff, 1.0); key.position.set(-2, 5, 4); scene.add(key);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xbfaee8, 0.5));
+
+const BLUE = new THREE.Color(0x1C56DB), PURPLE = new THREE.Color(0x7A4FB8), RED = new THREE.Color(0xDC3547);
+const brand = t => t < 0.5 ? BLUE.clone().lerp(PURPLE, t * 2) : PURPLE.clone().lerp(RED, (t - 0.5) * 2);
+
+// ---------------------------------------------------------------- the orb: exact logo artwork
+const R = 0.62;                                  // orb radius in world units
+const ORB_IN_PNG = 384 / 1344;                    // measured: orb radius / image width
+const orb = new THREE.Group(); scene.add(orb);
+const tex = await new THREE.TextureLoader().loadAsync('poli-logo-orb.png');
+tex.colorSpace = THREE.SRGBColorSpace; tex.anisotropy = 8;
+const logo = new THREE.Mesh(new THREE.PlaneGeometry(1, 1).scale(2 * R / (2 * ORB_IN_PNG), 2 * R / (2 * ORB_IN_PNG), 1),
+  new THREE.MeshBasicMaterial({ map: tex, transparent: true, toneMapped: false, depthWrite: false }));
+logo.renderOrder = 10; orb.add(logo);
+// Poli's own light: the smile's blue end, red end, and the lavender halo light the world around it
+const lB = new THREE.PointLight(0x2f63ff, 4.0, 4, 2); lB.position.set(-0.55, -0.05, 0.25); orb.add(lB);
+const lR = new THREE.PointLight(0xff3d58, 3.6, 4, 2); lR.position.set(0.55, -0.05, 0.25); orb.add(lR);
+const lH = new THREE.PointLight(0xb39cff, 1.7, 5, 2); lH.position.set(0, 0, 0); orb.add(lH);
+
+// ---------------------------------------------------------------- materials
+const pearl = () => new THREE.MeshPhysicalMaterial({ color: 0xffffff, roughness: 0.24, clearcoat: 1, clearcoatRoughness: 0.05,
+  iridescence: 0.2, iridescenceIOR: 1.35, iridescenceThicknessRange: [180, 420], sheen: 0.1, sheenColor: new THREE.Color(0xe4dbff) });
+const glowMat = (c, k = 2.2, op = 1) => new THREE.MeshBasicMaterial({ color: c.clone().multiplyScalar(k), toneMapped: false, transparent: op < 1, opacity: op });
+function gradientColors(geo, fn, k = 2.4) {           // per-vertex brand gradient (HDR so it glows)
+  const pos = geo.attributes.position, cols = [];
+  for (let i = 0; i < pos.count; i++) { const c = brand(fn(pos.getX(i), pos.getY(i), pos.getZ(i))).multiplyScalar(k); cols.push(c.r, c.g, c.b); }
+  geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3)); return geo;
+}
+
+// ---------------------------------------------------------------- hover field (shared)
+function hoverField(y, scale = 1, strength = 1) {
+  const g = new THREE.Group(); g.position.y = y;
+  const mk = (draw, w, blend) => {
+    const c = document.createElement('canvas'); c.width = c.height = 1024; draw(c.getContext('2d'));
+    const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+    const m = new THREE.Mesh(new THREE.PlaneGeometry(w, w), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, toneMapped: false, blending: blend }));
+    m.rotation.x = -Math.PI / 2; g.add(m); return m;
+  };
+  // soft shadow
+  mk(ctx => { const rg = ctx.createRadialGradient(512, 512, 0, 512, 512, 512);
+    rg.addColorStop(0, `rgba(60,40,130,${0.30 * strength})`); rg.addColorStop(0.45, `rgba(60,40,130,${0.10 * strength})`); rg.addColorStop(1, 'rgba(0,0,0,0)');
+    ctx.fillStyle = rg; ctx.fillRect(0, 0, 1024, 1024); }, 1.9 * scale, THREE.NormalBlending);
+  // concentric light rings, like ripples of the primary logo's rings
+  mk(ctx => { for (let i = 0; i < 3; i++) { const r = 210 + i * 95;
+      const lg = ctx.createLinearGradient(512 - r, 0, 512 + r, 0); lg.addColorStop(0, '#2F63FF'); lg.addColorStop(0.5, '#8A5BE0'); lg.addColorStop(1, '#FF3D58');
+      ctx.strokeStyle = lg; ctx.globalAlpha = (0.85 - i * 0.25) * strength; ctx.lineWidth = 7 - i * 1.6; ctx.beginPath(); ctx.arc(512, 512, r, 0, Math.PI * 2); ctx.stroke(); }
+    ctx.globalAlpha = 1; const rg = ctx.createRadialGradient(512, 512, 0, 512, 512, 330);
+    rg.addColorStop(0, `rgba(160,130,255,${0.55 * strength})`); rg.addColorStop(1, 'rgba(160,130,255,0)'); ctx.fillStyle = rg; ctx.fillRect(0, 0, 1024, 1024); }, 2.6 * scale, BG === 'dark' ? THREE.AdditiveBlending : THREE.NormalBlending);
+  return g;
+}
+
+// ---------------------------------------------------------------- variant builders
+const world = new THREE.Group(); scene.add(world);
+let orbY = 0.25, camPos = [0, 0.32, 5.4], look = [0, 0.05, 0], tilt = 0;
+
+function gyroRings(n = 2) {
+  const g = new THREE.Group();
+  const defs = [[1.42, 0.034, 1.25, 0.25], [1.62, 0.026, -0.95, -0.55], [1.82, 0.02, 0.35, 1.2]].slice(0, n);
+  defs.forEach(([rr, tube, rx, rz], i) => {
+    const ring = new THREE.Group();
+    const t = new THREE.Mesh(new THREE.TorusGeometry(rr * R, tube, 48, 360), pearl()); ring.add(t);
+    // glowing inner seam running around the ring
+    const seam = new THREE.TorusGeometry(rr * R - tube * 0.55, tube * 0.18, 8, 360);
+    gradientColors(seam, (x, y) => (Math.atan2(y, x) / Math.PI + 1) / 2, 2.6);
+    ring.add(new THREE.Mesh(seam, new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false })));
+    ring.rotation.set(rx, 0, rz); g.add(ring);
+    if (i === 0) { const bead = new THREE.Mesh(new THREE.SphereGeometry(0.045, 32, 16), glowMat(new THREE.Color(1, 1, 1), 2.5));
+      bead.position.set(rr * R, 0, 0); ring.add(bead); }
+  });
+  return g;
+}
+function satellite(color) {
+  const g = new THREE.Group();
+  const s = new THREE.Mesh(new THREE.SphereGeometry(0.15, 96, 48), pearl()); g.add(s);
+  // a soft brand-colored glow core seen through the pearl's lower edge
+  const core = new THREE.PointLight(color, 1.6, 0.9, 2); core.position.set(0, -0.05, 0.1); g.add(core);
+  const halo = new THREE.Mesh(new THREE.SphereGeometry(0.16, 32, 16), new THREE.MeshBasicMaterial({ color: color.clone().multiplyScalar(1.4), transparent: true, opacity: 0.16, toneMapped: false, depthWrite: false }));
+  g.add(halo);
+  return g;
+}
+function auraPetals(count = 9, rad = 1.5) {
+  const g = new THREE.Group();
+  for (let i = 0; i < count; i++) {
+    const a = -Math.PI / 2 + (i - (count - 1) / 2) * (Math.PI * 1.25 / (count - 1)) + Math.PI;   // fan behind and above the orb
+    const geo = new THREE.SphereGeometry(1, 96, 48); geo.scale(0.11, 0.42, 0.045);
+    const pos = geo.attributes.position; for (let k = 0; k < pos.count; k++) { const y = pos.getY(k); pos.setZ(k, pos.getZ(k) - 0.5 * y * y); }   // gentle curl
+    geo.computeVertexNormals();
+    const petal = new THREE.Mesh(geo, pearl());
+    const piv = new THREE.Group(); piv.add(petal); petal.position.y = rad * R + 0.12;
+    piv.rotation.z = a - Math.PI / 2 * 0 ; piv.rotation.z = (i - (count - 1) / 2) * (Math.PI * 1.15 / (count - 1));
+    piv.position.z = -0.34; petal.rotation.x = -0.32;
+    // glowing tip line on each petal's inner edge
+    const line = new THREE.Mesh(new THREE.CapsuleGeometry(0.012, 0.42, 4, 16), new THREE.MeshBasicMaterial({ color: brand(i / (count - 1)).multiplyScalar(2.6), toneMapped: false }));
+    line.position.set(0, rad * R + 0.12, 0.045); line.rotation.x = -0.32; piv.add(line);
+    g.add(piv);
+  }
+  return g;
+}
+function lightTrail() {
+  const pts = [new THREE.Vector3(-2.8, -1.25, -1.6), new THREE.Vector3(-1.8, -0.95, -1.0), new THREE.Vector3(-0.9, -0.35, -0.5), new THREE.Vector3(0.0, 0.0, -0.2)];
+  const curve = new THREE.CatmullRomCurve3(pts);
+  const g = new THREE.Group();
+  [[0.21, 0.10], [0.13, 0.35], [0.05, 0.9]].forEach(([r, op]) => {
+    const geo = new THREE.TubeGeometry(curve, 220, r, 32, false);
+    const uv = geo.attributes.uv; const cols = [], al = [];
+    for (let i = 0; i < uv.count; i++) { const t = uv.getX(i); const c = brand(t).multiplyScalar(2.2); cols.push(c.r, c.g, c.b); al.push(Math.pow(1 - t, 0.25) * (1 - Math.pow(1 - t, 6) * 0) * Math.pow(t, 0.0)); }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+    geo.setAttribute('alpha', new THREE.Float32BufferAttribute(uv.array.filter((_, k) => k % 2 === 0).map(t => Math.min(1, (1 - t) * 1.4) * Math.min(1, t * 8)), 1));
+    const m = new THREE.ShaderMaterial({ transparent: true, depthWrite: false, blending: THREE.AdditiveBlending, toneMapped: false,
+      uniforms: { op: { value: op } },
+      vertexShader: 'attribute vec3 color; attribute float alpha; varying vec3 vC; varying float vA; void main(){ vC=color; vA=alpha; gl_Position=projectionMatrix*modelViewMatrix*vec4(position,1.0);} ',
+      fragmentShader: 'uniform float op; varying vec3 vC; varying float vA; void main(){ gl_FragColor=vec4(vC*vA*op, 1.0);} ' });
+    g.add(new THREE.Mesh(geo, m));
+  });
+  // sparkles shed along the trail
+  const rnd = (s => () => (s = (s * 16807) % 2147483647) / 2147483647)(9);
+  for (let i = 0; i < 26; i++) { const t = 0.15 + rnd() * 0.8; const p = curve.getPoint(1 - t);
+    const sp = new THREE.Mesh(new THREE.SphereGeometry(0.008 + rnd() * 0.018, 12, 8), glowMat(brand(1 - t), 2.6));
+    sp.position.copy(p).add(new THREE.Vector3((rnd() - 0.5) * 0.4, (rnd() - 0.5) * 0.4, (rnd() - 0.5) * 0.3)); g.add(sp); }
+  return g;
+}
+
+// a pearl panel wrapped onto a sphere of radius rb around the orb, centred at (yaw, pitch)
+function shellPanel(w, h, d, rb, yaw, pitch, roll = 0) {
+  const geo = new THREE.SphereGeometry(1, 160, 80); geo.scale(w / 2, h / 2, d / 2);
+  const pos = geo.attributes.position;
+  for (let i = 0; i < pos.count; i++) {
+    const x = pos.getX(i), y = pos.getY(i), z = pos.getZ(i);
+    const ax = x / rb, ay = y / rb, rr = rb + z;
+    pos.setXYZ(i, rr * Math.sin(ax) * Math.cos(ay), rr * Math.sin(ay), rr * Math.cos(ax) * Math.cos(ay));
+  }
+  geo.computeVertexNormals();
+  const m = new THREE.Mesh(geo, pearl());
+  const piv = new THREE.Group(); piv.add(m);
+  piv.rotation.order = 'YXZ'; piv.rotation.set(-pitch, yaw, roll);
+  return piv;
+}
+// open/close states for the shell: [hoodPitch, wingYaw, wingPitch, wingRadius]
+const SHELL = {
+  hero:      [0.62, 1.50, 0.02, 1.34],
+  idle:      [0.55, 1.56, -0.10, 1.30],
+  happy:     [0.75, 1.40, 0.30, 1.46],   // wings lift and open: delighted
+  curious:   [0.62, 1.52, 0.02, 1.34],   // whole shell tilts; the logo stays upright
+  listening: [0.40, 1.62, 0.08, 1.26],   // hood leans forward, wings gather close
+  unsure:    [0.62, 1.60, -0.46, 1.34],  // wings droop: "I don't know yet"
+};
+function shell(state) {
+  const [hp, wy, wp, wr] = state; const g = new THREE.Group();
+  g.add(shellPanel(1.5, 0.66, 0.10, 1.26 * R, Math.PI, hp, 0));          // hood: a crescent arching behind and above
+  g.add(shellPanel(0.42, 1.10, 0.09, wr * R, -wy, wp, 0.0));             // left wing
+  g.add(shellPanel(0.42, 1.10, 0.09, wr * R, wy, wp, 0.0));              // right wing
+  return g;
+}
+
+// satellites poses (positions relative to the orb centre) for "hands" body language
+const SAT = {
+  hero:      { L: [-0.80, -0.40, 0.34], R: [0.80, 0.42, 0.36], bob: 0.04, tilt: 0.0 },   // one raised: hello
+  idle:      { L: [-0.84, -0.5, 0.25], R: [0.84, -0.5, 0.25], bob: 0, tilt: 0 },
+  happy:     { L: [-0.95, 0.35, 0.25], R: [0.95, 0.35, 0.25], bob: 0.12, tilt: 0 },
+  curious:   { L: [-0.9, -0.45, 0.2], R: [0.62, -0.68, 0.55], bob: 0, tilt: 0.14 },
+  listening: { L: [-0.74, -0.2, 0.5], R: [0.74, -0.2, 0.5], bob: -0.03, tilt: 0 },
+  unsure:    { L: [-1.12, -0.12, 0.15], R: [1.12, -0.12, 0.15], bob: -0.04, tilt: -0.1 },     // the shrug: "I don't know yet"
+};
+
+if (V === 'shell') {
+  const st = SHELL[P] || SHELL.hero; const sh = shell(st); sh.position.y = 0.22; world.add(sh);
+  world.add(hoverField(-1.15, 1.05, 0.85)); orbY = 0.22;
+  if (P === 'curious') sh.rotation.z = 0.16;
+  camPos = [0, 0.5, 5.6]; look = [0, 0.0, 0];
+} else if (V === 'orbit') {
+  const ring = new THREE.Group();
+  const rr = 1.62 * R;
+  ring.add(new THREE.Mesh(new THREE.TorusGeometry(rr, 0.03, 64, 400), pearl()));
+  const seam = new THREE.TorusGeometry(rr, 0.009, 8, 400); gradientColors(seam, (x) => (x / rr + 1) / 2, 2.8);
+  const sm = new THREE.Mesh(seam, new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false })); sm.position.z = 0.026; ring.add(sm);
+  const bead = new THREE.Mesh(new THREE.SphereGeometry(0.05, 32, 16), glowMat(new THREE.Color(1, 1, 1), 2.6)); bead.position.set(rr * Math.cos(-2.2), rr * Math.sin(-2.2), 0); ring.add(bead);
+  ring.rotation.set(Math.PI / 2 - 0.2, 0, 0.1); ring.position.set(0, 0.22 - 0.74, 0); world.add(ring);
+  world.add(hoverField(-1.35, 1.0, 0.7)); orbY = 0.22;
+  camPos = [0, 0.5, 6.0]; look = [0, -0.18, 0];
+} else if (V === 'halo') {
+  const ring = new THREE.Group();
+  const t = new THREE.Mesh(new THREE.TorusGeometry(0.78 * R, 0.042, 64, 360), pearl()); ring.add(t);
+  const seam = new THREE.TorusGeometry(0.78 * R, 0.012, 8, 360); gradientColors(seam, (x, y) => (x / (0.78 * R) + 1) / 2, 2.8);
+  const sm = new THREE.Mesh(seam, new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false })); sm.position.y = -0.03; ring.add(sm);
+  ring.rotation.x = Math.PI / 2 - 0.42; ring.position.set(0, 0.22 + R * 1.18, -0.05); world.add(ring);
+  world.add(hoverField(-1.05, 1.0, 0.85)); orbY = 0.22;
+  camPos = [0, 0.5, 5.4]; look = [0, 0.12, 0];
+} else if (V === 'hover') {
+  world.add(hoverField(-1.05, 1.05, 1)); orbY = 0.2;
+  camPos = [0, 0.55, 5.2]; look = [0, -0.15, 0];
+} else if (V === 'gyro') {
+  const gy = gyroRings(2); gy.position.y = 0.2; world.add(gy); world.add(hoverField(-1.25, 1.1, 0.7)); orbY = 0.2;
+  camPos = [0, 0.45, 6.0]; look = [0, -0.05, 0];
+} else if (V === 'satellites') {
+  const pose = SAT[P] || SAT.hero; orbY = 0.2 + pose.bob;
+  const L = satellite(new THREE.Color(0x2f63ff)), Rr = satellite(new THREE.Color(0xff3d58));
+  L.position.set(pose.L[0] * R / 0.62, orbY + pose.L[1], pose.L[2]); Rr.position.set(pose.R[0], orbY + pose.R[1], pose.R[2]);
+  world.add(L, Rr); world.add(hoverField(-1.1, 1.05, 0.8));
+  camPos = [0, 0.4, 5.6]; look = [0, -0.02, 0];
+} else if (V === 'aura') {
+  const au = auraPetals(9, 1.55); au.position.y = 0.12; world.add(au); world.add(hoverField(-1.2, 1.0, 0.6)); orbY = 0.12;
+  camPos = [0, 0.3, 6.0]; look = [0, 0.15, 0];
+} else if (V === 'glide') {
+  const tr = lightTrail(); world.add(tr); orbY = 0.15; tilt = 0.0;
+  tr.position.y = orbY; camPos = [0, 0.25, 6.4]; look = [-0.5, -0.2, 0];
+}
+orb.position.y = orbY; logo.rotation.z = tilt;
+world.rotation.y = 0;
+
+camera.position.set(...camPos); camera.lookAt(...look);
+logo.lookAt(camera.position); logo.rotation.z += tilt;
+
+const rt = new THREE.WebGLRenderTarget(SIZE * 2, SIZE * 2, { samples: 4, type: THREE.HalfFloatType });
+const composer = new EffectComposer(renderer, rt); composer.setPixelRatio(2); composer.setSize(SIZE, SIZE);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(SIZE * 2, SIZE * 2), 0.45, 0.5, 1.4));
+composer.addPass(new OutputPass());
+composer.render();
+window.done = true;
+</script>
+</body>
+</html>
