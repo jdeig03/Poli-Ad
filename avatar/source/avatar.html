@@ -1,0 +1,325 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Avatar</title>
+<style>html,body{margin:0;background:#fff;overflow:hidden}canvas{display:block}</style>
+<script type="importmap">
+{ "imports": { "three": "./node_modules/three/build/three.module.js", "three/addons/": "./node_modules/three/examples/jsm/" } }
+</script>
+</head>
+<body>
+<script type="module">
+import * as THREE from 'three';
+import { RoomEnvironment } from 'three/addons/environments/RoomEnvironment.js';
+import { EffectComposer } from 'three/addons/postprocessing/EffectComposer.js';
+import { RenderPass } from 'three/addons/postprocessing/RenderPass.js';
+import { UnrealBloomPass } from 'three/addons/postprocessing/UnrealBloomPass.js';
+import { OutputPass } from 'three/addons/postprocessing/OutputPass.js';
+
+// ---------------------------------------------------------------------------------------------
+// Poli avatar. One character system, several renditions (?v=...), expressions (?e=...).
+// The head IS the Poli orb; the blue->red smile is the expression language; it floats.
+// ---------------------------------------------------------------------------------------------
+const Q = new URLSearchParams(location.search);
+const V = Q.get('v') || 'companion';
+const E = Q.get('e') || 'default';
+const BG = Q.get('bg') || 'light';
+const SIZE = Number(Q.get('size') || 1024);
+
+const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true, alpha: false });
+renderer.setPixelRatio(2);
+renderer.setSize(SIZE, SIZE);
+renderer.toneMapping = THREE.NeutralToneMapping;
+renderer.toneMappingExposure = 1.0;
+document.body.appendChild(renderer.domElement);
+
+const scene = new THREE.Scene();
+const pmrem = new THREE.PMREMGenerator(renderer);
+scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture;
+scene.environmentIntensity = BG === 'dark' ? 0.5 : 0.7;
+
+// studio backdrop
+function backdrop() {
+  const c = document.createElement('canvas'); c.width = 1024; c.height = 1024;
+  const g = c.getContext('2d');
+  if (BG === 'dark') {
+    g.fillStyle = '#05060D'; g.fillRect(0, 0, 1024, 1024);
+    [[180, 260, 620, 'rgba(28,86,219,0.28)'], [520, 640, 560, 'rgba(122,79,184,0.20)'], [880, 900, 620, 'rgba(220,53,71,0.18)']].forEach(([x, y, r, col]) => {
+      const rg = g.createRadialGradient(x, y, 0, x, y, r); rg.addColorStop(0, col); rg.addColorStop(1, 'rgba(0,0,0,0)'); g.fillStyle = rg; g.fillRect(0, 0, 1024, 1024); });
+  } else {
+    const rg = g.createRadialGradient(512, 430, 60, 512, 520, 760);
+    rg.addColorStop(0, '#F7F6FA'); rg.addColorStop(0.55, '#EEEBF4'); rg.addColorStop(1, '#DCD6E8');
+    g.fillStyle = rg; g.fillRect(0, 0, 1024, 1024);
+  }
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace; return t;
+}
+scene.background = backdrop();
+
+const camera = new THREE.PerspectiveCamera(26, 1, 0.1, 100);
+
+// lights: soft key from upper left, cool fill, warm rim (brand blue/red hints in reflections)
+const key = new THREE.DirectionalLight(0xffffff, 0.95); key.position.set(-3, 5, 4); scene.add(key);
+const fill = new THREE.DirectionalLight(0xdfe6ff, 0.35); fill.position.set(4, 1, 3); scene.add(fill);
+scene.add(new THREE.HemisphereLight(0xffffff, 0xb7a6e8, 0.45));
+const rimB = new THREE.PointLight(0x3d6bff, 0.7, 10, 2); rimB.position.set(-3.2, 0.8, -2.6); scene.add(rimB);
+const rimR = new THREE.PointLight(0xff4a63, 0.6, 10, 2); rimR.position.set(3.2, 0.3, -2.6); scene.add(rimR);
+
+// ---------------------------------------------------------------------------------------------
+// Pearl material with a face painted procedurally in the shader (wraps the sphere perfectly).
+// Face coordinates: longitude/latitude of the object-space normal, facing +Z.
+// ---------------------------------------------------------------------------------------------
+const FACE = {
+  // visor ellipse (radians)
+  visor: 0, vc: 0.06, vw: 0.98, vh: 0.44,
+  // eyes: 0 none, 1 ovals, 2 happy arcs, 3 small dots on pearl, 4 squint/thinking, 5 wide (listening), 6 tilted unsure
+  eyes: 0, eyeX: 0.36, eyeY: 0.09, eyeRX: 0.205, eyeRY: 0.15, eyeTilt: 0.16,
+  // smile: 0 none, 1 glowing in visor, 2 logo smile on pearl
+  smile: 0, sY: -0.05, sK: 0.85, sL: 0.56, sT: 0.034, glow: 5.0,
+};
+
+let MAT_ID = 0;
+function pearlMaterial(face, opts = {}) {
+  const m = new THREE.MeshPhysicalMaterial({
+    color: 0xffffff, roughness: 0.28, metalness: 0.0, clearcoat: 1.0, clearcoatRoughness: 0.05,
+    iridescence: 0.18, iridescenceIOR: 1.35, iridescenceThicknessRange: [180, 420], sheen: 0.12, sheenColor: new THREE.Color(0xe2d8ff), sheenRoughness: 0.6,
+  });
+  const U = {}; for (const k in face) U['u_' + k] = { value: face[k] };
+  U.u_body = { value: opts.body ? 1 : 0 };
+  const id = 'pearl-' + (MAT_ID++);
+  m.customProgramCacheKey = () => id;
+  m.onBeforeCompile = sh => {
+    Object.assign(sh.uniforms, U);
+    sh.vertexShader = sh.vertexShader
+      .replace('#include <common>', '#include <common>\nvarying vec3 vObjP;')
+      .replace('#include <begin_vertex>', '#include <begin_vertex>\nvObjP = position;');
+    const decl = Object.keys(U).map(k => `uniform float ${k};`).join('\n');
+    sh.fragmentShader = sh.fragmentShader
+      .replace('#include <common>', `#include <common>
+varying vec3 vObjP;
+${decl}
+vec3 lin(vec3 c){ return pow(c, vec3(2.2)); }
+vec3 brand(float t){ // logo gradient: blue -> purple -> red
+  vec3 b = lin(vec3(0.11,0.34,0.86)), p = lin(vec3(0.48,0.31,0.72)), r = lin(vec3(0.86,0.21,0.28));
+  return t < 0.5 ? mix(b, p, t*2.0) : mix(p, r, (t-0.5)*2.0);
+}
+float parab(vec2 p, float c0, float k, float L){
+  float x = clamp(p.x, -L, L); float y = c0 + k*x*x;
+  if (abs(p.x) > L) return length(p - vec2(x, y));
+  return abs(p.y - y) / sqrt(1.0 + 4.0*k*k*x*x);
+}
+vec3 led(vec3 c, float d, float glow){   // d: signed distance (negative inside)
+  float inside = 1.0 - smoothstep(-0.004, 0.004, d);
+  float core = smoothstep(-0.01, -0.12, d);
+  vec3 lit = c * (1.7 + core * 0.9) + vec3(1.0) * core * core * 0.16;
+  return inside * lit * glow / 6.0 + c * (exp(-max(d, 0.0) * 34.0) * 0.42 + exp(-max(d, 0.0) * 120.0) * 0.5) * (1.0 - inside);
+}
+float ellip(vec2 p, vec2 c, vec2 r, float a){
+  vec2 q = p - c; float s = sin(a), co = cos(a); q = vec2(co*q.x - s*q.y, s*q.x + co*q.y);
+  return (length(q / r) - 1.0) * min(r.x, r.y);
+}
+`)
+      .replace('#include <color_fragment>', `#include <color_fragment>
+vec3 n = normalize(vObjP);
+vec2 ll = vec2(atan(n.x, n.z), asin(clamp(n.y, -1.0, 1.0)));
+// pearl: faint lavender toward the base, like the logo orb
+diffuseColor.rgb = mix(lin(vec3(1.0)), lin(vec3(0.91,0.88,0.97)), smoothstep(0.1, -0.95, n.y));
+float visorM = 0.0; vec3 faceE = vec3(0.0); float visorRim = 0.0;
+if (u_body < 0.5) {
+  if (u_visor > 0.5) {
+    float d = pow(ll.x/u_vw, 2.0) + pow((ll.y-u_vc)/u_vh, 2.0);
+    visorM = 1.0 - smoothstep(0.965, 1.0, d);
+    visorRim = smoothstep(0.90, 0.965, d) * (1.0 - smoothstep(0.965, 1.0, d));
+    diffuseColor.rgb = mix(diffuseColor.rgb, lin(vec3(0.015,0.016,0.03)), visorM);
+  }
+  // eyes
+  vec2 L = vec2(-u_eyeX, u_eyeY), R = vec2(u_eyeX, u_eyeY);
+  vec3 cL = brand(0.0), cR = brand(1.0);
+  float aa = 0.006;
+  if (u_eyes > 0.5 && u_eyes < 1.5) {          // soft ovals, gently tilted toward each other
+    float dl = ellip(ll, L, vec2(u_eyeRX, u_eyeRY), -u_eyeTilt), dr = ellip(ll, R, vec2(u_eyeRX, u_eyeRY), u_eyeTilt);
+    faceE += led(cL, dl, u_glow);
+    faceE += led(cR, dr, u_glow);
+  } else if (u_eyes > 1.5 && u_eyes < 2.5) {   // happy arcs  ^ ^  (the smile, flipped, as eyes)
+    float dl = parab(ll - L, 0.05, -2.6, 0.15), dr = parab(ll - R, 0.05, -2.6, 0.15);
+    faceE += led(cL, (dl - 0.037) * 1.0, u_glow);
+    faceE += led(cR, (dr - 0.037) * 1.0, u_glow);
+  } else if (u_eyes > 2.5 && u_eyes < 3.5) {   // small glass dots on bare pearl
+    float dl = ellip(ll, L, vec2(0.078, 0.095), 0.0), dr = ellip(ll, R, vec2(0.078, 0.095), 0.0);
+    float mL = 1.0 - smoothstep(-aa, aa, dl), mR = 1.0 - smoothstep(-aa, aa, dr);
+    diffuseColor.rgb = mix(diffuseColor.rgb, lin(vec3(0.03,0.03,0.06)), max(mL, mR));
+    visorM = max(visorM, max(mL, mR));
+    float gl = 1.0 - smoothstep(-aa, aa, ellip(ll, L + vec2(0.0, -0.005), vec2(0.045, 0.06), 0.0));
+    float gr = 1.0 - smoothstep(-aa, aa, ellip(ll, R + vec2(0.0, -0.005), vec2(0.045, 0.06), 0.0));
+    faceE += cL * gl * u_glow * 0.8 + cR * gr * u_glow * 0.8;
+  } else if (u_eyes > 3.5 && u_eyes < 4.5) {   // thinking: one eye narrowed, glance up-right
+    float dl = ellip(ll, L + vec2(0.04, 0.03), vec2(u_eyeRX*0.95, u_eyeRY*0.45), -0.1), dr = ellip(ll, R + vec2(0.04, 0.04), vec2(u_eyeRX, u_eyeRY), 0.15);
+    faceE += led(cL, dl, u_glow);
+    faceE += led(cR, dr, u_glow);
+  } else if (u_eyes > 4.5 && u_eyes < 5.5) {   // listening: round, open, attentive
+    float dl = ellip(ll, L, vec2(u_eyeRX*0.9, u_eyeRY*1.2), 0.0), dr = ellip(ll, R, vec2(u_eyeRX*0.9, u_eyeRY*1.2), 0.0);
+    faceE += led(cL, dl, u_glow);
+    faceE += led(cR, dr, u_glow);
+  } else if (u_eyes > 5.5) {                    // unsure ("I don't know"): brows tilted down at the outer corners
+    float dl = ellip(ll, L, vec2(u_eyeRX, u_eyeRY*0.72), 0.32), dr = ellip(ll, R, vec2(u_eyeRX, u_eyeRY*0.72), -0.32);
+    faceE += led(cL, dl, u_glow);
+    faceE += led(cR, dr, u_glow);
+  }
+  // smile
+  if (u_smile > 0.5) {
+    float ds = parab(ll, u_sY, u_sK, u_sL);
+    float m = 1.0 - smoothstep(u_sT - aa, u_sT + aa, ds);
+    float t = clamp((ll.x + u_sL) / (2.0*u_sL), 0.0, 1.0);
+    vec3 c = brand(t);
+    if (u_smile < 1.5) { faceE += led(c, ds - u_sT, u_glow); }
+    else { diffuseColor.rgb = mix(diffuseColor.rgb, c, m); faceE += c * m * 1.4 + c * exp(-max(ds - u_sT, 0.0)*40.0) * 0.45; }
+  }
+} else {
+  // body pearl: white, with the same faint lavender settling toward the tip
+  diffuseColor.rgb = mix(lin(vec3(1.0)), lin(vec3(0.91,0.88,0.97)), smoothstep(-0.55, -1.4, vObjP.y));
+  // body: a glowing smile seam across the chest (front only)
+  vec2 p = vObjP.xy; float front = smoothstep(0.0, 0.25, vObjP.z);
+  float ds = parab(p, -0.30, 1.3, 0.30);
+  float t = clamp((p.x + 0.30) / 0.60, 0.0, 1.0);
+  vec3 c = brand(t);
+  faceE += front * led(c, ds - 0.017, u_glow) * step(0.5, u_glow);
+}
+`)
+      .replace('#include <roughnessmap_fragment>', `#include <roughnessmap_fragment>
+roughnessFactor = mix(roughnessFactor, 0.14, visorM);`)
+      .replace('#include <lights_physical_fragment>', `#include <lights_physical_fragment>
+material.clearcoat *= mix(1.0, 0.45, visorM);
+material.specularColor *= mix(1.0, 0.55, visorM);`)
+      .replace('#include <lights_fragment_end>', `#include <lights_fragment_end>
+reflectedLight.indirectSpecular *= mix(1.0, 0.22, visorM);
+#ifdef USE_CLEARCOAT
+clearcoatSpecularIndirect *= mix(1.0, 0.3, visorM);
+#endif`)
+      .replace('#include <emissivemap_fragment>', `#include <emissivemap_fragment>
+totalEmissiveRadiance += faceE + vec3(0.25,0.2,0.4) * visorRim * 0.0;`);
+  };
+  return m;
+}
+
+// ---------------------------------------------------------------------------------------------
+// parts
+// ---------------------------------------------------------------------------------------------
+const rig = new THREE.Group(); scene.add(rig);
+const R = 0.62;
+
+function head(face) {
+  const g = new THREE.Mesh(new THREE.SphereGeometry(R, 256, 128), pearlMaterial(face));
+  return g;
+}
+function body() {
+  const pts = [[0, 0.02], [0.28, 0.0], [0.47, -0.045], [0.575, -0.13], [0.61, -0.25], [0.6, -0.42], [0.555, -0.66], [0.47, -0.92], [0.35, -1.15], [0.21, -1.32], [0.08, -1.42], [0.0, -1.445]];
+  const curve = new THREE.SplineCurve(pts.map(([x, y]) => new THREE.Vector2(x, y)));
+  const prof = curve.getPoints(120); prof[0].x = 0; prof[prof.length - 1].x = 0;
+  prof.reverse();   // bottom -> top so the lathe's faces point outward
+  const geo = new THREE.LatheGeometry(prof, 200);
+  geo.computeVertexNormals();
+  return new THREE.Mesh(geo, pearlMaterial(FACE, { body: true }));
+}
+function arm(side, raise = 0) {
+  const pivot = new THREE.Group();
+  const geo = new THREE.SphereGeometry(1, 128, 64); geo.scale(0.12, 0.48, 0.1); geo.translate(0, -0.5, 0);
+  const m = new THREE.Mesh(geo, pearlMaterial(FACE, { body: true }));
+  // only chest gets the seam; arms use plain pearl
+  m.material = pearlMaterial({ ...FACE, glow: 0 }, { body: true });
+  pivot.add(m);
+  pivot.position.set(side * 0.8, -0.1, 0.0);
+  pivot.rotation.z = side * (0.22 + raise);
+  pivot.rotation.x = -0.08;
+  return pivot;
+}
+function orbits(radius, y, tilt = 0.22) {
+  const g = new THREE.Group();
+  [[radius, 0.0045, 0.0, Math.PI * 1.25, 1.0], [radius * 1.16, 0.003, 1.9, Math.PI * 0.7, 0.6], [radius * 1.16, 0.003, 4.4, Math.PI * 0.35, 0.45]].forEach(([r, tube, start, arc, k]) => {
+    const geo = new THREE.TorusGeometry(r, tube, 12, 400, arc); geo.rotateZ(start);
+    const cols = []; const pos = geo.attributes.position;
+    for (let i = 0; i < pos.count; i++) {
+      const a = (Math.atan2(pos.getY(i), pos.getX(i)) + Math.PI) / (Math.PI * 2);
+      const c = new THREE.Color().setHSL(0, 0, 0); const b = new THREE.Color(0x1C56DB), p = new THREE.Color(0x7A4FB8), rr = new THREE.Color(0xDC3547);
+      if (a < 0.5) c.lerpColors(b, p, a * 2); else c.lerpColors(p, rr, (a - 0.5) * 2);
+      c.multiplyScalar(2.4 * k); cols.push(c.r, c.g, c.b);
+    }
+    geo.setAttribute('color', new THREE.Float32BufferAttribute(cols, 3));
+    const mesh = new THREE.Mesh(geo, new THREE.MeshBasicMaterial({ vertexColors: true, toneMapped: false, transparent: true, opacity: 0.9 }));
+    g.add(mesh);
+    // a bead of light riding the main orbit
+    if (k === 1.0) { const bead = new THREE.Mesh(new THREE.SphereGeometry(0.022, 24, 16), new THREE.MeshBasicMaterial({ color: new THREE.Color(3, 3, 3.4), toneMapped: false }));
+      bead.position.set(Math.cos(start + arc) * r, Math.sin(start + arc) * r, 0); g.add(bead); }
+  });
+  g.rotation.x = Math.PI / 2 - tilt; g.position.y = y;
+  return g;
+}
+function floatGlow(y, w) {
+  // soft levitation glow + contact shadow on an invisible floor
+  const c = document.createElement('canvas'); c.width = c.height = 512; const g = c.getContext('2d');
+  const rg = g.createRadialGradient(256, 256, 10, 256, 256, 256);
+  rg.addColorStop(0, BG === 'dark' ? 'rgba(150,110,255,0.55)' : 'rgba(90,60,170,0.30)');
+  rg.addColorStop(0.35, BG === 'dark' ? 'rgba(110,80,230,0.20)' : 'rgba(110,80,200,0.12)');
+  rg.addColorStop(1, 'rgba(0,0,0,0)');
+  g.fillStyle = rg; g.fillRect(0, 0, 512, 512);
+  const t = new THREE.CanvasTexture(c); t.colorSpace = THREE.SRGBColorSpace;
+  const m = new THREE.Mesh(new THREE.PlaneGeometry(w, w * 0.5), new THREE.MeshBasicMaterial({ map: t, transparent: true, depthWrite: false, toneMapped: false,
+    blending: BG === 'dark' ? THREE.AdditiveBlending : THREE.NormalBlending }));
+  m.rotation.x = -Math.PI / 2; m.position.y = y; return m;
+}
+
+// ---------------------------------------------------------------------------------------------
+// expressions (shared by every rendition with eyes)
+// ---------------------------------------------------------------------------------------------
+const EXPR = {
+  default: { eyes: 1 }, happy: { eyes: 2 }, thinking: { eyes: 4 }, listening: { eyes: 5 }, unsure: { eyes: 6 },
+};
+
+// ---------------------------------------------------------------------------------------------
+// renditions
+// ---------------------------------------------------------------------------------------------
+let camY = 0, camZ = 6.2, look = 0, yaw = -0.32, headTilt = 0;
+const f = { ...FACE };
+
+if (V === 'smile') {                      // 1. "Glow Smile": pure orb, black glass visor, the logo smile IS the face
+  Object.assign(f, { visor: 1, smile: 1, sY: -0.03, sK: 0.9, sL: 0.5, sT: 0.03, glow: 6.0 });
+  const h = head(f); rig.add(h); h.position.y = 0.1;
+  rig.add(orbits(1.0, 0.1, 0.32)); rig.add(floatGlow(-0.95, 2.6));
+  camZ = 4.7; camY = 0.18; look = 0.08; yaw = -0.16;
+} else if (V === 'logo') {                // 2. "Living Logo": the logo exactly, plus two tiny glass eyes. Most faithful.
+  Object.assign(f, { visor: 0, eyes: 3, eyeX: 0.27, eyeY: 0.16, smile: 2, sY: -0.16, sK: 0.75, sL: 0.6, sT: 0.068, glow: 3.0 });
+  const h = head(f); rig.add(h); h.position.y = 0.1;
+  rig.add(floatGlow(-0.95, 2.6));
+  camZ = 4.4; camY = 0.12; look = 0.06; yaw = -0.14;
+} else if (V === 'eyes') {                // 3. "Glass Eyes": orb + visor + blue/red eyes. EVE's warmth, Poli's colors.
+  Object.assign(f, { visor: 1, glow: 6.0 }, EXPR[E] || EXPR.default);
+  const h = head(f); rig.add(h); h.position.y = 0.1;
+  rig.add(floatGlow(-0.95, 2.6));
+  camZ = 4.4; camY = 0.12; look = 0.06; yaw = -0.16;
+} else if (V === 'companion' || V === 'ambassador') {   // 4/5. full floating character
+  Object.assign(f, { visor: 1, glow: 6.0 }, V === 'ambassador' ? EXPR.happy : (EXPR[E] || EXPR.default));
+  const h = head(f); h.position.y = 0.98; rig.add(h);
+  const b = body(); b.position.y = 0.2; rig.add(b);
+  rig.add(arm(-1, 0)); const ra = arm(1, V === 'ambassador' ? 2.45 : 0); if (V === 'ambassador') { ra.position.x = 0.74; ra.position.y = 0.02; ra.rotation.x = 0.25; ra.rotation.y = -0.5; } rig.add(ra);
+  rig.children.filter(c => c.isGroup).forEach(a => a.position.y += 0.06);
+  rig.add(floatGlow(-1.75, 3.2));
+  if (V === 'ambassador') { rig.add(orbits(1.18, 0.98, 0.28)); headTilt = 0.12; }
+  if (E === 'thinking') headTilt = -0.12; if (E === 'unsure') headTilt = 0.16;
+  h.rotation.z = headTilt;
+  camZ = 9.0; camY = 0.25; look = 0.08; yaw = -0.24;
+}
+rig.rotation.y = yaw;
+
+camera.position.set(0, camY, camZ); camera.lookAt(0, look, 0);
+
+// post: HDR bloom only catches the glowing light (eyes, smile, orbits)
+const rt = new THREE.WebGLRenderTarget(SIZE * 2, SIZE * 2, { samples: 4, type: THREE.HalfFloatType });
+const composer = new EffectComposer(renderer, rt);
+composer.setPixelRatio(2); composer.setSize(SIZE, SIZE);
+composer.addPass(new RenderPass(scene, camera));
+composer.addPass(new UnrealBloomPass(new THREE.Vector2(SIZE * 2, SIZE * 2), 0.32, 0.4, 1.35));
+composer.addPass(new OutputPass());
+composer.render();
+window.done = true;
+</script>
+</body>
+</html>
