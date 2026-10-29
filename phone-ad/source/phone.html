@@ -1,0 +1,560 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Phone Ad</title>
+<style>
+  @font-face { font-family: 'UI'; font-weight: 400; src: url('node_modules/@fontsource/inter/files/inter-latin-400-normal.woff2'); }
+  @font-face { font-family: 'UI'; font-weight: 500; src: url('node_modules/@fontsource/inter/files/inter-latin-500-normal.woff2'); }
+  @font-face { font-family: 'UI'; font-weight: 600; src: url('node_modules/@fontsource/inter/files/inter-latin-600-normal.woff2'); }
+  @font-face { font-family: 'UI'; font-weight: 700; src: url('node_modules/@fontsource/inter/files/inter-latin-700-normal.woff2'); }
+  @font-face { font-family: 'Georgia2'; font-weight: 400; src: url('node_modules/@fontsource/gelasio/files/gelasio-latin-400-normal.woff2'); }
+  @font-face { font-family: 'Georgia2'; font-weight: 700; src: url('node_modules/@fontsource/gelasio/files/gelasio-latin-700-normal.woff2'); }
+  @font-face { font-family: 'Manrope'; font-weight: 800; src: url('node_modules/@fontsource/manrope/files/manrope-latin-800-normal.woff2'); }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 432px; height: 768px; overflow: hidden; background: #000; }
+  body { font-family: 'UI', sans-serif; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; color: #111; }
+  #screen { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+  #cam { position: absolute; inset: 0; transform-origin: 50% 50%; }
+  .page { position: absolute; left: 0; top: 0; width: 432px; }
+  .vp { position: absolute; inset: 0; overflow: hidden; }
+
+  /* ---------------- status bar + island ---------------- */
+  #status { position: absolute; left: 0; right: 0; top: 0; height: 50px; z-index: 50; pointer-events: none; background: rgba(255,255,255,0.82); backdrop-filter: blur(18px) saturate(1.8); }
+  #status .time { position: absolute; left: 46px; top: 17px; font: 600 17px 'UI'; letter-spacing: -0.02em; }
+  #status .ic { position: absolute; right: 28px; top: 19px; display: flex; gap: 6px; align-items: center; }
+  #island { position: absolute; left: 50%; top: 11px; width: 126px; height: 37px; margin-left: -63px; border-radius: 20px; background: #000; z-index: 60; }
+
+  /* ---------------- Safari chrome ---------------- */
+  #bar { position: absolute; left: 0; right: 0; bottom: 0; height: 108px; z-index: 40;
+    background: rgba(248,248,250,0.8); border-top: 0.5px solid rgba(0,0,0,0.14); backdrop-filter: blur(18px) saturate(1.8); }
+  #pill { position: absolute; left: 12px; right: 12px; height: 46px; border-radius: 14px; background: #fff; z-index: 45;
+    box-shadow: 0 1px 6px rgba(0,0,0,0.12), 0 0 0 0.5px rgba(0,0,0,0.06); display: flex; align-items: center; padding: 0 14px; overflow: hidden; }
+  #pill .aa { font: 600 15px 'UI'; color: #111; width: 26px; }
+  #pill .url { flex: 1; text-align: center; font: 500 16.5px 'UI'; color: #111; white-space: nowrap; overflow: hidden; display: flex; justify-content: center; align-items: center; gap: 5px; }
+  #pill .rl { width: 22px; display: flex; justify-content: flex-end; }
+  #pill .edit { position: absolute; inset: 0; display: none; align-items: center; padding: 0 12px; gap: 8px; font: 400 17px 'UI'; color: #111; }
+  #pill .edit .typed { white-space: pre; }
+  #pill .edit .ac { background: #B4D5FE; white-space: pre; }
+  #pill .edit .ph { color: #8e8e93; }
+  #pill .edit .x { margin-left: auto; width: 20px; height: 20px; border-radius: 50%; background: #c7c7cc; display: grid; place-items: center; }
+  #progress { position: absolute; left: 0; bottom: 0; height: 2.5px; background: #007AFF; border-radius: 2px; }
+  .caret { display: inline-block; width: 2px; height: 21px; background: #007AFF; border-radius: 1px; vertical-align: -4px; }
+  #tools { position: absolute; left: 0; right: 0; top: 60px; height: 40px; display: flex; justify-content: space-around; align-items: center; padding: 0 10px; }
+  #home { position: absolute; left: 50%; bottom: 8px; width: 140px; height: 5px; margin-left: -70px; border-radius: 3px; background: #111; z-index: 80; }
+
+  /* address editing sheet */
+  #sheet { position: absolute; left: 0; right: 0; top: 0; bottom: 0; background: #F2F2F7; z-index: 30; display: none; padding-top: 62px; }
+  #sheet h4 { font: 700 20px 'UI'; margin: 4px 20px 10px; letter-spacing: -0.02em; }
+  #sheet .grp { margin: 0 16px 16px; background: #fff; border-radius: 12px; overflow: hidden; }
+  #sheet .row { display: flex; align-items: center; gap: 12px; height: 46px; padding: 0 14px; border-bottom: 0.5px solid #E5E5EA; font: 400 16.5px 'UI'; color: #111; }
+  #sheet .row:last-child { border-bottom: 0; }
+  #sheet .row b { font-weight: 600; }
+  #sheet .row small { margin-left: auto; color: #8e8e93; font-size: 13px; }
+  #sheet .fav { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px 0; padding: 4px 16px; }
+
+  /* ---------------- keyboard ---------------- */
+  #kb { position: absolute; left: 0; right: 0; bottom: 0; height: 336px; z-index: 70; background: #D2D5DB; }
+  #kb .acc { position: absolute; left: 0; right: 0; top: 0; height: 44px; background: #F2F3F5; border-bottom: 0.5px solid #c8c8cc; display: none; align-items: center; padding: 0 16px; gap: 24px; }
+  #kb .acc b { margin-left: auto; color: #007AFF; font: 600 17px 'UI'; }
+  .key { position: absolute; height: 44px; border-radius: 6px; background: #fff; box-shadow: 0 1px 0 #8A8C90; display: grid; place-items: center; font: 400 23px 'UI'; color: #111; }
+  .key.sp { background: #ADB2BB; font-size: 16px; }
+  .key.down { background: #ADB2BB; }
+  .key.sp.down { background: #fff; }
+  #pop { position: absolute; width: 56px; height: 104px; display: none; z-index: 75; pointer-events: none; }
+  #pop .cap { position: absolute; left: 0; top: 0; width: 56px; height: 60px; background: #fff; border-radius: 10px 10px 14px 14px; display: grid; place-items: center; font: 400 34px 'UI';
+    box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+  #pop .stem { position: absolute; left: 10px; top: 50px; width: 36px; height: 50px; background: #fff; border-radius: 0 0 8px 8px; box-shadow: 0 2px 2px rgba(0,0,0,0.2); }
+  #kb .glob { position: absolute; bottom: 30px; left: 26px; } #kb .mic { position: absolute; bottom: 30px; right: 26px; }
+
+  #touch { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; background: rgba(110,110,120,0.32); border: 1.5px solid rgba(255,255,255,0.7); z-index: 90; display: none; pointer-events: none; }
+
+  /* ---------------- start page ---------------- */
+  #start { background: #fff; padding-top: 70px; height: 768px; }
+  #start h3 { font: 700 22px 'UI'; margin: 0 22px 14px; letter-spacing: -0.02em; }
+  .tile { display: flex; flex-direction: column; align-items: center; gap: 7px; font: 500 12px 'UI'; color: #3c3c43; }
+  .tile i { width: 66px; height: 66px; border-radius: 15px; display: grid; place-items: center; font: 700 26px 'UI'; color: #fff; font-style: normal; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  .card { margin: 22px 18px 0; border-radius: 14px; background: #F2F2F7; padding: 14px 16px; font: 500 14px 'UI'; color: #3c3c43; display: flex; gap: 12px; align-items: center; }
+
+  /* ---------------- search results ---------------- */
+  #serp { background: #fff; padding-top: 58px; }
+  .sq { margin: 0 14px; height: 46px; border-radius: 23px; border: 1px solid #dfe1e5; box-shadow: 0 1px 6px rgba(32,33,36,0.12); display: flex; align-items: center; gap: 12px; padding: 0 16px; font: 400 16.5px 'UI'; color: #202124; }
+  .tabs { display: flex; gap: 24px; margin: 14px 22px 0; font: 500 14px 'UI'; color: #5f6368; border-bottom: 1px solid #ebebeb; }
+  .tabs span { padding-bottom: 10px; } .tabs .on { color: #202124; border-bottom: 3px solid #202124; font-weight: 600; }
+  .qa { margin: 16px 14px 6px; border-radius: 18px; background: #F7F6F2; border: 1px solid #ECE7D6; padding: 16px 16px 14px; }
+  .qa .hd { display: flex; align-items: center; gap: 8px; font: 600 15px 'UI'; color: #202124; }
+  .warn { margin-left: auto; display: inline-flex; align-items: center; gap: 6px; padding: 5px 10px; border-radius: 999px; background: #FFF1CC; color: #8A5A00; font: 600 12.5px 'UI'; border: 1px solid #F3D78A; }
+  .qa p { margin-top: 10px; font: 400 15px/1.55 'UI'; color: #3c4043; }
+  .hl { background-image: linear-gradient(#FFD666, #FFD666); background-repeat: no-repeat; background-position: 0 92%; background-size: 0% 38%; padding: 0 1px; }
+  .res { padding: 16px 22px 14px; border-bottom: 8px solid #F1F3F4; }
+  .res .src { display: flex; align-items: center; gap: 10px; font: 500 13px 'UI'; color: #202124; }
+  .res .src i { width: 26px; height: 26px; border-radius: 50%; display: grid; place-items: center; font: 700 12px 'UI'; color: #fff; font-style: normal; }
+  .res .src small { display: block; font: 400 12px 'UI'; color: #5f6368; }
+  .res h5 { margin-top: 9px; font: 500 18.5px/1.3 'UI'; color: #1a0dab; letter-spacing: -0.015em; }
+  .res p { margin-top: 6px; font: 400 14px/1.5 'UI'; color: #4d5156; }
+  .lock { display: inline-flex; align-items: center; gap: 5px; margin-top: 8px; padding: 4px 9px; border-radius: 6px; background: #F1F3F4; font: 600 12px 'UI'; color: #5f6368; }
+  .vs { display: inline-block; font: 700 11px 'UI'; letter-spacing: 0.04em; padding: 3px 7px; border-radius: 5px; margin-right: 6px; vertical-align: 2px; }
+
+  /* ---------------- campaign site (rebuilt from the askpoli.us demo) ---------------- */
+  #site { background: #fff; color: #111827; font-family: 'UI', sans-serif; }
+  .navy { color: rgb(20,40,75); }
+  #site header { height: 64px; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; border-bottom: 1px solid #e5e7eb; margin-top: 54px; }
+  #site header .n1 { font: 700 20px 'Georgia2', serif; letter-spacing: 0.05em; color: rgb(20,40,75); line-height: 1; }
+  #site header .n2 { font: 600 10px 'UI'; letter-spacing: 0.22em; text-transform: uppercase; color: rgb(180,35,44); margin-top: 4px; }
+  .btn { border-radius: 2px; font: 700 12px 'UI'; letter-spacing: 0.08em; color: #fff; background: rgb(180,35,44); padding: 9px 16px; }
+  .hero { position: relative; overflow: hidden; background: rgb(20,40,75); color: #fff; padding: 64px 16px; }
+  .hero .ph { position: absolute; inset: 0; background:
+      radial-gradient(160px 120px at 82% 30%, rgba(255,214,150,0.35), transparent 70%),
+      radial-gradient(220px 160px at 95% 70%, rgba(120,160,220,0.35), transparent 70%),
+      linear-gradient(180deg, #3d5a86, #233a60 60%, #1a2c4d); }
+  .hero .ov { position: absolute; inset: 0; background: linear-gradient(90deg, rgba(20,40,75,0.94) 0%, rgba(20,40,75,0.7) 55%, rgba(20,40,75,0.2) 100%); }
+  .hero .in { position: relative; }
+  .hero .k { font: 700 11px 'UI'; letter-spacing: 0.24em; text-transform: uppercase; color: rgba(255,255,255,0.8); }
+  .hero h1 { font: 700 40px/1.05 'Georgia2', serif; margin-top: 12px; letter-spacing: -0.01em; }
+  .hero p { font: 400 16px/1.6 'UI'; color: rgba(255,255,255,0.85); margin-top: 16px; }
+  .hero .bs { display: flex; gap: 12px; margin-top: 32px; }
+  .hero .b1 { border-radius: 2px; background: #fff; color: rgb(20,40,75); font: 700 13px 'UI'; letter-spacing: 0.08em; padding: 12px 24px; }
+  .hero .b2 { border-radius: 2px; background: rgb(180,35,44); color: #fff; font: 700 13px 'UI'; letter-spacing: 0.08em; padding: 12px 24px; }
+  .hero .ed { font: 400 13px 'UI'; color: rgba(255,255,255,0.75); margin-top: 32px; }
+  .askwrap { background: #f3f4f1; border-bottom: 1px solid #e5e7eb; padding: 32px 0; }
+  #widget { height: 560px; display: flex; flex-direction: column; padding: 16px; }
+  #widget .top { display: flex; gap: 16px; }
+  #widget .orbcol { width: 96px; display: flex; flex-direction: column; align-items: center; flex: none; }
+  #widget .orbcol svg { width: 72px; height: 72px; filter: drop-shadow(rgba(40,30,90,0.16) 0 3px 4px) drop-shadow(rgba(90,65,190,0.2) 0 16px 32px); }
+  #widget .t1 { font: 700 20px/1.2 'Georgia2', serif; color: rgb(20,40,75); }
+  #widget .t2 { font: 400 12px/1.62 'UI'; color: #374151; margin-top: 6px; }
+  #msgs { flex: 1; min-height: 0; margin-top: 12px; display: flex; flex-direction: column; gap: 12px; overflow: hidden; }
+  .u { align-self: flex-end; max-width: 78%; background: rgb(20,40,75); color: #fff; font: 400 13.5px/1.45 'UI'; padding: 10px 14px; border-radius: 16px 16px 4px 16px; }
+  .a { display: flex; gap: 8px; align-items: flex-start; }
+  .a > svg { width: 26px; height: 26px; flex: none; margin-top: 2px; }
+  .a .bb { background: #fff; border: 1px solid #e5e7eb; border-radius: 4px 16px 16px 16px; padding: 10px 13px; font: 400 13.5px/1.5 'UI'; color: #111827; box-shadow: 0 1px 2px rgba(0,0,0,0.04); position: relative; overflow: hidden; }
+  .a .lbl { font: 600 11px 'UI'; color: #6b7280; margin-bottom: 4px; letter-spacing: 0.01em; }
+  .dots { display: inline-flex; gap: 4px; padding: 4px 2px; } .dots i { width: 7px; height: 7px; border-radius: 50%; background: #9ca3af; }
+  .ok { display: inline-flex; align-items: center; gap: 6px; margin-top: 9px; padding: 5px 10px 5px 6px; border-radius: 999px; font: 600 11.5px 'UI'; color: #fff;
+    background: linear-gradient(110deg, rgb(26,86,219) 10%, rgb(112,80,184) 55%, rgb(220,53,69) 100%); }
+  .ok i { width: 17px; height: 17px; border-radius: 50%; background: rgba(255,255,255,0.28); display: grid; place-items: center; flex: none; }
+  .chips { display: flex; gap: 6px; margin-top: 12px; overflow: hidden; white-space: nowrap; }
+  .chips span { flex: none; border-radius: 999px; border: 1px solid rgba(20,40,75,0.333); background: #fff; padding: 4px 12px; font: 500 11px 'UI'; color: #111827; }
+  .form { margin-top: 10px; display: flex; align-items: center; gap: 8px; border-radius: 12px; background: #fff; border: 1px solid #d1d5db; padding: 6px 6px 6px 16px; box-shadow: 0 1px 2px rgba(0,0,0,0.05); }
+  .form .in { flex: 1; font: 400 13px 'UI'; color: #9ca3af; padding: 6px 0; white-space: nowrap; overflow: hidden; }
+  .form .in.has { color: #111827; }
+  .form .send { width: 32px; height: 32px; border-radius: 8px; background: rgb(20,40,75); display: grid; place-items: center; opacity: 0.4; }
+  .disc { margin-top: 6px; font: 400 10px/1.4 'UI'; color: #6b7280; }
+  .meet { padding: 56px 16px 80px; }
+  .meet .k { font: 700 12px 'UI'; letter-spacing: 0.2em; text-transform: uppercase; color: rgb(180,35,44); }
+  .meet h2 { font: 700 30px/1.2 'Georgia2', serif; color: rgb(20,40,75); margin-top: 8px; }
+  .meet p { font: 400 16px/1.65 'UI'; color: #374151; margin-top: 14px; }
+
+  /* ---------------- success + transition ---------------- */
+  #fx { position: absolute; inset: 0; pointer-events: none; z-index: 85; }
+  #dark { position: absolute; inset: 0; z-index: 95; opacity: 0; background:
+      radial-gradient(470px 470px at 32px 224px, rgba(28,86,219,0.30), transparent 70%),
+      radial-gradient(440px 440px at 224px 432px, rgba(122,79,184,0.22), transparent 70%),
+      radial-gradient(470px 470px at 378px 608px, rgba(220,53,71,0.20), transparent 70%), #04050B; }
+  #flyorb { position: absolute; z-index: 96; display: none; }
+  #flyorb svg { width: 100%; height: 100%; display: block; }
+  #flyhalo { position: absolute; z-index: 95; display: none; border-radius: 50%; background: radial-gradient(circle, rgba(150,110,255,0.45) 0%, rgba(110,80,220,0.14) 40%, transparent 70%); }
+  #target { position: absolute; inset: 0; width: 432px; height: 768px; z-index: 98; opacity: 0; }
+</style>
+</head>
+<body>
+<div id="screen">
+  <div id="cam">
+    <div class="vp" id="vp">
+      <!-- start page -->
+      <div class="page" id="start">
+        <h3>Favorites</h3>
+        <div class="fav" style="display:grid;grid-template-columns:repeat(4,1fr);gap:18px 0;padding:0 10px">
+          <div class="tile"><i style="background:#E8453C">N</i>News</div>
+          <div class="tile"><i style="background:#3D8BFD">W</i>Weather</div>
+          <div class="tile"><i style="background:#34A853">M</i>Maps</div>
+          <div class="tile"><i style="background:#7E57C2">L</i>Library</div>
+          <div class="tile"><i style="background:#1F2A44">R</i>Riverton</div>
+          <div class="tile"><i style="background:#F4A300">S</i>Sports</div>
+          <div class="tile"><i style="background:#00897B">B</i>Bank</div>
+          <div class="tile"><i style="background:#5F6368">T</i>Transit</div>
+        </div>
+        <h3 style="margin-top:30px">Privacy Report</h3>
+        <div class="card"><svg width="22" height="26" viewBox="0 0 22 26"><path d="M11 1 2 4.5v7.3C2 18 6 23 11 25c5-2 9-7 9-13.2V4.5z" fill="#8e8e93"/></svg>In the last seven days, Safari has prevented 41 trackers from profiling you.</div>
+        <h3 style="margin-top:30px">Reading List</h3>
+        <div class="card">Your Reading List is empty.</div>
+      </div>
+
+      <!-- search results (fictional engine, fictional outlets) -->
+      <div class="page" id="serp" style="opacity:0">
+        <div class="sq"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg>alex rivera housing plan</div>
+        <div class="tabs"><span class="on">All</span><span>News</span><span>Videos</span><span>Images</span><span>Forums</span></div>
+        <div class="qa" id="qa">
+          <div class="hd"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#5f6368" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16.5v.5" stroke-linecap="round"/></svg>Quick answer<span class="warn" id="warn"><svg width="13" height="13" viewBox="0 0 24 24"><path d="M12 3 2 20h20z" fill="#C98A00"/><path d="M12 9.5v5M12 17v.6" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/></svg>Sources disagree</span></div>
+          <p>Information about Alex Rivera's housing plan is <span class="hl">limited and conflicting</span>. Some reports <span class="hl">suggest</span> Rivera supports new starter homes, while others claim Rivera <span class="hl">opposes new development</span>. It is <span class="hl">not clear</span> what the plan includes or how it would be paid for.</p>
+        </div>
+        <div class="res">
+          <div class="src"><i style="background:#1F4E79">RL</i><div>Riverton Ledger<small>rivertonledger.com · 3 days ago</small></div></div>
+          <h5><span class="vs" style="background:#E7F3EC;color:#1E7A46">SAYS: SUPPORTS</span>Rivera backs starter homes, but details are thin</h5>
+          <p>At Tuesday's forum, Rivera spoke about permits but did not say how much the plan would cost...</p>
+        </div>
+        <div class="res">
+          <div class="src"><i style="background:#8B1E3F">KP</i><div>Kessler County Post<small>Opinion · 1 week ago</small></div></div>
+          <h5><span class="vs" style="background:#FDECEC;color:#B3261E">SAYS: OPPOSES</span>Rivera quietly opposes new development, neighbors claim</h5>
+          <p>A Cedar Hill group says the candidate has resisted new projects. The campaign did not respond...</p>
+        </div>
+        <div class="res">
+          <div class="src"><i style="background:#3F51B5">VC</i><div>The Valley Courier<small>valleycourier.com</small></div></div>
+          <h5>Where the District 4 candidates stand on rent</h5>
+          <div class="lock"><svg width="11" height="13" viewBox="0 0 14 17"><rect x="1" y="7" width="12" height="9" rx="2" fill="#5f6368"/><path d="M4 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="#5f6368" stroke-width="2"/></svg>Subscribers only</div>
+        </div>
+        <div class="res">
+          <div class="src"><i style="background:#FF6A2B">rt</i><div>RivertonTalk<small>Forum · 14 replies</small></div></div>
+          <h5>Does anyone actually know where Rivera stands on housing?</h5>
+          <p>"Honestly I've heard both things." · "Depends who you ask." · "No idea, sorry."</p>
+        </div>
+        <div style="height:400px"></div>
+      </div>
+
+      <!-- campaign site -->
+      <div class="page" id="site" style="opacity:0">
+        <header><div><p class="n1">ALEX RIVERA</p><p class="n2">For City Council</p></div><div class="btn">DONATE</div></header>
+        <section class="hero"><div class="ph"></div><div class="ov"></div><div class="in">
+          <p class="k">Riverton City Council, District 4</p>
+          <h1>Leadership that shows up</h1>
+          <p>Housing people can afford, streets that are safe and lit, and a City Hall that answers when you call.</p>
+          <div class="bs"><span class="b1">VOLUNTEER</span><span class="b2">BOOK A CALL</span></div>
+          <p class="ed">Election Day is Tuesday, November 2, 2027.</p>
+        </div></section>
+        <section class="askwrap" id="askwrap"><div id="widget">
+          <div class="top"><div class="orbcol" id="orbcol"><!--ORB--></div>
+            <div><p class="t1">Ask Alex Rivera</p><p class="t2">Ask Alex is the campaign's AI representative. Ask about Alex's plans, record, and events, and get answers drawn only from the campaign's own knowledge base.</p></div></div>
+          <div id="msgs">
+            <div class="u" id="ubub" style="display:none">What will you do about housing costs</div>
+            <div class="a" id="abub" style="display:none"><!--ORBSM--><div class="bb" id="bb"><div class="lbl">Ask Alex · AI representative</div><div id="atext"></div><div id="dots" class="dots"><i></i><i></i><i></i></div><div class="ok" id="okb" style="display:none"><i><svg width="10" height="10" viewBox="0 0 12 12"><path d="M2.5 6.4 5 8.8l4.6-5.4" fill="none" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" id="chk"/></svg></i>Straight from Alex's campaign</div><div id="sweep" style="position:absolute;top:0;bottom:0;width:90px;left:-120px;background:linear-gradient(100deg,transparent,rgba(160,130,255,0.22),transparent)"></div></div></div>
+          </div>
+          <div class="chips" id="chips"><span>What is your plan for housing costs?</span><span>Where do you stand on public safety?</span><span>How can I volunteer?</span><span>What's your favorite movie?</span></div>
+          <div class="form" id="form"><div class="in" id="inp">Ask Alex anything…</div><div class="send" id="send"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div></div>
+          <p class="disc">Alex Rivera is a fictional demo. Questions are saved to the demo campaign, like on a real campaign site, so please don't share personal information.</p>
+        </div></section>
+        <section class="meet"><p class="k">Meet Alex</p><h2>A neighbor who fixes things for a living</h2><p>Alex Rivera grew up on Riverton's West End and has lived in District 4's Cedar Hill neighborhood since 2013.</p></section>
+      </div>
+
+      <!-- Safari address-editing sheet -->
+      <div id="sheet"><div id="sugg"></div></div>
+    </div>
+
+    <svg id="fx" viewBox="0 0 432 768"></svg>
+
+    <!-- Safari bottom bar -->
+    <div id="bar">
+      <div id="tools">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5 8 12l7 7"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#b9b9be" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"><path d="m9 5 7 7-7 7"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 3v12M7.5 7.5 12 3l4.5 4.5M5 11v9h14v-9"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linejoin="round"><path d="M3 5.5C5.5 4 9 4 12 6c3-2 6.5-2 9-.5V19c-2.5-1.5-6-1.5-9 .5-3-2-6.5-2-9-.5z"/><path d="M12 6v13.5"/></svg>
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#007AFF" stroke-width="2" stroke-linejoin="round"><rect x="3" y="7" width="14" height="14" rx="3"/><path d="M7 3h11a3 3 0 0 1 3 3v11"/></svg>
+      </div>
+    </div>
+    <div id="pill">
+      <div class="aa">ᴀA</div>
+      <div class="url" id="urltxt"></div>
+      <div class="rl"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#111" stroke-width="2.2" stroke-linecap="round"><path d="M20 12a8 8 0 1 1-2.3-5.6M20 4v5h-5"/></svg></div>
+      <div class="edit" id="edit"><svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg><span id="etext"></span><span class="x"><svg width="9" height="9" viewBox="0 0 10 10" stroke="#fff" stroke-width="2" stroke-linecap="round"><path d="m2 2 6 6M8 2 2 8"/></svg></span></div>
+      <div id="progress"></div>
+    </div>
+
+    <!-- keyboard -->
+    <div id="kb"><div class="acc" id="acc"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b9b9be" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 15 6-6 6 6"/></svg><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#b9b9be" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="m6 9 6 6 6-6"/></svg><b>Done</b></div>
+      <div id="keys"></div>
+      <svg class="glob" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5a5d63" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+      <svg class="mic" width="22" height="26" viewBox="0 0 20 26" fill="none" stroke="#5a5d63" stroke-width="1.9" stroke-linecap="round"><rect x="6" y="1.5" width="8" height="14" rx="4"/><path d="M2 12a8 8 0 0 0 16 0M10 20v4"/></svg>
+    </div>
+    <div id="pop"><div class="stem"></div><div class="cap" id="popc">a</div></div>
+    <div id="touch"></div>
+  <div id="status"><span class="time" id="clock">11:47</span>
+    <span class="ic">
+      <svg width="19" height="12" viewBox="0 0 19 12"><rect x="0" y="8" width="3.4" height="4" rx="1" fill="currentColor"/><rect x="5" y="5.5" width="3.4" height="6.5" rx="1" fill="currentColor"/><rect x="10" y="3" width="3.4" height="9" rx="1" fill="currentColor"/><rect x="15" y="0" width="3.4" height="12" rx="1" fill="currentColor"/></svg>
+      <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 11.5 6 9a3.6 3.6 0 0 1 5 0z M3.6 6.6a7 7 0 0 1 9.8 0l-1.5 1.5a5 5 0 0 0-6.8 0z M1.2 4.2a10.4 10.4 0 0 1 14.6 0l-1.5 1.5a8.3 8.3 0 0 0-11.6 0z" fill="currentColor"/></svg>
+      <svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.8" fill="none" stroke="currentColor" stroke-opacity=".4"/><rect x="2" y="2" width="16.5" height="9" rx="2.4" fill="currentColor"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2" fill="currentColor" fill-opacity=".45"/></svg>
+    </span></div>
+  <div id="home"></div>
+  </div>
+
+
+
+  <div id="dark"></div>
+  <div id="flyhalo"></div>
+  <div id="flyorb"></div>
+  <img id="target">
+</div>
+
+<script>
+// =====================================================================================
+// Timeline. render(t) sets every element from t (seconds), so frames are deterministic.
+// =====================================================================================
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const lerp = (a, b, k) => a + (b - a) * k;
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const eout = k => 1 - Math.pow(1 - k, 3);
+const eoutQ = k => 1 - Math.pow(1 - k, 5);
+const spring = k => k <= 0 ? 0 : k >= 1 ? 1 : 1 - Math.exp(-6.5 * k) * Math.cos(9 * k);
+
+const ORB = fetchSync('poli-orb.svg');
+function fetchSync(u) { const x = new XMLHttpRequest(); x.open('GET', u, false); x.send(); return x.responseText; }
+const uniq = (svg, sfx) => svg.replace(/id="([^"]+)"/g, `id="$1${sfx}"`).replace(/url\(#([^)]+)\)/g, `url(#$1${sfx})`);
+$('orbcol').innerHTML = uniq(ORB, 'w');
+$('abub').insertAdjacentHTML('afterbegin', uniq(ORB, 's'));
+$('flyorb').innerHTML = uniq(ORB, 'f');
+
+// ---------------- script of the story ----------------
+const Q1 = 'alex rivera housing plan';
+const Q2 = 'alexriv', Q2AC = 'eraforcitycouncil.com';
+const Q3 = 'What will you do about housing costs';
+const ANSWER = "Alex's plan for housing costs: cut new-home permit waits from 143 days to 70, allow starter homes near the Route 9 bus line, and create a $1.5 million repair fund for small landlords who keep rents fair. Every proposal comes with its cost, with no increase in the city property tax rate.";
+
+function typingTimes(text, t0, dt, seed) {           // natural typing rhythm
+  let s = seed, t = t0; const out = [];
+  for (const ch of text) { s = (s * 16807) % 2147483647; const j = (s / 2147483647 - 0.5) * 0.45; out.push(t); t += dt * (1 + j) + (ch === ' ' ? dt * 0.35 : 0); }
+  return out;
+}
+const T = {};
+T.tap1 = 0.45; T.kb1 = [0.52, 0.82];
+T.ty1 = typingTimes(Q1, 0.95, 0.07, 7); T.go1 = T.ty1.at(-1) + 0.28;
+T.load1 = [T.go1 + 0.05, T.go1 + 0.75]; T.serp = T.go1 + 0.6;
+T.hl = T.serp + 0.35; T.scroll1 = [T.serp + 1.25, T.serp + 2.0];
+T.tap2 = T.serp + 3.05; T.kb2 = [T.tap2 + 0.07, T.tap2 + 0.37];
+T.ty2 = typingTimes(Q2, T.tap2 + 0.45, 0.07, 3); T.ac = T.ty2.at(-1) + 0.08; T.go2 = T.ac + 0.42;
+T.load2 = [T.go2 + 0.05, T.go2 + 0.7]; T.site = T.go2 + 0.55;
+T.scroll2 = [T.site + 0.45, T.site + 1.55];
+T.tap3 = T.scroll2[1] + 0.25; T.kb3 = [T.tap3 + 0.06, T.tap3 + 0.36];
+T.ty3 = typingTimes(Q3, T.tap3 + 0.48, 0.058, 11); T.send = T.ty3.at(-1) + 0.3;
+T.kbdown3 = [T.send + 0.08, T.send + 0.38]; T.dots = [T.send + 0.25, T.send + 1.05];
+T.stream = [T.dots[1], T.dots[1] + 1.75];
+T.ok = T.stream[1] + 0.15; T.ring = [T.ok + 0.1, T.ok + 1.0];
+T.fly = [T.ok + 0.95, T.ok + 1.95]; T.dark = [T.ok + 1.05, T.ok + 1.7]; T.xfade = [T.ok + 1.75, T.ok + 2.05];
+T.end = T.xfade[1];
+window.DUR = T.end; window.T = T;
+
+// ---------------- keyboard build ----------------
+const KB = { top: 0, padTop: 10, rowH: 44, gap: 12, kw: 37.4, kg: 5.8, side: 3.5 };
+const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+const keyEl = {};
+function buildKeys(mode) {                    // mode: 'url' | 'text'
+  const box = $('keys'); box.innerHTML = '';
+  const off = mode === 'text' ? 44 : 0;
+  const y0 = off + KB.padTop;
+  const W = 432, kw = (W - 2 * KB.side - 9 * KB.kg) / 10;
+  const add = (label, x, y, w, cls = '') => { const d = document.createElement('div'); d.className = 'key ' + cls; d.style.left = x + 'px'; d.style.top = y + 'px'; d.style.width = w + 'px'; d.textContent = label; box.appendChild(d); return d; };
+  rows.forEach((r, ri) => {
+    const y = y0 + ri * (KB.rowH + KB.gap);
+    const n = r.length; const rowW = n * kw + (n - 1) * KB.kg;
+    let x = ri === 0 ? KB.side : (W - rowW) / 2;
+    if (ri === 2) { add('⇧', KB.side, y, kw * 1.28, 'sp').id = 'kshift'; add('⌫', W - KB.side - kw * 1.28, y, kw * 1.28, 'sp'); }
+    for (const ch of r) { keyEl[ch] = { el: add(ch, x, y, kw), x: x + kw / 2, y }; x += kw + KB.kg; }
+  });
+  const y = y0 + 3 * (KB.rowH + KB.gap);
+  add('123', KB.side, y, kw * 1.28, 'sp');
+  if (mode === 'url') {
+    keyEl[' '] = { el: add('space', KB.side + kw * 1.28 + KB.kg, y, 432 - 2 * KB.side - kw * 2.56 - kw * 1.1 - KB.kg * 3 - 70, 'sp'), x: 0, y };
+    keyEl['.'] = { el: add('.', 432 - KB.side - 98 - KB.kg - kw * 1.1, y, kw * 1.1, 'sp'), x: 0, y };
+    keyEl.go = { el: add('go', 432 - KB.side - 98, y, 98, 'sp'), x: 432 - KB.side - 49, y };
+    keyEl.go.el.style.background = '#007AFF'; keyEl.go.el.style.color = '#fff';
+  } else {
+    keyEl[' '] = { el: add('space', KB.side + kw * 1.28 + KB.kg, y, 432 - 2 * KB.side - kw * 1.28 - 98 - KB.kg * 2, 'sp'), x: 0, y };
+    keyEl.go = { el: add('go', 432 - KB.side - 98, y, 98, 'sp'), x: 432 - KB.side - 49, y };
+    keyEl.go.el.style.background = '#007AFF'; keyEl.go.el.style.color = '#fff';
+  }
+  Object.values(keyEl).forEach(k => k.el.style.fontSize = k.el.classList.contains('sp') ? '16px' : '23px');
+}
+let kbMode = null;
+
+// ---------------- helpers ----------------
+function typedCount(times, t) { let n = 0; for (const tt of times) if (t >= tt) n++; return n; }
+function pressedKey(text, times, t) {          // the key held at time t (90 ms press)
+  for (let i = times.length - 1; i >= 0; i--) if (t >= times[i] && t < times[i] + 0.09) return text[i];
+  return null;
+}
+function touch(x, y, t, at) {                   // finger tap indicator
+  const k = prog(t, at - 0.05, at + 0.28);
+  if (k <= 0 || k >= 1) return false;
+  const el = $('touch'); el.style.display = 'block'; el.style.left = x + 'px'; el.style.top = y + 'px';
+  el.style.opacity = k < 0.25 ? k / 0.25 : 1 - (k - 0.25) / 0.75; el.style.transform = `scale(${0.85 + 0.25 * k})`;
+  return true;
+}
+const vis = (id, on) => $(id).style.display = on ? '' : 'none';
+
+const PAGE_TOP_ASK = () => $('askwrap').offsetTop;
+
+function render(t) {
+  // ---------- which page ----------
+  const onSerp = t >= T.serp, onSite = t >= T.site;
+  $('start').style.opacity = onSerp ? 0 : 1;
+  $('serp').style.opacity = onSite ? 0 : clamp((t - T.serp) / 0.18);
+  $('site').style.opacity = clamp((t - T.site) / 0.18);
+
+  // ---------- keyboard + address editing ----------
+  let kbK = 0, mode = 'url', editing = false, typed = '', ac = '', ph = '';
+  if (t >= T.kb1[0] && t < T.go1 + 0.3) { editing = true; kbK = t < T.go1 ? eout(prog(t, ...T.kb1)) : 1 - eout(prog(t, T.go1 + 0.02, T.go1 + 0.3)); typed = Q1.slice(0, typedCount(T.ty1, t)); ph = 'Search or enter website name'; }
+  if (t >= T.kb2[0] && t < T.go2 + 0.3) { editing = true; kbK = t < T.go2 ? eout(prog(t, ...T.kb2)) : 1 - eout(prog(t, T.go2 + 0.02, T.go2 + 0.3)); typed = Q2.slice(0, typedCount(T.ty2, t)); ac = t >= T.ac ? Q2AC : ''; }
+  if (t >= T.kb3[0] && t < T.kbdown3[1]) { mode = 'text'; kbK = t < T.send ? eout(prog(t, ...T.kb3)) : 1 - eout(prog(t, ...T.kbdown3)); }
+  if (kbMode !== mode) { buildKeys(mode); kbMode = mode; }
+  const kbH = mode === 'text' ? 336 : 292;
+  $('kb').style.height = kbH + 'px';
+  $('acc').style.display = mode === 'text' ? 'flex' : 'none';
+  $('kb').style.transform = `translateY(${(1 - kbK) * (kbH + 10)}px)`;
+  $('kb').style.display = kbK > 0.001 ? '' : 'none';
+
+  // address pill position: bottom bar normally, above keyboard while editing
+  const pillIdleY = 768 - 108 + 8, pillEditY = 768 - kbH - 46 - 8;
+  const editK = editing ? kbK : 0;
+  $('pill').style.top = lerp(pillIdleY, pillEditY, editK) + 'px';
+  $('pill').style.left = $('pill').style.right = lerp(12, 10, editK) + 'px';
+  $('bar').style.transform = `translateY(${(mode === 'text' ? kbK : 0) * 130}px)`;
+  $('pill').style.transform = `translateY(${(mode === 'text' ? kbK : 0) * 130}px)`;
+  $('tools').style.opacity = 1 - editK;
+  $('edit').style.display = editing ? 'flex' : 'none';
+  $('pill').querySelectorAll('.aa,.url,.rl').forEach(e => e.style.visibility = editing ? 'hidden' : 'visible');
+  if (editing) {
+    const blink = Math.floor(t / 0.5) % 2 === 0 || typed.length > 0;
+    $('etext').innerHTML = typed || ac ? `<span class="typed">${typed}</span>${ac ? `<span class="ac">${ac}</span>` : (blink ? '<span class="caret"></span>' : '')}` : `${blink ? '<span class="caret"></span>' : ''}<span class="ph">${ph || 'Search or enter website name'}</span>`;
+  }
+  // sheet with suggestions while editing
+  const sheetK = editing ? editK : 0;
+  $('sheet').style.display = sheetK > 0.01 ? 'block' : 'none';
+  $('sheet').style.opacity = sheetK;
+  if (sheetK > 0.01) {
+    let html = '';
+    if (typed && !ac && t < T.kb2[0]) {
+      const s = ['alex rivera housing plan', 'alex rivera housing', 'alex rivera riverton', 'alex rivera city council district 4'].filter(x => x.startsWith(typed.toLowerCase())).slice(0, 4);
+      html = `<h4>Search Suggestions</h4><div class="grp">${(s.length ? s : [typed]).map(x => `<div class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg><span><b>${x.slice(0, typed.length)}</b>${x.slice(typed.length)}</span></div>`).join('')}</div>`;
+    } else if (ac) {
+      html = `<h4>Top Hit</h4><div class="grp"><div class="row"><span style="width:26px;height:26px;border-radius:6px;background:rgb(20,40,75);color:#fff;display:grid;place-items:center;font:700 11px 'UI'">AR</span><span><b>Alex Rivera for City Council</b><br><span style="font-size:13px;color:#8e8e93">alexriveraforcitycouncil.com</span></span></div></div>`;
+    } else if (typed) {
+      html = `<h4>Search Suggestions</h4><div class="grp"><div class="row"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#8e8e93" stroke-width="2.4" stroke-linecap="round"><circle cx="10.5" cy="10.5" r="6.5"/><path d="m20 20-4.6-4.6"/></svg><span><b>${typed}</b></span></div></div>`;
+    } else {
+      html = `<h4>Favorites</h4><div class="grp" style="background:transparent"><div class="fav" style="display:grid;grid-template-columns:repeat(4,1fr);padding:0">${['News|#E8453C', 'Weather|#3D8BFD', 'Maps|#34A853', 'Library|#7E57C2'].map(s => { const [n, c] = s.split('|'); return `<div class="tile"><i style="background:${c}">${n[0]}</i>${n}</div>`; }).join('')}</div></div>`;
+    }
+    $('sugg').innerHTML = html;
+  }
+
+  // key presses + popups
+  Object.values(keyEl).forEach(k => k.el.classList.remove('down'));
+  $('pop').style.display = 'none';
+  let pk = null;
+  if (t < T.go1 + 0.1) pk = pressedKey(Q1, T.ty1, t);
+  else if (t < T.go2 + 0.1) pk = pressedKey(Q2, T.ty2, t);
+  else pk = pressedKey(Q3.toLowerCase(), T.ty3, t);
+  const goAt = [T.go1, T.go2, T.send].find(g => t >= g && t < g + 0.12);
+  if (goAt && kbK > 0.5) keyEl.go.el.classList.add('down');
+  if (pk && kbK > 0.5) {
+    const k = keyEl[pk];
+    if (k) {
+      k.el.classList.add('down');
+      if (pk !== ' ' && pk !== '.') {
+        const kbTop = 768 - kbH;
+        $('pop').style.display = 'block'; $('pop').style.left = (k.x - 28) + 'px'; $('pop').style.top = (kbTop + k.y - 56) + 'px';
+        const upper = mode === 'text' && T.ty3[0] <= t && t < T.ty3[0] + 0.09;
+        $('popc').textContent = upper ? pk.toUpperCase() : pk;
+      }
+    }
+  }
+  // auto-capitalised first letter on the text keyboard
+  if (mode === 'text') { const up = typedCount(T.ty3, t) === 0; rows.join('').split('').forEach(c => keyEl[c] && (keyEl[c].el.textContent = up ? c.toUpperCase() : c)); }
+
+  // ---------- address text, progress ----------
+  const domain = t >= T.go2 ? 'alexriveraforcitycouncil.com' : t >= T.go1 ? Q1 : '';
+  $('urltxt').innerHTML = domain ? (t >= T.go2 ? `<svg width="10" height="13" viewBox="0 0 14 17" style="flex:none"><rect x="1" y="7" width="12" height="9" rx="2" fill="#111"/><path d="M4 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="#111" stroke-width="2"/></svg>` : '') + domain : '<span style="color:#8e8e93;font-weight:400">Search or enter website name</span>';
+  let pr = -1;
+  for (const L of [T.load1, T.load2]) if (t >= L[0] && t < L[1] + 0.2) pr = t < L[1] ? eout(prog(t, ...L)) * 0.92 + 0.05 : 1;
+  $('progress').style.width = pr < 0 ? '0' : (pr * 100) + '%';
+  $('progress').style.opacity = pr < 0 ? 0 : (t > T.load1[1] && t < T.load1[1] + 0.2) || (t > T.load2[1] && t < T.load2[1] + 0.2) ? 1 - prog(t, ...(t < T.load2[0] ? [T.load1[1], T.load1[1] + 0.2] : [T.load2[1], T.load2[1] + 0.2])) : 1;
+
+  // ---------- search results: highlights + scroll ----------
+  document.querySelectorAll('#qa .hl').forEach((h, i) => h.style.backgroundSize = (eout(prog(t, T.hl + i * 0.28, T.hl + i * 0.28 + 0.35)) * 100) + '% 38%');
+  const w = prog(t, T.serp + 0.2, T.serp + 0.55); $('warn').style.transform = `scale(${0.6 + 0.4 * spring(w)})`; $('warn').style.opacity = clamp(w * 3);
+  $('serp').style.transform = `translateY(${-eio(prog(t, ...T.scroll1)) * 250}px)`;
+
+  // ---------- campaign site: scroll + widget ----------
+  const askTop = PAGE_TOP_ASK();
+  let sy = eio(prog(t, ...T.scroll2)) * (askTop - 40);
+  const kb3k = t >= T.kb3[0] && t < T.kbdown3[1] ? (t < T.send ? eout(prog(t, ...T.kb3)) : 1 - eout(prog(t, ...T.kbdown3))) : 0;
+  // with the keyboard up, iOS scrolls the focused input just above it
+  const formY = $('form').offsetTop;                                         // page y of the input
+  const needed = formY + 50 - (768 - 336 - 8);
+  sy = lerp(sy, Math.max(sy, needed), kb3k);
+  $('site').style.transform = `translateY(${-sy}px)`;
+
+  const n3 = typedCount(T.ty3, t);
+  const inp = $('inp');
+  const sent = t >= T.send + 0.05;
+  if (!sent && n3 > 0) { inp.classList.add('has'); inp.innerHTML = Q3.slice(0, n3) + (t >= T.tap3 ? '<span class="caret" style="height:16px;vertical-align:-3px"></span>' : ''); }
+  else if (!sent && t >= T.tap3 + 0.05) { inp.classList.remove('has'); inp.innerHTML = (Math.floor(t / 0.5) % 2 === 0 ? '<span class="caret" style="height:16px;vertical-align:-3px;margin-right:1px"></span>' : '') + 'Ask Alex anything…'; }
+  else { inp.classList.remove('has'); inp.textContent = 'Ask Alex anything…'; }
+  $('send').style.opacity = !sent && n3 > 0 ? 1 : 0.4;
+  $('form').style.borderColor = t >= T.tap3 && !sent ? '#9ca3af' : '#d1d5db';
+  // messages
+  vis('ubub', sent); $('ubub').style.opacity = clamp((t - T.send - 0.05) / 0.15); $('ubub').style.transform = `translateY(${(1 - eout(prog(t, T.send + 0.05, T.send + 0.3))) * 10}px)`;
+  vis('abub', t >= T.dots[0]); $('abub').style.opacity = clamp((t - T.dots[0]) / 0.15);
+  vis('dots', t < T.dots[1]);
+  document.querySelectorAll('#dots i').forEach((d, i) => d.style.opacity = 0.35 + 0.65 * Math.max(0, Math.sin((t * 7 - i * 0.9))));
+  const words = ANSWER.split(' '); const nw = Math.round(eio(prog(t, ...T.stream)) * words.length);
+  $('atext').textContent = t >= T.stream[0] ? words.slice(0, nw).join(' ') : '';
+  vis('okb', t >= T.ok); const ok = prog(t, T.ok, T.ok + 0.45);
+  $('okb').style.transform = `scale(${0.7 + 0.3 * spring(ok)})`; $('okb').style.opacity = clamp(ok * 4); $('okb').style.transformOrigin = '0 50%';
+  $('chk').style.strokeDasharray = 12; $('chk').style.strokeDashoffset = 12 * (1 - eout(prog(t, T.ok + 0.12, T.ok + 0.4)));
+  $('sweep').style.left = lerp(-120, 360, eio(prog(t, T.ok + 0.1, T.ok + 0.8))) + 'px';
+  // keep the chat scrolled to the newest message
+  const msgs = $('msgs'); msgs.scrollTop = msgs.scrollHeight;
+
+  // ---------- taps ----------
+  $('touch').style.display = 'none';
+  touch(216, 768 - 108 + 31, t, T.tap1);
+  touch(216, 768 - 108 + 31, t, T.tap2);
+  const fr = $('inp').getBoundingClientRect(); touch(fr.left + 90, fr.top + fr.height / 2, t, T.tap3);
+
+  // ---------- success: brand rings from the widget orb ----------
+  const fx = $('fx'); fx.innerHTML = '';
+  const orbR = $('orbcol').querySelector('svg').getBoundingClientRect();
+  const ocx = orbR.left + orbR.width / 2, ocy = orbR.top + orbR.height / 2;
+  if (!fx.querySelector('defs')) fx.insertAdjacentHTML('beforeend', '<defs><linearGradient id="rg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#1A56DB"/><stop offset=".5" stop-color="#7050B8"/><stop offset="1" stop-color="#DC3545"/></linearGradient><filter id="gb"><feGaussianBlur stdDeviation="3"/></filter></defs>');
+  for (const d of [0, 0.18, 0.36]) {
+    const k = prog(t, T.ring[0] + d, T.ring[0] + d + 0.85); if (k <= 0 || k >= 1) continue;
+    const r = 36 + eout(k) * 150, a = Math.pow(1 - k, 1.8);
+    fx.insertAdjacentHTML('beforeend', `<circle cx="${ocx}" cy="${ocy}" r="${r}" fill="none" stroke="url(#rg)" stroke-width="${3 * (1 - k) + 1}" opacity="${a}" filter="url(#gb)"/><circle cx="${ocx}" cy="${ocy}" r="${r}" fill="none" stroke="url(#rg)" stroke-width="${1.6 * (1 - k) + 0.6}" opacity="${a}"/>`);
+  }
+
+  // ---------- gentle camera: push in on the conflict, then on the answer ----------
+  const z1 = eio(prog(t, T.serp + 0.1, T.serp + 1.0)) * (1 - eio(prog(t, T.scroll1[0] - 0.1, T.scroll1[0] + 0.6)));
+  const z2 = eio(prog(t, T.stream[0], T.ok + 0.4));
+  const zoom = 1 + 0.05 * z1 + 0.05 * z2;
+  const qaR = $('qa').getBoundingClientRect();
+  $('cam').style.transformOrigin = z2 > 0 ? `50% 38%` : `50% 42%`;
+  $('cam').style.transform = `scale(${zoom})`;
+
+  // ---------- transition into the end card ----------
+  const fk = eio(prog(t, ...T.fly));
+  const fly = $('flyorb'), halo = $('flyhalo');
+  if (t >= T.fly[0]) {
+    // start: the widget orb exactly where it sits on screen (after camera zoom); end: the end card orb (540,900 r250 @1080)
+    const sx = ocx, sy0 = ocy, sr = orbR.width / 2;
+    const camK = zoom, cx0 = 216 + (sx - 216) * camK, cy0 = 768 * 0.38 + (sy0 - 768 * 0.38) * camK;
+    const ex = 216, ey = 360, er = 100;
+    const cx = lerp(cx0, ex, fk), cy = lerp(cy0, ey, fk) - Math.sin(fk * Math.PI) * 18, r = lerp(sr * camK, er, fk);
+    fly.style.display = 'block'; fly.style.left = (cx - r) + 'px'; fly.style.top = (cy - r) + 'px'; fly.style.width = fly.style.height = (2 * r) + 'px';
+    halo.style.display = 'block'; const hr = r * 2.3; halo.style.left = (cx - hr) + 'px'; halo.style.top = (cy - hr) + 'px'; halo.style.width = halo.style.height = (2 * hr) + 'px';
+    halo.style.opacity = eout(prog(t, T.fly[0] + 0.2, T.fly[1]));
+    $('orbcol').style.visibility = 'hidden';
+  } else { fly.style.display = 'none'; halo.style.display = 'none'; $('orbcol').style.visibility = 'visible'; }
+  const dk = eio(prog(t, ...T.dark));
+  $('dark').style.opacity = dk;
+  $('cam').style.filter = dk > 0 ? `blur(${dk * 6}px)` : 'none';
+  $('status').style.opacity = 1 - dk; $('home').style.opacity = 1 - dk;
+  $('target').style.opacity = eio(prog(t, ...T.xfade));
+}
+
+window.render = render;
+window.ready = Promise.all([document.fonts.ready, new Promise(r => { const im = $('target'); im.onload = r; im.onerror = r; im.src = 'endcard-target.png'; })])
+  .then(() => { buildKeys('url'); kbMode = 'url'; });
+if (!location.search.includes('render')) window.ready.then(() => { const s = performance.now(); const loop = n => { render(((n - s) / 1000) % (T.end + 0.8)); requestAnimationFrame(loop); }; requestAnimationFrame(loop); });
+</script>
+</body>
+</html>
