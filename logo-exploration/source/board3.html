@@ -1,0 +1,173 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Brand System</title>
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'Display'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-SemiBold.otf'); }
+  @font-face { font-family: 'Display'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-Bold.otf'); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; background: #fff; color: #1D1D1F; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  section { padding: 110px 80px; text-align: center; }
+  hr { border: 0; height: 1px; background: #E8E8ED; margin: 0 80px; }
+  .k { font: 600 15px 'Inter'; color: #86868B; }
+  h1 { font: 700 76px/1.04 'Display'; letter-spacing: -0.03em; }
+  h2 { font: 700 48px/1.08 'Display'; letter-spacing: -0.025em; margin-top: 8px; }
+  .sub { font: 400 20px/1.45 'Inter'; color: #6E6E73; margin: 16px auto 0; max-width: 740px; letter-spacing: -0.01em; }
+  .cap { font: 500 14px/1.4 'Inter'; color: #86868B; }
+  .cap b { color: #1D1D1F; font-weight: 600; }
+  .panel { background: #FBFBFD; border-radius: 28px; }
+  .wm { font-family: 'Display'; font-weight: 600; letter-spacing: -0.04em; color: #1D1D1F; line-height: 1; }
+  .lock { display: flex; align-items: center; }
+  .grid6 { display: grid; grid-template-columns: repeat(6, 1fr); gap: 14px; margin-top: 60px; }
+  .grid6 > div { padding: 26px 8px 20px; display: flex; flex-direction: column; align-items: center; gap: 16px; border-radius: 22px; }
+  .grid6 .sel { background: #FBFBFD; box-shadow: inset 0 0 0 1.5px #1D1D1F; }
+  .tag { font: 600 11px 'Inter'; letter-spacing: 0.08em; text-transform: uppercase; color: #fff; background: #1D1D1F; padding: 4px 8px; border-radius: 6px; }
+  .bal { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 60px; }
+  .bal .panel { padding: 48px 40px 40px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+  .bar { display: flex; width: 100%; height: 14px; border-radius: 7px; overflow: hidden; }
+  .legend { display: flex; justify-content: space-between; width: 100%; font: 500 13px 'Inter'; color: #6E6E73; }
+  .fam { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; margin-top: 60px; }
+  .fam .panel { height: 260px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 24px; }
+  .icon { position: relative; border-radius: 22.37%; background: #fff; box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04), 0 18px 40px rgba(60,60,90,0.12); display: grid; place-items: center; }
+  .sw { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-top: 60px; text-align: left; }
+  .sw .c { border-radius: 24px; height: 150px; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.05); }
+  .sw .n { font: 600 17px 'Display'; margin-top: 14px; } .sw .h { font: 400 14px 'Inter'; color: #86868B; margin-top: 3px; }
+  .type { display: grid; grid-template-columns: 1.2fr 1fr; gap: 24px; margin-top: 60px; text-align: left; }
+  .type .panel { padding: 44px; }
+  .field { position: relative; overflow: hidden; background: #fff; }
+  .field::before, .field::after { content: ''; position: absolute; border-radius: 50%; filter: blur(60px); }
+  .field::before { width: 62%; height: 70%; left: -12%; top: 18%; background: rgba(111,143,239,0.42); }
+  .field::after { width: 62%; height: 70%; right: -12%; top: 18%; background: rgba(232,102,122,0.38); }
+  .field > .mid { position: absolute; width: 46%; height: 50%; left: 27%; bottom: -16%; border-radius: 50%; filter: blur(60px); background: rgba(155,127,218,0.36); }
+  .field > .ct { position: relative; z-index: 2; }
+  .apps { display: grid; grid-template-columns: 1fr 1fr; gap: 28px; margin-top: 60px; }
+  .post { aspect-ratio: 1; border-radius: 24px; box-shadow: 0 0 0 1px #EDEDF2; display: flex; flex-direction: column; justify-content: space-between; padding: 40px; text-align: left; }
+  .card { width: 100%; aspect-ratio: 1.75; border-radius: 18px; background: #fff; box-shadow: 0 0 0 1px #EDEDF2, 0 20px 40px -20px rgba(40,40,80,0.25); padding: 32px; text-align: left; position: relative; overflow: hidden; }
+  .nav { border-radius: 22px; box-shadow: 0 0 0 1px #EDEDF2; overflow: hidden; text-align: left; }
+  .nav .top { display: flex; align-items: center; justify-content: space-between; gap: 16px; padding: 16px 22px; border-bottom: 1px solid #F0F0F3; }
+  .nav .links { display: flex; gap: 18px; font: 500 13px 'Inter'; color: #3A3A3F; white-space: nowrap; }
+  .nav .btn { white-space: nowrap; font: 600 13px 'Inter'; color: #fff; background: #1D1D1F; padding: 9px 16px; border-radius: 999px; }
+  .foot { font: 400 13px 'Inter'; color: #86868B; padding: 0 80px 80px; text-align: center; }
+</style>
+<script src="brand.js"></script>
+</head>
+<body><div id="root"></div>
+<script>
+const B = window.PoliBrand, C = B.COLORS; let u = 0;
+const mk = (o = {}) => B.brandMark({ ...o, id: 'm' + (u++) });
+const sz = (w, o = {}) => mk({ ...o, size: w, smile: o.smile || (w <= 32 ? 13 : undefined) });   // heavier line at small sizes
+const lock = (h, gap = 0.24) => `<div class="lock" style="gap:${h * gap}px">${sz(h * 1.16)}<span class="wm" style="font-size:${h * 1.18}px">Poli</span></div>`;
+const stacked = h => `<div style="display:flex;flex-direction:column;align-items:center;gap:${h * 0.32}px">${sz(h * 1.7)}<span class="wm" style="font-size:${h}px">Poli</span></div>`;
+const icon = w => `<div class="icon" style="width:${w}px;height:${w}px">${sz(w * 0.64)}</div>`;
+// colour shares measured from the renders (see balance.py)
+const share = (b, p, r) => `<div class="bar"><i style="width:${b}%;background:${C.blue}"></i><i style="width:${p}%;background:${C.purple}"></i><i style="width:${r}%;background:${C.red}"></i></div>
+  <div class="legend"><span>Blue ${b}%</span><span>Purple ${p}%</span><span>Red ${r}%</span></div>`;
+const OLD = `<svg viewBox="0 0 270 270" width="220" height="220"><defs><clipPath id="oc"><circle cx="135" cy="135" r="135"/></clipPath>
+  <linearGradient id="og" gradientUnits="userSpaceOnUse" x1="14" y1="40" x2="262" y2="196"><stop offset="0" stop-color="#86A0F2"/><stop offset=".4" stop-color="#8284E2"/><stop offset=".7" stop-color="#A97BCB"/><stop offset="1" stop-color="#EA6168"/></linearGradient>
+  <radialGradient id="od" cx="44%" cy="74%" r="62%"><stop offset="0" stop-color="#5559D3" stop-opacity=".5"/><stop offset="1" stop-color="#5559D3" stop-opacity="0"/></radialGradient>
+  <radialGradient id="ot" cx="34%" cy="10%" r="70%"><stop offset="0" stop-color="#fff" stop-opacity=".72"/><stop offset=".5" stop-color="#fff" stop-opacity=".2"/><stop offset="1" stop-color="#fff" stop-opacity="0"/></radialGradient></defs>
+  <circle cx="135" cy="135" r="135" fill="url(#og)"/><circle cx="135" cy="135" r="135" fill="url(#od)" clip-path="url(#oc)"/><circle cx="135" cy="135" r="135" fill="url(#ot)" clip-path="url(#oc)"/>
+  <path d="M 40 134 Q 135 216 230 134" stroke="#fff" stroke-width="13" stroke-linecap="round" fill="none"/></svg>`;
+
+document.getElementById('root').innerHTML = `
+<section style="padding-top:150px;padding-bottom:110px">
+  ${sz(360)}
+  <div class="wm" style="font-size:88px;margin-top:56px">Poli</div>
+  <p class="sub" style="margin-top:18px">Ask anything.</p>
+</section>
+<hr>
+<section>
+  <div class="k">The smile</div><h2>Cleaner. Calmer. Geometric.</h2>
+  <p class="sub">Your favourites, Calm and Petite, redrawn as true circular arcs with a lighter, even line. Balanced Arc is the recommendation.</p>
+  <div class="grid6">${['calm', 'petite', 'wide', 'balanced', 'small', 'concentric'].map(n => `<div class="${n === 'balanced' ? 'sel' : ''}">${sz(140, { smileStyle: n })}
+    <div style="display:flex;gap:12px;align-items:center">${sz(36, { smileStyle: n })}${sz(20, { smileStyle: n })}</div>
+    <div class="cap"><b>${B.SMILES[n].title}</b></div>${n === 'balanced' ? '<span class="tag">Recommended</span>' : '<span style="height:22px"></span>'}</div>`).join('')}</div>
+</section>
+<hr>
+<section>
+  <div class="k">Balance</div><h2>Left, right, and everything in between.</h2>
+  <p class="sub">The colours stand for every voter, so they now share the orb equally. Blue and red are matched in brightness, and the light comes from straight above, favouring neither side.</p>
+  <div class="bal">
+    <div class="panel">${OLD}${share(64, 24, 11)}<div class="cap">Before</div></div>
+    <div class="panel">${sz(220, { smileStyle: 'classic' })}${share(33, 33, 35)}<div class="cap">After (shown with today's smile for a fair comparison)</div></div>
+  </div>
+</section>
+<hr>
+<section>
+  <div class="k">Logo family</div><h2>One mark, every size.</h2>
+  <div class="fam">
+    <div class="panel">${sz(150)}<div class="cap"><b>Mark</b></div></div>
+    <div class="panel">${lock(60)}<div class="cap"><b>Horizontal lockup</b></div></div>
+    <div class="panel">${stacked(40)}<div class="cap"><b>Stacked lockup</b></div></div>
+    <div class="panel">${icon(132)}<div class="cap"><b>App icon</b></div></div>
+    <div class="panel"><div style="display:flex;gap:28px;align-items:center">${mk({ size: 118, mono: C.ink })}${mk({ size: 118, mono: C.purple })}</div><div class="cap"><b>One colour</b> · for print, engraving, embroidery</div></div>
+    <div class="panel"><div style="display:flex;gap:26px;align-items:flex-end">${[64, 32, 16].map(w => `<div style="display:flex;flex-direction:column;align-items:center;gap:10px">${sz(w, { smile: w <= 16 ? 17 : undefined })}<span class="cap">${w}px</span></div>`).join('')}</div><div class="cap"><b>Favicon</b> · the line thickens slightly at small sizes</div></div>
+  </div>
+</section>
+<hr>
+<section>
+  <div class="k">Clear space</div><h2>Room to breathe.</h2>
+  <p class="sub">Keep clear space around the mark equal to half its width, and never show it smaller than 20px on screen or 8mm in print.</p>
+  <div class="panel" style="margin-top:56px;padding:60px;display:flex;justify-content:center;gap:120px;align-items:center">
+    <div style="position:relative;width:320px;height:320px;border:1.5px dashed #C7C7D1;border-radius:20px;display:grid;place-items:center">
+      ${sz(160)}<span class="cap" style="position:absolute;top:30px;left:50%;transform:translateX(-50%)">½ width</span><span class="cap" style="position:absolute;left:14px;top:50%;transform:translateY(-50%)">½</span></div>
+    <div style="text-align:left"><div style="display:flex;align-items:flex-end;gap:18px">${sz(20)}<span class="cap"><b>20px</b> minimum on screen</span></div>
+      <div style="display:flex;align-items:flex-end;gap:18px;margin-top:26px">${lock(18)}<span class="cap"><b>Lockup</b> minimum 80px wide</span></div></div>
+  </div>
+</section>
+<hr>
+<section>
+  <div class="k">Colour</div><h2>Aura, in three parts.</h2>
+  <div class="sw">
+    <div><div class="c" style="background:${C.blue}"></div><div class="n">Aura Blue</div><div class="h">${C.blue}</div></div>
+    <div><div class="c" style="background:${C.purple}"></div><div class="n">Aura Purple</div><div class="h">${C.purple}</div></div>
+    <div><div class="c" style="background:${C.red}"></div><div class="n">Aura Red</div><div class="h">${C.red}</div></div>
+    <div><div class="c" style="background:${C.ink}"></div><div class="n">Ink</div><div class="h">${C.ink} · text and one-colour mark</div></div>
+    <div><div class="c" style="background:${C.mist}"></div><div class="n">Mist</div><div class="h">${C.mist} · quiet panels</div></div>
+    <div><div class="c" style="background:#fff"></div><div class="n">White</div><div class="h">#FFFFFF · the canvas, always</div></div>
+  </div>
+  <div class="bar" style="height:56px;border-radius:18px;margin-top:28px;background:linear-gradient(90deg, ${C.blue} 0%, ${C.blue} 12%, ${C.purple} 44%, ${C.red} 84%, ${C.red} 100%)"></div>
+  <p class="cap" style="margin-top:12px">The Aura gradient. Always left to right, always all three colours, never one side alone.</p>
+</section>
+<hr>
+<section>
+  <div class="k">Typography</div><h2>Quiet type. Clear voice.</h2>
+  <div class="type">
+    <div class="panel"><div style="font:700 56px/1.05 Display;letter-spacing:-0.03em">Ask your candidate anything.</div>
+      <div class="cap" style="margin-top:22px"><b>Display, Semibold and Bold</b> · headlines and the wordmark, tight spacing</div></div>
+    <div class="panel"><div style="font:400 18px/1.55 Inter;color:#3A3A3F">Poli puts an AI Representative on a candidate's own website. It answers voters day and night, in the candidate's own words, and shows the campaign what people care about.</div>
+      <div class="cap" style="margin-top:22px"><b>Text, Regular and Medium</b> · everything else</div></div>
+  </div>
+  <p class="cap" style="margin-top:16px">Shown in Inter as a stand-in. For the final system, license a refined grotesk with a matching display cut.</p>
+</section>
+<hr>
+<section>
+  <div class="k">Aura field</div><h2>A soft light, never a loud one.</h2>
+  <p class="sub">A blurred, balanced wash of all three colours on white. Use it behind headlines and posts. Blue and red always appear together.</p>
+  <div class="panel field" style="margin-top:56px;height:360px;border-radius:32px;display:grid;place-items:center"><div class="mid"></div><div class="ct">${lock(64)}</div></div>
+</section>
+<hr>
+<section>
+  <div class="k">In use</div><h2>Everywhere Poli shows up.</h2>
+  <div class="apps">
+    <div class="post field"><div class="mid"></div><div class="ct">${lock(26)}</div><div class="ct"><div style="font:700 50px/1.04 Display;letter-spacing:-0.03em">Ask your candidate anything.</div><div style="font:400 18px Inter;color:#3A3A3F;margin-top:14px">Straight answers, in their own words.</div></div></div>
+    <div style="display:flex;flex-direction:column;gap:28px">
+      <div class="card"><div style="display:flex;justify-content:space-between;align-items:flex-start">${lock(26)}</div>
+        <div style="position:absolute;left:32px;bottom:30px"><div style="font:600 19px Display;letter-spacing:-0.01em">Jordan Lee</div><div style="font:400 14px Inter;color:#6E6E73;margin-top:3px">Partnerships · askpoli.us</div></div>
+        <div style="position:absolute;right:-60px;bottom:-60px;opacity:.95">${sz(220)}</div></div>
+      <div class="nav"><div class="top">${lock(20)}<div class="links"><span>How it works</span><span>Voters</span><span>Candidates</span></div><span class="btn">Try it free</span></div>
+        <div class="field" style="height:150px;display:grid;place-items:center"><div class="mid"></div><div class="ct" style="font:700 28px/1.15 Display;letter-spacing:-0.025em;text-align:center;padding:0 36px">You can't be everywhere.<br>Your AI Representative can.</div></div></div>
+      <div style="display:flex;gap:14px;justify-content:center;align-items:center">
+        ${['Ask Alex Rivera', 'askpolius', 'askpoli.us'].map(t => `<div style="display:flex;align-items:center;gap:10px;padding:10px 18px 10px 10px;border-radius:999px;box-shadow:inset 0 0 0 1px #EDEDF2;font:500 15px Inter">${sz(28)}${t}</div>`).join('')}</div>
+    </div>
+  </div>
+</section>
+<div class="foot">Brand system concept, v0.1. Final artwork would be rebuilt as production vectors once the direction is approved. The name on the business card is a placeholder.</div>`;
+window.ready = document.fonts.ready;
+</script>
+</body>
+</html>
