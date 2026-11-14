@@ -1,0 +1,102 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Aura Refined</title>
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'Display'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-SemiBold.otf'); }
+  @font-face { font-family: 'Display'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-Bold.otf'); }
+  @font-face { font-family: 'Manrope'; font-weight: 800; src: url('../../phone-ad/source/node_modules/@fontsource/manrope/files/manrope-latin-800-normal.woff2'); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1200px; background: #fff; color: #1D1D1F; font-family: 'Inter', sans-serif; -webkit-font-smoothing: antialiased; }
+  section { padding: 120px 80px; text-align: center; }
+  .k { font: 600 15px 'Inter'; color: #86868B; letter-spacing: 0; }
+  h1 { font: 700 76px/1.04 'Display'; letter-spacing: -0.03em; margin-top: 10px; }
+  h2 { font: 700 48px/1.08 'Display'; letter-spacing: -0.025em; }
+  .sub { font: 400 21px/1.45 'Inter'; color: #6E6E73; margin: 16px auto 0; max-width: 720px; letter-spacing: -0.01em; }
+  .wm { font-family: 'Display'; font-weight: 600; letter-spacing: -0.04em; color: #1D1D1F; line-height: 1; }
+  .three { display: grid; grid-template-columns: repeat(3, 1fr); gap: 40px; margin-top: 80px; }
+  .three h3 { font: 600 22px 'Display'; letter-spacing: -0.015em; margin-top: 36px; }
+  .three p { font: 400 16px/1.45 'Inter'; color: #6E6E73; margin-top: 8px; padding: 0 16px; }
+  .icon { position: relative; border-radius: 22.37%; background: #FFFFFF; box-shadow: 0 0 0 1px rgba(0,0,0,0.05), 0 2px 4px rgba(0,0,0,0.04), 0 18px 40px rgba(60,60,90,0.12); display: grid; place-items: center; }
+  .icons { display: flex; justify-content: center; align-items: flex-end; gap: 56px; margin-top: 72px; }
+  .icons figure { display: flex; flex-direction: column; align-items: center; gap: 16px; font: 500 14px 'Inter'; color: #86868B; }
+  .pair { display: grid; grid-template-columns: 1fr 1fr; gap: 32px; margin-top: 64px; }
+  .panel { background: #FBFBFD; border-radius: 28px; padding: 56px 24px 40px; display: flex; flex-direction: column; align-items: center; gap: 28px; }
+  .panel .cap { font: 500 14px 'Inter'; color: #86868B; }
+  .lock { display: flex; align-items: center; }
+  hr { border: 0; height: 1px; background: #E8E8ED; margin: 0 80px; }
+  .phone { width: 320px; height: 600px; border-radius: 52px; padding: 11px; background: #1D1D1F; margin: 64px auto 0; box-shadow: 0 40px 80px -30px rgba(40,40,80,0.35); }
+  .scr { position: relative; height: 100%; border-radius: 42px; overflow: hidden; background: linear-gradient(175deg, #F6F3FB 0%, #EEF1FA 50%, #FAF1F4 100%); }
+  .sb { display: flex; justify-content: space-between; padding: 18px 30px 0; font: 600 15px 'Inter'; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 22px 0; padding: 34px 16px 0; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; font: 500 11px 'Inter'; color: #1D1D1F; }
+  .ph { width: 58px; height: 58px; border-radius: 13px; background: #fff; box-shadow: 0 1px 2px rgba(0,0,0,0.06); display: grid; place-items: center; }
+  .ph i { width: 26px; height: 26px; border-radius: 7px; background: #E3E3E8; display: block; }
+  .ctx { display: flex; justify-content: center; gap: 28px; margin-top: 56px; }
+  .chip { display: flex; align-items: center; gap: 12px; padding: 12px 20px 12px 12px; border-radius: 999px; background: #FBFBFD; box-shadow: inset 0 0 0 1px #EDEDF2; font: 500 16px 'Inter'; color: #1D1D1F; }
+  .sizes { display: flex; justify-content: center; align-items: flex-end; gap: 40px; margin-top: 56px; }
+  .sizes figure { display: flex; flex-direction: column; align-items: center; gap: 12px; font: 500 13px 'Inter'; color: #86868B; }
+  .foot { font: 400 13px 'Inter'; color: #86868B; padding: 0 80px 80px; text-align: center; }
+</style>
+<script src="marks2.js"></script>
+</head>
+<body>
+<div id="root"></div>
+<script>
+const M = window.PoliMarks2; let u = 0;
+const mk = (n, o = {}) => M.mark(n, { ...o, id: n + (u++) });
+const s = (svg, w) => svg.replace('<svg', `<svg width="${w}" height="${w}"`);
+const icon = (n, w) => `<div class="icon" style="width:${w}px;height:${w}px">${s(mk(n, { halo: false }), w * 0.64)}</div>`;
+const lock = (n, h, font = 'Display', wt = 600, ls = '-0.04em') => `<div class="lock" style="gap:${h * 0.24}px">${s(mk(n, { halo: false }), h * 1.16)}<span style="font-family:${font};font-weight:${wt};font-size:${h * 1.18}px;letter-spacing:${ls};line-height:1;color:#1D1D1F">Poli</span></div>`;
+const app = n => `<div class="app"><div class="ph"><i></i></div>${n}</div>`;
+document.getElementById('root').innerHTML = `
+<section style="padding-top:150px;padding-bottom:110px">
+  ${s(mk('pure'), 380)}
+  <div class="wm" style="font-size:88px;margin-top:56px">Poli</div>
+  <p class="sub" style="margin-top:18px">Ask anything.</p>
+</section>
+<hr>
+<section>
+  <div class="k">Aura, refined</div>
+  <h2 style="margin-top:10px">Three ways to say less.</h2>
+  <p class="sub">Every version keeps Aura's soft blue to red light and today's smile, now in pure white.</p>
+  <div class="three">${M.names.map(n => `<div>${s(mk(n), n === 'light' ? 300 : 248)}<h3 style="${n === 'light' ? 'margin-top:-16px' : ''}">${M.CONCEPTS[n].title}</h3><p>${M.CONCEPTS[n].line}</p></div>`).join('')}</div>
+</section>
+<hr>
+<section>
+  <h2>Made for the Home Screen.</h2>
+  <p class="sub">A white icon with the orb at its centre. Calm next to everything else on the phone.</p>
+  <div class="icons">${M.names.map(n => `<figure>${icon(n, 180)}${M.CONCEPTS[n].title}</figure>`).join('')}</div>
+  <div class="phone"><div class="scr"><div class="sb"><span>9:41</span><span>●●● ▮</span></div>
+    <div class="grid">${['Calendar', 'Weather', 'Notes', 'Maps', 'Music', 'Camera'].map(app).join('')}
+      <div class="app">${icon('pure', 58)}Poli</div>${['Mail', 'News', 'Health', 'Wallet', 'Clock'].map(app).join('')}</div></div></div>
+</section>
+<hr>
+<section>
+  <h2>A quieter wordmark.</h2>
+  <p class="sub">With the colour living in the orb, the name can step back. A refined semibold with tight spacing feels closer to Apple than today's heavy ExtraBold.</p>
+  <div class="pair">
+    <div class="panel">${lock('pure', 64)}<div class="cap">Recommended: semibold display, tight spacing</div></div>
+    <div class="panel">${lock('pure', 64, 'Manrope', 800, '-0.035em')}<div class="cap">Today's typeface: Manrope ExtraBold</div></div>
+  </div>
+</section>
+<hr>
+<section>
+  <h2>Clear at every size.</h2>
+  <p class="sub">No glow, no extra shadows. The mark is just the orb and the smile, so it holds up from a billboard to a browser tab.</p>
+  <div class="sizes">${[128, 64, 40, 28, 20].map(w => `<figure>${s(mk('pure', { halo: false }), w)}${w}px</figure>`).join('')}</div>
+  <div class="ctx">
+    <div class="chip">${s(mk('pure', { halo: false }), 28)}Ask Alex Rivera</div>
+    <div class="chip">${s(mk('pure', { halo: false }), 28)}askpolius</div>
+    <div class="chip">${s(mk('pure', { halo: false }), 28)}askpoli.us</div>
+  </div>
+</section>
+<div class="foot">Concept exploration. Final artwork would be rebuilt as production vectors once a direction is chosen.</div>`;
+window.ready = document.fonts.ready;
+</script>
+</body>
+</html>
