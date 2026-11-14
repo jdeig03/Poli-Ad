@@ -1,0 +1,168 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Logo Exploration</title>
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/Inter-Bold.otf'); }
+  @font-face { font-family: 'InterDisplay'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
+  @font-face { font-family: 'Manrope'; font-weight: 800; src: url('../../phone-ad/source/node_modules/@fontsource/manrope/files/manrope-latin-800-normal.woff2'); }
+  @font-face { font-family: 'Serif'; font-weight: 700; src: url('../../phone-ad/source/node_modules/@fontsource/gelasio/files/gelasio-latin-700-normal.woff2'); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { background: #fff; width: 1200px; font-family: 'Inter', sans-serif; color: #14131C; -webkit-font-smoothing: antialiased; }
+  .wrap { padding: 64px 64px 56px; }
+  .eyebrow { font: 700 13px 'Inter'; letter-spacing: 0.18em; color: #7A4FB8; text-transform: uppercase; }
+  h1 { font: 800 54px/1.05 'InterDisplay'; letter-spacing: -0.02em; margin-top: 10px; }
+  .lede { font: 400 19px/1.5 'Inter'; color: #5E5B6E; margin-top: 14px; max-width: 820px; }
+  h2 { font: 700 22px 'Inter'; letter-spacing: -0.01em; margin: 56px 0 18px; }
+  .note { font: 400 15px/1.5 'Inter'; color: #6E6A80; }
+  .tile { border: 1px solid #ECEAF2; border-radius: 22px; background: #fff; }
+  .cols3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; }
+  .card { padding: 22px 22px 26px; }
+  .card .stage { height: 300px; display: grid; place-items: center; }
+  .card h3 { font: 700 24px 'Inter'; letter-spacing: -0.01em; margin-top: 6px; }
+  .card h3 small { font: 600 13px 'Inter'; color: #9A96AA; letter-spacing: 0.1em; margin-right: 8px; vertical-align: 3px; }
+  .card p { font: 400 15px/1.5 'Inter'; color: #5E5B6E; margin-top: 8px; min-height: 45px; }
+  .meta { display: flex; gap: 8px; margin-top: 14px; flex-wrap: wrap; }
+  .pill { font: 600 12px 'Inter'; padding: 6px 10px; border-radius: 999px; background: #F4F2F8; color: #4A4660; }
+  .pill.good { background: #E9F6EF; color: #1D7A4A; } .pill.mid { background: #FFF4DE; color: #8A5A00; }
+  .row { display: flex; gap: 24px; align-items: stretch; }
+  .icon { position: relative; border-radius: 22.4%; overflow: hidden; background: linear-gradient(180deg, #FFFFFF, #F3F2F8); box-shadow: 0 1px 2px rgba(20,19,28,0.08), 0 10px 28px rgba(60,50,120,0.12), inset 0 0 0 1px rgba(20,19,28,0.04); }
+  .icon > svg { position: absolute; left: 4%; top: 6%; width: 92%; height: 92%; }
+  .lock { display: flex; align-items: center; }
+  .lock .w { font-family: 'Manrope'; font-weight: 800; letter-spacing: -0.035em; color: #14131C; line-height: 1; }
+  .swatch { display: flex; align-items: center; gap: 10px; font: 600 14px 'Inter'; color: #3B3850; }
+  .swatch i { width: 34px; height: 34px; border-radius: 10px; display: block; box-shadow: inset 0 0 0 1px rgba(0,0,0,0.06); }
+  .sizes { display: flex; align-items: flex-end; gap: 34px; padding: 28px 30px; }
+  .sizes figure { display: flex; flex-direction: column; align-items: center; gap: 10px; font: 600 12px 'Inter'; color: #9A96AA; }
+  canvas.px { image-rendering: pixelated; }
+  /* mockups */
+  .phone { width: 300px; height: 560px; border-radius: 46px; padding: 12px; background: #15151A; box-shadow: 0 30px 60px -20px rgba(40,30,90,0.35); flex: none; }
+  .phone .scr { position: relative; width: 100%; height: 100%; border-radius: 36px; overflow: hidden; background: linear-gradient(170deg, #F4F1FA 0%, #EEF2FA 45%, #F9EEF2 100%); }
+  .phone .sb { display: flex; justify-content: space-between; padding: 16px 26px 0; font: 600 14px 'Inter'; }
+  .grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px 0; padding: 30px 14px 0; }
+  .app { display: flex; flex-direction: column; align-items: center; gap: 6px; font: 500 10.5px 'Inter'; color: #2A2833; }
+  .app .ic { width: 54px; height: 54px; border-radius: 13px; display: grid; place-items: center; box-shadow: 0 1px 3px rgba(0,0,0,0.12); }
+  .dock { position: absolute; left: 12px; right: 12px; bottom: 14px; height: 80px; border-radius: 28px; background: rgba(255,255,255,0.55); display: flex; justify-content: space-around; align-items: center; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.6); }
+  .ig { width: 100%; padding: 22px; }
+  .ig .top { display: flex; align-items: center; gap: 26px; }
+  .ig .av { width: 92px; height: 92px; border-radius: 50%; padding: 3px; background: conic-gradient(from 200deg, #FEDA75, #FA7E1E, #D62976, #962FBF, #4F5BD5, #FEDA75); flex: none; }
+  .ig .av > div { width: 100%; height: 100%; border-radius: 50%; background: #fff; padding: 3px; }
+  .ig .av > div > div { width: 100%; height: 100%; border-radius: 50%; background: linear-gradient(180deg,#fff,#F3F2F8); display: grid; place-items: center; overflow: hidden; }
+  .ig .st { display: flex; gap: 22px; text-align: center; font: 400 13px 'Inter'; color: #3B3850; } .ig .st b { display: block; font: 700 17px 'Inter'; color: #14131C; }
+  .ig .bio { margin-top: 14px; font: 400 14px/1.45 'Inter'; color: #14131C; } .ig .bio b { font-weight: 700; }
+  .ig .btns { display: flex; gap: 8px; margin-top: 14px; } .ig .btns span { flex: 1; text-align: center; padding: 9px; border-radius: 9px; font: 600 13px 'Inter'; background: #EFEFF2; } .ig .btns span.f { background: #0095F6; color: #fff; }
+  .wid { background: #f3f4f1; border-radius: 18px; padding: 20px; }
+  .wid .hd { display: flex; gap: 16px; align-items: flex-start; }
+  .wid .t1 { font: 700 20px 'Serif'; color: rgb(20,40,75); } .wid .t2 { font: 400 12px/1.6 'Inter'; color: #374151; margin-top: 4px; }
+  .wid .u { margin: 16px 0 10px auto; width: fit-content; max-width: 80%; background: rgb(20,40,75); color: #fff; font: 400 13px 'Inter'; padding: 9px 13px; border-radius: 15px 15px 4px 15px; }
+  .wid .a { display: flex; gap: 8px; } .wid .b { background: #fff; border: 1px solid #e5e7eb; border-radius: 4px 15px 15px 15px; padding: 9px 12px; font: 400 13px/1.5 'Inter'; color: #111827; }
+  .tabs { background: #EDECF1; border-radius: 16px; padding: 10px 10px 0; }
+  .tabs .tb { display: flex; gap: 6px; } .tabs .t { display: flex; align-items: center; gap: 9px; padding: 10px 14px; border-radius: 10px 10px 0 0; font: 500 13px 'Inter'; color: #6E6A80; width: 260px; }
+  .tabs .t.on { background: #fff; color: #14131C; }
+  .tabs .bar { background: #fff; padding: 10px 14px 14px; } .tabs .url { background: #F2F1F5; border-radius: 9px; padding: 8px 12px; font: 400 13px 'Inter'; color: #3B3850; }
+  .foot { margin-top: 48px; font: 400 13px 'Inter'; color: #9A96AA; }
+</style>
+<script src="marks.js"></script>
+</head>
+<body><div class="wrap" id="root"></div>
+<script>
+const M = window.PoliMarks;
+const Q = new URLSearchParams(location.search);
+const B = Q.get('b') || 'overview', C = Q.get('c') || 'aura';
+const SW = { aura: '#8486E3', meridian: '#8559D2', glass: '#6A62E2' };
+const CONTRAST = { aura: 2.5, meridian: 3.6, glass: 4.2 };
+let uid = 0;
+const mk = (n, o = {}) => M.mark(n, { ...o, id: n + (uid++) });
+const sized = (svg, w) => svg.replace('<svg', `<svg width="${w}" height="${w}"`);
+const icon = (n, w) => `<div class="icon" style="width:${w}px;height:${w}px">${mk(n)}</div>`;
+const lockup = (n, h, gap = 0.26) => `<div class="lock" style="gap:${h * gap}px">${sized(mk(n, { glow: false }), h * 1.18)}<span class="w" style="font-size:${h * 1.22}px">Poli</span></div>`;
+const stacked = (n, h) => `<div style="display:flex;flex-direction:column;align-items:center;gap:${h * 0.22}px">${sized(mk(n, { glow: false }), h * 1.5)}<span class="lock"><span class="w" style="font-size:${h}px">Poli</span></span></div>`;
+const contrastPill = n => `<span class="pill ${CONTRAST[n] >= 3 ? 'good' : 'mid'}">Smile contrast ${CONTRAST[n]}:1 min</span>`;
+const root = document.getElementById('root');
+
+function glyph(color, shape) {
+  const s = { dot: '<circle cx="12" cy="12" r="6" fill="#fff"/>', sq: '<rect x="6" y="6" width="12" height="12" rx="3" fill="#fff"/>', ring: '<circle cx="12" cy="12" r="6" fill="none" stroke="#fff" stroke-width="2.4"/>', bars: '<path d="M6 17V11M10 17V7M14 17v-4M18 17V9" stroke="#fff" stroke-width="2.2" stroke-linecap="round"/>', tri: '<path d="M12 6l6 11H6z" fill="#fff"/>', wave: '<path d="M5 13c2-4 4-4 7 0s5 4 7 0" stroke="#fff" stroke-width="2.2" fill="none" stroke-linecap="round"/>' }[shape];
+  return `<div class="ic" style="background:${color}"><svg width="26" height="26" viewBox="0 0 24 24">${s}</svg></div>`;
+}
+function phoneMock(n) {
+  const apps = [['Calendar', '#F25C54', 'sq'], ['Weather', '#4A90E2', 'dot'], ['Notes', '#F5B83D', 'bars'], ['Maps', '#38B27A', 'tri'],
+                ['Music', '#E64980', 'wave'], ['Camera', '#5C6170', 'ring'], ['Poli', null], ['Mail', '#3B82F6', 'sq'],
+                ['News', '#EF4444', 'bars'], ['Health', '#F472B6', 'dot'], ['Wallet', '#1F2937', 'sq'], ['Clock', '#111827', 'ring']];
+  return `<div class="phone"><div class="scr"><div class="sb"><span>9:41</span><span>●●● ▮</span></div><div class="grid">${apps.map(a => a[1] === null
+    ? `<div class="app">${icon(n, 54)}<span>Poli</span></div>` : `<div class="app">${glyph(a[1], a[2])}<span>${a[0]}</span></div>`).join('')}</div>
+    <div class="dock">${[['#34C759', 'dot'], ['#3B82F6', 'wave'], ['#F59E0B', 'sq'], ['#8B5CF6', 'ring']].map(g => glyph(g[0], g[1])).join('')}</div></div></div>`;
+}
+function igMock(n) {
+  return `<div class="tile ig"><div class="top"><div class="av"><div><div>${sized(mk(n, { glow: false }), 66)}</div></div></div>
+    <div><div style="font:700 18px Inter;margin-bottom:12px">askpolius</div><div class="st"><div><b>48</b>posts</div><div><b>1,284</b>followers</div><div><b>312</b>following</div></div></div></div>
+    <div class="bio"><b>Poli</b><br>Ask candidates anything. Get answers in their own words.<br><span style="color:#00376B">askpoli.us</span></div>
+    <div class="btns"><span class="f">Follow</span><span>Message</span></div></div>`;
+}
+function widMock(n) {
+  return `<div class="wid"><div class="hd">${sized(mk(n, { glow: false }), 64)}<div><div class="t1">Ask Alex Rivera</div><div class="t2">Ask Alex is the campaign's AI representative. Answers are drawn only from the campaign's own knowledge base.</div></div></div>
+    <div class="u">How can I volunteer?</div><div class="a">${sized(mk(n, { glow: false }), 26)}<div class="b">Knock doors Saturdays at 10am, or make calls from home on Tuesday evenings.</div></div></div>`;
+}
+function tabMock(n) {
+  return `<div class="tabs"><div class="tb"><div class="t on">${sized(mk(n, { glow: false }), 16)}Poli · AI Representatives</div><div class="t"><span style="width:16px;height:16px;border-radius:4px;background:#C9C6D6"></span>Riverton Ledger</div></div>
+    <div class="bar"><div class="url">askpoli.us</div></div></div>`;
+}
+function sizesStrip(n) {
+  const list = [64, 48, 32, 24, 16];
+  return `<div class="tile sizes">${list.map(s => `<figure><canvas class="real" data-n="${n}" data-s="${s}" width="${s * 2}" height="${s * 2}" style="width:${s}px;height:${s}px"></canvas>${s}px</figure>`).join('')}
+    <div style="width:1px;align-self:stretch;background:#ECEAF2;margin:0 6px"></div>
+    ${[32, 16].map(s => `<figure><canvas class="px" data-n="${n}" data-s="${s}" width="${s}" height="${s}" style="width:${s * 5}px;height:${s * 5}px"></canvas>${s}px, enlarged</figure>`).join('')}</div>`;
+}
+
+if (B === 'overview') {
+  root.innerHTML = `
+    <div class="eyebrow">Poli · Logo exploration</div>
+    <h1>A new Poli mark</h1>
+    <p class="lede">A frosted gradient orb that moves from blue to red, with a clean white smile. Three new directions, shown on white. The smile keeps the same shape and proportions as today.</p>
+    <div class="cols3" style="margin-top:44px">${M.names.map((n, i) => `<div class="tile card"><div class="stage">${sized(mk(n), 300)}</div>
+      <h3><small>${'ABC'[i]}</small>${M.CONCEPTS[n].title}</h3><p>${M.CONCEPTS[n].line}</p><div class="meta">${contrastPill(n)}</div></div>`).join('')}</div>
+    <h2>As an app icon</h2>
+    <div class="cols3">${M.names.map(n => `<div class="tile" style="display:grid;place-items:center;padding:34px">${icon(n, 168)}</div>`).join('')}</div>
+    <h2>With the wordmark</h2>
+    <div class="cols3">${M.names.map(n => `<div class="tile" style="display:grid;place-items:center;height:150px">${lockup(n, 52)}</div>`).join('')}</div>
+    <h2>Shared system</h2>
+    <div class="tile" style="padding:26px 28px;display:flex;gap:44px;align-items:center">
+      <div class="swatch"><i style="background:#1C56DB"></i>Blue #1C56DB</div><div class="swatch"><i style="background:#7A4FB8"></i>Purple #7A4FB8</div><div class="swatch"><i style="background:#DC3547"></i>Red #DC3547</div>
+      <div class="swatch"><i style="background:#fff"></i>Smile #FFFFFF</div><div class="swatch"><i style="background:#14131C"></i>Ink #14131C</div></div>
+    <p class="note" style="margin-top:14px">Wordmark: Manrope ExtraBold in solid ink, the typeface already used for "Poli" on askpoli.us. With colour now living in the orb, a solid wordmark keeps the lockup clean.</p>
+    <div class="foot">Concept exploration. Final artwork would be rebuilt as production vectors once a direction is chosen.</div>`;
+} else {
+  const c = M.CONCEPTS[C], i = M.names.indexOf(C);
+  root.innerHTML = `
+    <div class="eyebrow">Direction ${'ABC'[i]}</div>
+    <h1>${c.title}</h1><p class="lede">${c.line}</p>
+    <div class="row" style="margin-top:36px">
+      <div class="tile" style="flex:1.6;display:grid;place-items:center;height:520px">${sized(mk(C), 500)}</div>
+      <div style="flex:1;display:flex;flex-direction:column;gap:24px">
+        <div class="tile" style="flex:1;display:flex;align-items:center;justify-content:space-around;padding:20px">
+          <div style="text-align:center">${sized(mk(C, { glow: false }), 150)}<p class="note" style="margin-top:10px">Clean mark</p></div>
+          <div style="text-align:center">${icon(C, 150)}<p class="note" style="margin-top:10px">App icon</p></div></div>
+        <div class="tile" style="flex:1;display:grid;place-items:center">${stacked(C, 56)}</div></div></div>
+    <h2>Lockups</h2>
+    <div class="row"><div class="tile" style="flex:1.4;display:grid;place-items:center;height:170px">${lockup(C, 70)}</div>
+      <div class="tile" style="flex:1;display:flex;align-items:center;justify-content:space-around;height:170px">${lockup(C, 34)}${lockup(C, 20)}</div></div>
+    <h2>Small sizes</h2>${sizesStrip(C)}
+    <p class="note" style="margin-top:12px">The glow under the orb is for large uses only. Small sizes use the clean mark, so the smile and the blue to red journey stay readable down to a 16px browser tab.</p>
+    <h2>In use</h2>
+    <div class="row">${phoneMock(C)}
+      <div style="flex:1;display:flex;flex-direction:column;gap:20px">${igMock(C)}${widMock(C)}${tabMock(C)}</div></div>
+    <div class="foot">Concept exploration. Final artwork would be rebuilt as production vectors once a direction is chosen.</div>`;
+}
+
+// draw small-size canvases from the clean SVG
+const draws = [...document.querySelectorAll('canvas[data-n]')].map(cv => new Promise(res => {
+  const img = new Image(); img.onload = () => { const g = cv.getContext('2d'); g.imageSmoothingEnabled = true; g.imageSmoothingQuality = 'high'; g.drawImage(img, 0, 0, cv.width, cv.height); res(); };
+  img.src = 'data:image/svg+xml;charset=utf-8,' + encodeURIComponent(M.mark(cv.dataset.n, { glow: false, id: 'cv' + (uid++) }).replace('<svg', `<svg width="${cv.width * 4}" height="${cv.width * 4}"`));
+}));
+window.ready = Promise.all([document.fonts.ready, ...draws]);
+</script>
+</body>
+</html>
