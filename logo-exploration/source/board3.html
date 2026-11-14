@@ -82,10 +82,10 @@ document.getElementById('root').innerHTML = `
 <hr>
 <section>
   <div class="k">The smile</div><h2>Cleaner. Calmer. Geometric.</h2>
-  <p class="sub">Your favourites, Calm and Petite, redrawn as true circular arcs with a lighter, even line. Balanced Arc is the recommendation.</p>
-  <div class="grid6">${['calm', 'petite', 'wide', 'balanced', 'small', 'concentric'].map(n => `<div class="${n === 'balanced' ? 'sel' : ''}">${sz(140, { smileStyle: n })}
+  <p class="sub">Calm is the one: shallow, content and unhurried, redrawn as a true circular arc with a lighter, even line.</p>
+  <div class="grid6">${['calmArc', 'petite', 'wide', 'balanced', 'small', 'concentric'].map(n => `<div class="${n === 'calmArc' ? 'sel' : ''}">${sz(140, { smileStyle: n })}
     <div style="display:flex;gap:12px;align-items:center">${sz(36, { smileStyle: n })}${sz(20, { smileStyle: n })}</div>
-    <div class="cap"><b>${B.SMILES[n].title}</b></div>${n === 'balanced' ? '<span class="tag">Recommended</span>' : '<span style="height:22px"></span>'}</div>`).join('')}</div>
+    <div class="cap"><b>${B.SMILES[n].title}</b></div>${n === 'calmArc' ? '<span class="tag">Selected</span>' : '<span style="height:22px"></span>'}</div>`).join('')}</div>
 </section>
 <hr>
 <section>

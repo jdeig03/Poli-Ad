@@ -3,7 +3,7 @@
 // mark({ id, size, mono, smile }) -> SVG. Browser: window.PoliBrand. Node: module.exports.
 (function (target) {
   const SMILE = 'M 40 134 Q 135 216 230 134';
-  let DEFAULT_SMILE = 'balanced';
+  let DEFAULT_SMILE = 'calmArc';
   const COLORS = {
     blue: '#6F8FEF', purple: '#9B7FDA', red: '#E8667A',     // the Aura trio, equal weight
     blueDeep: '#1C56DB', redDeep: '#DC3547',               // saturated accents for type and UI
@@ -15,6 +15,7 @@
     refined: { title: 'Refined', line: 'Same curve, a lighter line. Calmer and more precise.', q: [40, 134, 135, 216, 230, 134], w: [9.5, 9.5] },
     calm:    { title: 'Calm', line: 'Shallower and lighter. Content rather than grinning.', q: [50, 142, 135, 198, 220, 142], w: [10, 10] },
     tapered: { title: 'Tapered', line: 'Full in the middle, fine at the ends, like a brush stroke.', q: [40, 134, 135, 216, 230, 134], w: [6, 14] },
+    calmArc:    { title: 'Calm', line: 'Calm, redrawn as a true arc: same endpoints, same depth.', arc: [135, 26.98, 143.02, 36.46], w: [10, 10] },
     // geometric arcs: arc = [centre x, centre y, radius, half-angle in degrees], measured from straight down
     wide:       { title: 'Open Arc', line: 'A wide, shallow arc. Calm and generous.', arc: [135, 30, 150, 30], w: [9, 9] },
     balanced:   { title: 'Balanced Arc', line: 'Between calm and petite. Clean, friendly, centred.', arc: [135, 82, 102, 35], w: [9.5, 9.5] },
