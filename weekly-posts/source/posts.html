@@ -12,23 +12,23 @@
   @font-face { font-family: 'Display'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
 
   /* Existing Poli look: near-black aurora, white type, the blue -> purple -> red gradient as the only accent */
-  :root { --bg: #04050B; --ink: #FFFFFF; --soft: #C3C0D6; --dim: #8E8BA3; --line: rgba(255,255,255,0.10);
+  :root { --bg: #FFFFFF; --ink: #14131C; --soft: #4B4860; --dim: #7C7990; --line: #E7E5EE; --panel: #F6F5FA;
           --blue: #1C56DB; --purple: #7A4FB8; --red: #DC3547;
           --grad: linear-gradient(90deg, #1E55D8 0%, #5E50C2 38%, #8E47A6 68%, #D23A55 100%); }
   * { box-sizing: border-box; margin: 0; padding: 0; }
   html, body { width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: 'Inter', 'Noto Color Emoji', sans-serif; -webkit-font-smoothing: antialiased; }
   #s { position: relative; width: 1080px; height: 1350px; overflow: hidden;
     background:
-      radial-gradient(720px 720px at 60px 220px, rgba(28,86,219,0.30), transparent 70%),
-      radial-gradient(640px 640px at 560px 880px, rgba(122,79,184,0.20), transparent 70%),
-      radial-gradient(760px 760px at 1060px 1330px, rgba(220,53,71,0.20), transparent 70%), var(--bg); }
+      radial-gradient(720px 720px at 40px 180px, rgba(28,86,219,0.13), transparent 70%),
+      radial-gradient(640px 640px at 560px 900px, rgba(122,79,184,0.08), transparent 70%),
+      radial-gradient(760px 760px at 1080px 1350px, rgba(220,53,71,0.11), transparent 70%), var(--bg); }
   #s.warm { background:
-      radial-gradient(760px 640px at 900px 160px, rgba(220,53,71,0.22), transparent 70%),
-      radial-gradient(700px 700px at 120px 1240px, rgba(28,86,219,0.24), transparent 70%),
-      radial-gradient(600px 600px at 540px 700px, rgba(122,79,184,0.14), transparent 70%), var(--bg); }
-  .grain { position: absolute; inset: 0; opacity: 0.07; background-image: radial-gradient(circle, #fff 1.2px, transparent 1.5px); background-size: 40px 40px; background-position: 20px 0;
+      radial-gradient(760px 640px at 920px 140px, rgba(220,53,71,0.11), transparent 70%),
+      radial-gradient(700px 700px at 100px 1260px, rgba(28,86,219,0.12), transparent 70%),
+      radial-gradient(600px 600px at 540px 700px, rgba(122,79,184,0.06), transparent 70%), var(--bg); }
+  .grain { position: absolute; inset: 0; opacity: 0.09; background-image: radial-gradient(circle, #7A4FB8 1.2px, transparent 1.5px); background-size: 40px 40px; background-position: 20px 0;
     -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 40%, #000 20%, transparent 80%); }
-  .vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 58%, rgba(0,0,0,0.5) 100%); }
+  .vig { position: absolute; inset: 0; pointer-events: none; display: none; }
 
   .top { position: absolute; top: 64px; left: 84px; right: 84px; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
   .brand { display: flex; align-items: center; gap: 14px; font: 800 34px 'Display'; letter-spacing: -0.01em; }
@@ -41,29 +41,29 @@
   .h2 { font: 800 76px/1.02 'Display'; letter-spacing: -0.03em; }
   .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
   .p { font: 400 34px/1.42 'Inter'; color: var(--soft); letter-spacing: -0.01em; }
-  .tag { display: inline-block; font: 700 22px 'Inter'; letter-spacing: 0.14em; text-transform: uppercase; color: #B9A8F0; }
+  .tag { display: inline-block; font: 700 22px 'Inter'; letter-spacing: 0.14em; text-transform: uppercase; color: #7A4FB8; }
   .abs { position: absolute; left: 84px; right: 84px; }
 
   /* iMessage group chat (dark mode) */
-  .phone { position: absolute; left: 140px; right: 140px; top: 210px; bottom: 150px; border-radius: 56px; background: #000; border: 2px solid #26262B; overflow: hidden; box-shadow: 0 60px 120px -40px rgba(90,60,220,0.5); }
-  .phone .hd { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 34px 0 22px; border-bottom: 1px solid #1C1C20; background: #0D0D10; }
-  .phone .hd .av { width: 82px; height: 82px; border-radius: 50%; background: #2C2C32; display: grid; place-items: center; font-size: 44px; }
-  .phone .hd .nm { font: 600 26px 'Inter'; color: #fff; }
+  .phone { position: absolute; left: 140px; right: 140px; top: 210px; bottom: 150px; border-radius: 56px; background: #FFFFFF; border: 10px solid #1C1C1F; overflow: hidden; box-shadow: 0 50px 100px -40px rgba(60,40,140,0.35); }
+  .phone .hd { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 34px 0 22px; border-bottom: 1px solid #E5E5EA; background: #F9F9FB; }
+  .phone .hd .av { width: 82px; height: 82px; border-radius: 50%; background: #D8D8DE; display: grid; place-items: center; font-size: 44px; }
+  .phone .hd .nm { font: 600 26px 'Inter'; color: #000; }
   .phone .hd .sub { font: 400 19px 'Inter'; color: #8E8E93; }
   .thread { padding: 26px 26px; display: flex; flex-direction: column; gap: 6px; }
   .who { font: 400 18px 'Inter'; color: #8E8E93; margin: 14px 0 2px 70px; }
   .row { display: flex; align-items: flex-end; gap: 12px; }
   .row .pic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font: 600 22px 'Inter'; color: #fff; flex: none; }
-  .bub { max-width: 560px; padding: 15px 22px; border-radius: 30px; font: 400 29px/1.32 'Inter'; color: #fff; background: #26252A; }
-  .me { align-self: flex-end; background: #0A84FF; margin-top: 14px; }
+  .bub { max-width: 560px; padding: 15px 22px; border-radius: 30px; font: 400 29px/1.32 'Inter'; color: #000; background: #E9E9EB; }
+  .me { align-self: flex-end; background: #0B84FE; color: #fff; margin-top: 14px; }
   .react { position: relative; }
-  .react i { position: absolute; top: -26px; right: -14px; font-style: normal; background: #2C2C32; border: 3px solid #000; border-radius: 22px; padding: 2px 8px; font-size: 24px; }
+  .react i { position: absolute; top: -26px; right: -14px; font-style: normal; background: #E9E9EB; border: 3px solid #fff; border-radius: 22px; padding: 2px 8px; font-size: 24px; }
   .time { text-align: center; font: 500 18px 'Inter'; color: #8E8E93; margin: 6px 0 4px; }
 
   /* rules */
   .num { font: 800 300px/0.8 'Display'; letter-spacing: -0.05em; }
   /* Ask widget (demo campaign site look) */
-  .wid { position: absolute; left: 84px; right: 84px; border-radius: 40px; background: #F3F4F1; color: #111827; padding: 40px; box-shadow: 0 60px 120px -40px rgba(90,60,220,0.55); }
+  .wid { position: absolute; left: 84px; right: 84px; border-radius: 40px; background: #F3F4F1; color: #111827; padding: 40px; border: 1px solid #E5E7EB; box-shadow: 0 50px 100px -40px rgba(60,40,140,0.3); }
   .wid .t1 { font: 700 38px 'Georgia', serif; color: rgb(20,40,75); }
   .wid .t2 { font: 400 22px/1.5 'Inter'; color: #374151; margin-top: 6px; }
   .wid .u { margin: 30px 0 18px auto; width: fit-content; max-width: 78%; background: rgb(20,40,75); color: #fff; font: 400 29px/1.4 'Inter'; padding: 18px 24px; border-radius: 28px 28px 8px 28px; }
@@ -71,25 +71,25 @@
   .wid .a svg { width: 54px; height: 54px; flex: none; }
   .wid .b { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px 28px 28px 28px; padding: 20px 24px; font: 400 29px/1.45 'Inter'; color: #111827; }
   .wid .lbl { font: 600 19px 'Inter'; color: #6B7280; margin-bottom: 6px; }
-  .sample { position: absolute; font: 700 18px 'Inter'; letter-spacing: 0.16em; color: #E9E4FF; padding: 9px 16px; border-radius: 10px; background: rgba(20,16,44,0.85); border: 1.5px dashed rgba(190,170,255,0.6); }
+  .sample { position: absolute; font: 700 18px 'Inter'; letter-spacing: 0.16em; color: #5B3FA6; padding: 9px 16px; border-radius: 10px; background: #F1EDFB; border: 1.5px dashed rgba(122,79,184,0.5); }
 
   /* split comparison */
   .vs { position: absolute; left: 84px; right: 84px; top: 300px; bottom: 120px; align-content: center; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 26px; }
   .col { border-radius: 40px; padding: 52px 44px; min-height: 700px; display: flex; flex-direction: column; gap: 22px; }
-  .col.them { background: rgba(255,255,255,0.04); border: 1.5px solid var(--line); }
-  .col.us { background: linear-gradient(180deg, rgba(122,79,184,0.22), rgba(28,86,219,0.10)); border: 1.5px solid rgba(160,130,255,0.45); box-shadow: 0 40px 100px -40px rgba(120,90,255,0.6); }
+  .col.them { background: var(--panel); border: 1.5px solid var(--line); }
+  .col.us { background: #FFFFFF; border: 2px solid transparent; background-image: linear-gradient(#fff, #fff), linear-gradient(135deg, #1C56DB, #7A4FB8, #DC3547); background-origin: border-box; background-clip: padding-box, border-box; box-shadow: 0 40px 90px -40px rgba(90,60,200,0.45); }
   .col .lab { display: flex; align-items: center; gap: 14px; font: 700 28px 'Inter'; }
   .col .lab svg { width: 44px; height: 44px; }
-  .col .chip { width: 44px; height: 44px; border-radius: 12px; background: #2A2A33; display: grid; place-items: center; font: 700 20px 'Inter'; color: #8E8BA3; }
+  .col .chip { width: 44px; height: 44px; border-radius: 12px; background: #E7E5EE; display: grid; place-items: center; font: 700 20px 'Inter'; color: #7C7990; }
   .col .say { font: 700 64px/1.05 'Display'; margin-top: 24px; letter-spacing: -0.02em; }
-  .col.them .say { color: #8E8BA3; }
+  .col.them .say { color: #9A97AD; }
   .col .note { font: 400 34px/1.45 'Inter'; margin-top: auto; color: var(--soft); }
-  .col.them .note { color: #77748C; }
+  .col.them .note { color: #8B88A0; }
 
   /* listicle */
   .item { position: absolute; left: 84px; right: 84px; display: flex; gap: 40px; align-items: flex-start; }
   .bignum { font: 800 220px/0.82 'Display'; letter-spacing: -0.06em; flex: none; width: 210px; }
-  .card { position: absolute; left: 84px; right: 84px; border-radius: 36px; padding: 40px 44px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); }
+  .card { position: absolute; left: 84px; right: 84px; border-radius: 36px; padding: 40px 44px; background: #FFFFFF; border: 1.5px solid var(--line); box-shadow: 0 30px 70px -40px rgba(60,40,140,0.3); }
   .card .k { font: 600 22px 'Inter'; color: var(--dim); letter-spacing: 0.04em; }
   .card .v { font: 700 40px/1.25 'Display'; letter-spacing: -0.015em; margin-top: 12px; }
 </style>
@@ -104,8 +104,8 @@ const ORB = () => { const sfx = 'o' + (k++); return SRC.replace(/id="([^"]+)"/g,
 const orb = (w, extra = '') => ORB().replace(/<svg([^>]*?)width="\d+" height="\d+"/, `<svg$1width="${w}" height="${w}" ${extra}`);
 const Q = new URLSearchParams(location.search), P = +Q.get('p') || 1, N = +Q.get('n') || 1;
 const head = (i, n) => `<div class="top"><div class="brand">${orb(46)}<b>Poli</b></div><div class="page">${i} / ${n}</div></div>`;
-const swipe = `<div class="swipe">swipe <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C3C0D6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>`;
-const ask = (q, top) => `<div class="abs" style="top:${top}px"><div style="font:600 22px Inter;letter-spacing:.12em;color:#8E8BA3;margin-bottom:18px">TRY ASKING</div><div style="display:inline-flex;align-items:center;gap:20px;padding:22px 34px 22px 22px;border-radius:999px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(160,130,255,0.4);font:500 34px Inter;color:#fff">${orb(60)}${q}</div></div>`;
+const swipe = `<div class="swipe">swipe <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#4B4860" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>`;
+const ask = (q, top) => `<div class="abs" style="top:${top}px"><div style="font:600 22px Inter;letter-spacing:.12em;color:#7C7990;margin-bottom:18px">TRY ASKING</div><div style="display:inline-flex;align-items:center;gap:20px;padding:22px 34px 22px 22px;border-radius:999px;background:#FFFFFF;border:1.5px solid rgba(122,79,184,0.35);box-shadow:0 20px 50px -24px rgba(60,40,140,0.35);font:500 34px Inter;color:#14131C">${orb(60)}${q}</div></div>`;
 const foot = `<div class="abs" style="bottom:70px;display:flex;align-items:center;justify-content:space-between"><span class="p" style="font-size:28px">Look for "Ask [Candidate]" on their website.</span><span style="font:700 30px Inter" class="g">askpoli.us</span></div>`;
 
 // -------------------------------------------------------------------------------------------
@@ -155,13 +155,13 @@ const P1 = [
       <div class="u">Are you trying to close the library?</div>
       <div class="a">${orb(54)}<div class="b"><div class="lbl">Ask Alex · AI representative</div>No. Alex's plan keeps Eastgate Library open until 8pm on weeknights.</div></div>
     </div>
-    <div class="abs" style="bottom:150px;font:600 32px Inter;color:#fff">happy thanksgiving. pass the stuffing. 🥧</div>${foot}`,
+    <div class="abs" style="bottom:150px;font:600 32px Inter;color:#14131C">happy thanksgiving. pass the stuffing. 🥧</div>${foot}`,
 ];
 
 // -------------------------------------------------------------------------------------------
 // POST 2 · People used chatbots as voter guides this election. Split-screen contrast.
 // -------------------------------------------------------------------------------------------
-const them = `<div class="lab" style="color:#8E8BA3"><span class="chip">AI</span>A general chatbot</div>`;
+const them = `<div class="lab" style="color:#7C7990"><span class="chip">AI</span>A general chatbot</div>`;
 const us = () => `<div class="lab">${orb(44)}<span class="g">Poli</span></div>`;
 const vs = (i, a, an, b, bn) => `${head(i, 6)}
   <div class="abs" style="top:220px"><span class="tag" style="font-size:26px">${['', '', 'Where it gets answers', "When it doesn't know", 'Whose words they are', 'Where your question goes'][i]}</span></div>

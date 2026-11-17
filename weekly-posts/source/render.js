@@ -4,7 +4,7 @@ const { chromium } = require('playwright'); const path = require('path'); const 
   const out = process.argv[2]; const scale = Number(process.argv[3] || 2);
   const b = await chromium.launch({ args: ['--allow-file-access-from-files'] });
   const p = await b.newPage({ viewport: { width: 1080, height: 1350 }, deviceScaleFactor: scale });
-  const names = { 1: 'Post1-Thanksgiving', 2: 'Post2-Chatbot-vs-Poli', 3: 'Post3-Your-City-Council' };
+  const names = { 1: 'Post1-Thanksgiving-carousel-backup', 2: 'Post2-Chatbot-vs-Poli', 3: 'Post3-Your-City-Council' };
   await p.goto('file://' + path.join(__dirname, 'posts.html') + '?p=1&n=1');
   const counts = await p.evaluate(() => window.COUNTS);
   for (const [pi, n] of Object.entries(counts)) {

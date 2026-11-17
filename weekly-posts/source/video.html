@@ -1,0 +1,330 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Group Chat Reel</title>
+<style>
+  @font-face { font-family: 'UI'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'UI'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'UI'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'UI'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/Inter-Bold.otf'); }
+  @font-face { font-family: 'Display'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
+  @font-face { font-family: 'Serif'; font-weight: 700; src: url('../../phone-ad/source/node_modules/@fontsource/gelasio/files/gelasio-latin-700-normal.woff2'); }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 432px; height: 768px; overflow: hidden; background: #fff; }
+  body { font-family: 'UI', 'Noto Color Emoji', sans-serif; -webkit-font-smoothing: antialiased; letter-spacing: -0.01em; color: #000; }
+  #screen { position: absolute; inset: 0; overflow: hidden; background: #fff; }
+  .layer { position: absolute; inset: 0; background: #fff; }
+
+  /* status bar */
+  .status { position: absolute; left: 0; right: 0; top: 0; height: 50px; z-index: 40; pointer-events: none; }
+  .status .time { position: absolute; left: 46px; top: 17px; font: 600 17px 'UI'; letter-spacing: -0.02em; }
+  .status .ic { position: absolute; right: 28px; top: 19px; display: flex; gap: 6px; align-items: center; }
+
+  /* ---------------- Messages ---------------- */
+  #mhead { position: absolute; left: 0; right: 0; top: 0; height: 132px; z-index: 30; background: rgba(249,249,251,0.92); backdrop-filter: blur(20px); border-bottom: 0.5px solid #D9D9DE; }
+  #mhead .back { position: absolute; left: 10px; top: 70px; display: flex; align-items: center; gap: 2px; color: #0B84FE; font: 400 17px 'UI'; }
+  #mhead .back b { background: #0B84FE; color: #fff; font: 600 13px 'UI'; border-radius: 10px; padding: 1px 7px; }
+  #mhead .grp { position: absolute; left: 50%; top: 56px; transform: translateX(-50%); display: flex; flex-direction: column; align-items: center; gap: 4px; }
+  #mhead .avs { position: relative; width: 62px; height: 46px; }
+  #mhead .avs i { position: absolute; width: 30px; height: 30px; border-radius: 50%; border: 2px solid #F9F9FB; display: grid; place-items: center; font: 600 12px 'UI'; color: #fff; font-style: normal; }
+  #mhead .nm { font: 500 12.5px 'UI'; color: #000; display: flex; align-items: center; gap: 3px; }
+  #mhead .ft { position: absolute; right: 16px; top: 76px; }
+  #thread { position: absolute; left: 0; right: 0; top: 132px; overflow: hidden; }
+  #list { position: absolute; left: 0; right: 0; bottom: 0; padding: 0 12px 8px; display: flex; flex-direction: column; }
+  .m { overflow: hidden; flex: none; }
+  .mi { padding-top: 3px; }
+  .ts { text-align: center; font: 500 11.5px 'UI'; color: #8E8E93; padding: 10px 0 6px; }
+  .ts b { font-weight: 600; }
+  .who { font: 400 11.5px 'UI'; color: #8E8E93; margin: 8px 0 2px 46px; }
+  .in { display: flex; align-items: flex-end; gap: 8px; }
+  .in .av { width: 30px; height: 30px; border-radius: 50%; display: grid; place-items: center; font: 600 12.5px 'UI'; color: #fff; flex: none; }
+  .bub { max-width: 268px; padding: 8px 13px; border-radius: 19px; font: 400 17px/1.29 'UI'; position: relative; }
+  .in .bub { background: #E9E9EB; color: #000; }
+  .out { display: flex; justify-content: flex-end; margin-top: 6px; }
+  .out .bub { background: #0B84FE; color: #fff; }
+  .tb { position: absolute; top: -17px; right: -10px; background: #E9E9EB; border: 2.5px solid #fff; border-radius: 16px; padding: 1px 6px; font-size: 15px; line-height: 1.3; }
+  .out .tb { left: -12px; right: auto; }
+  .dots { display: inline-flex; gap: 4px; padding: 5px 2px; } .dots i { width: 8px; height: 8px; border-radius: 50%; background: #9C9CA1; }
+  .deliv { text-align: right; font: 500 11px 'UI'; color: #8E8E93; margin: 3px 4px 0 0; }
+  .link { width: 268px; border-radius: 19px; overflow: hidden; background: #E9E9EB; }
+  .link .img { height: 132px; background: #F3F4F1; display: flex; align-items: center; justify-content: center; gap: 12px; padding: 0 16px; border-bottom: 0.5px solid #D9D9DE; }
+  .link .img .t { font: 700 17px 'Serif'; color: rgb(20,40,75); }
+  .link .img .s { font: 400 9.5px/1.35 'UI'; color: #4B5563; margin-top: 3px; }
+  .link .meta { padding: 8px 12px 10px; background: #E9E9EB; }
+  .link .meta b { display: block; font: 600 14px 'UI'; color: #000; }
+  .link .meta span { font: 400 12.5px 'UI'; color: #8E8E93; }
+
+  /* input bar + keyboard */
+  #ibar { position: absolute; left: 0; right: 0; height: 52px; z-index: 30; display: flex; align-items: center; gap: 8px; padding: 0 10px; background: #fff; }
+  #ibar .plus { width: 34px; height: 34px; border-radius: 50%; background: #EDEDF0; display: grid; place-items: center; flex: none; }
+  #ibar .fld { flex: 1; height: 36px; border-radius: 18px; border: 1px solid #D1D1D6; display: flex; align-items: center; padding: 0 5px 0 14px; font: 400 17px 'UI'; color: #C4C4C8; white-space: nowrap; overflow: hidden; }
+  #ibar .fld.has { color: #000; }
+  #ibar .send { margin-left: auto; width: 28px; height: 28px; border-radius: 50%; background: #0B84FE; display: grid; place-items: center; flex: none; }
+  .caret { display: inline-block; width: 2px; height: 21px; background: #0B84FE; border-radius: 1px; vertical-align: -4px; margin-left: 1px; }
+  #kb { position: absolute; left: 0; right: 0; bottom: 0; height: 292px; z-index: 35; background: #D2D5DB; }
+  .key { position: absolute; height: 44px; border-radius: 6px; background: #fff; box-shadow: 0 1px 0 #8A8C90; display: grid; place-items: center; font: 400 23px 'UI'; color: #000; }
+  .key.sp { background: #ADB2BB; font-size: 15px; }
+  .key.down { background: #ADB2BB; } .key.sp.down { background: #fff; }
+  #pop { position: absolute; width: 56px; height: 104px; display: none; z-index: 36; }
+  #pop .cap { position: absolute; left: 0; top: 0; width: 56px; height: 60px; background: #fff; border-radius: 10px 10px 14px 14px; display: grid; place-items: center; font: 400 34px 'UI'; box-shadow: 0 2px 6px rgba(0,0,0,0.25); }
+  #pop .stem { position: absolute; left: 10px; top: 50px; width: 36px; height: 50px; background: #fff; border-radius: 0 0 8px 8px; box-shadow: 0 2px 2px rgba(0,0,0,0.2); }
+  #home { position: absolute; left: 50%; bottom: 8px; width: 140px; height: 5px; margin-left: -70px; border-radius: 3px; background: #111; z-index: 50; }
+  #touch { position: absolute; width: 40px; height: 40px; margin: -20px 0 0 -20px; border-radius: 50%; background: rgba(110,110,120,0.32); border: 1.5px solid rgba(255,255,255,0.7); z-index: 60; display: none; }
+
+  /* ---------------- Ask page (demo campaign site, light) ---------------- */
+  #page { background: #f3f4f1; }
+  #page .site { position: absolute; left: 0; right: 0; top: 50px; height: 58px; background: #fff; border-bottom: 1px solid #e5e7eb; display: flex; align-items: center; justify-content: space-between; padding: 0 16px; }
+  #page .n1 { font: 700 17px 'Serif'; letter-spacing: 0.05em; color: rgb(20,40,75); line-height: 1; }
+  #page .n2 { font: 600 8.5px 'UI'; letter-spacing: 0.22em; text-transform: uppercase; color: rgb(180,35,44); margin-top: 4px; }
+  #page .don { border-radius: 2px; font: 700 10.5px 'UI'; letter-spacing: 0.08em; color: #fff; background: rgb(180,35,44); padding: 8px 13px; }
+  #wid { position: absolute; left: 0; right: 0; top: 108px; padding: 18px 16px; }
+  #wid .top { display: flex; gap: 14px; }
+  #wid .t1 { font: 700 21px/1.2 'Serif'; color: rgb(20,40,75); }
+  #wid .t2 { font: 400 12px/1.6 'UI'; color: #374151; margin-top: 5px; }
+  #wmsgs { margin-top: 16px; display: flex; flex-direction: column; gap: 12px; }
+  .wu { align-self: flex-end; max-width: 80%; background: rgb(20,40,75); color: #fff; font: 400 15px/1.45 'UI'; padding: 10px 14px; border-radius: 16px 16px 4px 16px; }
+  .wa { display: flex; gap: 8px; align-items: flex-start; }
+  .wa .bb { background: #fff; border: 1px solid #e5e7eb; border-radius: 4px 16px 16px 16px; padding: 10px 13px; font: 400 15px/1.5 'UI'; color: #111827; }
+  .wa .lbl { font: 600 11px 'UI'; color: #6b7280; margin-bottom: 4px; }
+  .chips { display: flex; gap: 6px; margin-top: 14px; overflow: hidden; white-space: nowrap; }
+  .chips span { flex: none; border-radius: 999px; border: 1px solid rgba(20,40,75,0.333); background: #fff; padding: 5px 12px; font: 500 11.5px 'UI'; color: #111827; }
+  #wform { margin-top: 10px; display: flex; align-items: center; gap: 8px; border-radius: 12px; background: #fff; border: 1px solid #d1d5db; padding: 6px 6px 6px 14px; }
+  #winp { flex: 1; font: 400 14.5px 'UI'; color: #9ca3af; padding: 6px 0; white-space: nowrap; overflow: hidden; }
+  #winp.has { color: #111827; }
+  #wsend { width: 32px; height: 32px; border-radius: 8px; background: rgb(20,40,75); display: grid; place-items: center; opacity: 0.4; }
+  .wdisc { margin-top: 6px; font: 400 9.5px/1.4 'UI'; color: #6b7280; }
+  #sbar { position: absolute; left: 0; right: 0; bottom: 0; height: 100px; background: rgba(248,248,250,0.92); border-top: 0.5px solid rgba(0,0,0,0.14); z-index: 20; }
+  #sbar .pill { position: absolute; left: 12px; right: 12px; top: 8px; height: 46px; border-radius: 14px; background: #fff; box-shadow: 0 1px 6px rgba(0,0,0,0.12); display: flex; align-items: center; justify-content: center; gap: 6px; font: 500 15.5px 'UI'; }
+
+  /* overlays (creator-style captions) */
+  .ov { position: absolute; left: 50%; transform: translateX(-50%); z-index: 70; text-align: center; width: 360px; }
+  .ov span { display: inline; background: #fff; color: #000; font: 700 19px/1.55 'UI'; padding: 4px 10px; border-radius: 8px; box-decoration-break: clone; -webkit-box-decoration-break: clone; box-shadow: 0 2px 10px rgba(0,0,0,0.12); }
+
+  /* end frame */
+  #end { position: absolute; inset: 0; z-index: 80; opacity: 0; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center;
+    background:
+      radial-gradient(360px 360px at 20px 190px, rgba(28,86,219,0.14), transparent 70%),
+      radial-gradient(340px 340px at 430px 640px, rgba(220,53,71,0.12), transparent 70%),
+      radial-gradient(300px 300px at 216px 480px, rgba(122,79,184,0.07), transparent 70%), #fff; }
+  #end .w { font: 800 64px 'Display'; letter-spacing: -0.03em; margin-top: 26px; background: linear-gradient(90deg, #1E55D8 0%, #5E50C2 38%, #8E47A6 68%, #D23A55 100%); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  #end .l { font: 700 26px/1.2 'Display'; letter-spacing: -0.02em; color: #14131C; margin-top: 20px; }
+  #end .s { font: 400 14px 'UI'; color: #4B4860; margin-top: 30px; }
+  #end .u { font: 700 17px 'UI'; margin-top: 8px; background: linear-gradient(90deg, #1E55D8, #8E47A6, #D23A55); -webkit-background-clip: text; background-clip: text; color: transparent; }
+</style>
+</head>
+<body>
+<div id="screen">
+  <!-- Messages -->
+  <div class="layer" id="msgs">
+    <div id="thread"><div id="list"></div></div>
+    <div id="mhead">
+      <div class="back"><svg width="12" height="20" viewBox="0 0 12 20"><path d="M10 2 2 10l8 8" fill="none" stroke="#0B84FE" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"/></svg><b>12</b></div>
+      <div class="grp"><div class="avs"><i style="left:0;top:8px;background:#5E6AD2">M</i><i style="left:16px;top:0;background:#C2557A">L</i><i style="left:32px;top:8px;background:#3E9E7E">G</i></div>
+        <div class="nm">Family 🦃 <svg width="6" height="10" viewBox="0 0 6 10"><path d="m1 1 4 4-4 4" fill="none" stroke="#8E8E93" stroke-width="1.6" stroke-linecap="round"/></svg></div></div>
+      <svg class="ft" width="26" height="18" viewBox="0 0 26 18"><rect x="1" y="2" width="16" height="14" rx="4" fill="none" stroke="#0B84FE" stroke-width="2"/><path d="m18 7 6-4v12l-6-4z" fill="none" stroke="#0B84FE" stroke-width="2" stroke-linejoin="round"/></svg>
+    </div>
+    <div id="ibar"><div class="plus"><svg width="14" height="14" viewBox="0 0 14 14"><path d="M7 1v12M1 7h12" stroke="#8E8E93" stroke-width="2" stroke-linecap="round"/></svg></div>
+      <div class="fld" id="fld">iMessage</div></div>
+  </div>
+  <!-- Ask page -->
+  <div class="layer" id="page">
+    <div class="site"><div><p class="n1">ALEX RIVERA</p><p class="n2">For City Council</p></div><div class="don">DONATE</div></div>
+    <div id="wid">
+      <div class="top"><div id="worb"></div><div><p class="t1">Ask Alex Rivera</p><p class="t2">Ask Alex is the campaign's AI representative. Ask about Alex's plans, record, and events, and get answers drawn only from the campaign's own knowledge base.</p></div></div>
+      <div id="wmsgs"></div>
+      <div class="chips"><span>What is your plan for housing costs?</span><span>How can I volunteer?</span></div>
+      <div id="wform"><div id="winp">Ask Alex anything…</div><div id="wsend"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></div></div>
+      <p class="wdisc">Alex Rivera is a fictional demo. Questions are saved to the demo campaign, like on a real campaign site.</p>
+    </div>
+    <div id="sbar"><div class="pill"><svg width="10" height="13" viewBox="0 0 14 17"><rect x="1" y="7" width="12" height="9" rx="2" fill="#111"/><path d="M4 7V5a3 3 0 0 1 6 0v2" fill="none" stroke="#111" stroke-width="2"/></svg>alexriveraforcitycouncil.com</div></div>
+  </div>
+  <div class="status" id="status"><span class="time">6:12</span><span class="ic">
+    <svg width="19" height="12" viewBox="0 0 19 12"><rect x="0" y="8" width="3.4" height="4" rx="1"/><rect x="5" y="5.5" width="3.4" height="6.5" rx="1"/><rect x="10" y="3" width="3.4" height="9" rx="1"/><rect x="15" y="0" width="3.4" height="12" rx="1"/></svg>
+    <svg width="17" height="12" viewBox="0 0 17 12"><path d="M8.5 11.5 6 9a3.6 3.6 0 0 1 5 0z M3.6 6.6a7 7 0 0 1 9.8 0l-1.5 1.5a5 5 0 0 0-6.8 0z M1.2 4.2a10.4 10.4 0 0 1 14.6 0l-1.5 1.5a8.3 8.3 0 0 0-11.6 0z"/></svg>
+    <svg width="27" height="13" viewBox="0 0 27 13"><rect x="0.5" y="0.5" width="23" height="12" rx="3.8" fill="none" stroke="#000" stroke-opacity=".4"/><rect x="2" y="2" width="14" height="9" rx="2.4"/><path d="M25 4.5v4c.8-.3 1.4-1.1 1.4-2s-.6-1.7-1.4-2" fill-opacity=".45"/></svg></span></div>
+  <div id="kb"><div id="keys"></div>
+    <svg style="position:absolute;bottom:30px;left:26px" width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="#5a5d63" stroke-width="1.8"><circle cx="12" cy="12" r="9"/><path d="M3 12h18M12 3c3 3 3 15 0 18M12 3c-3 3-3 15 0 18"/></svg>
+    <svg style="position:absolute;bottom:30px;right:26px" width="22" height="26" viewBox="0 0 20 26" fill="none" stroke="#5a5d63" stroke-width="1.9" stroke-linecap="round"><rect x="6" y="1.5" width="8" height="14" rx="4"/><path d="M2 12a8 8 0 0 0 16 0M10 20v4"/></svg></div>
+  <div id="pop"><div class="stem"></div><div class="cap" id="popc">a</div></div>
+  <div id="touch"></div>
+  <div id="home"></div>
+  <div class="ov" id="ov1" style="top:150px"><span>pov: it's thanksgiving week</span><br><span>and the family group chat is active</span></div>
+  <div class="ov" id="ov2" style="top:560px"><span>me ending it in 30 seconds</span></div>
+  <div id="end"><div id="eorb"></div><div class="w">Poli</div><div class="l">skip the argument.<br>just ask.</div><div class="s">Look for "Ask [Candidate]" on their website.</div><div class="u">askpoli.us</div></div>
+</div>
+
+<script>
+const $ = id => document.getElementById(id);
+const clamp = (x, a = 0, b = 1) => Math.min(b, Math.max(a, x));
+const prog = (t, a, b) => clamp((t - a) / (b - a));
+const eout = k => 1 - Math.pow(1 - k, 3);
+const eio = k => k < .5 ? 4 * k * k * k : 1 - Math.pow(-2 * k + 2, 3) / 2;
+const spring = k => k <= 0 ? 0 : k >= 1 ? 1 : 1 - Math.exp(-7 * k) * Math.cos(10 * k);
+function load(u) { const x = new XMLHttpRequest(); x.open('GET', u, false); x.send(); return x.responseText; }
+const SRC = load('poli-orb.svg'); let ok = 0;
+const orb = w => { const s = 'v' + (ok++); return SRC.replace(/id="([^"]+)"/g, (m, a) => `id="${a}${s}"`).replace(/url\(#([^)]+)\)/g, (m, a) => `url(#${a}${s})`).replace(/width="\d+" height="\d+"/, `width="${w}" height="${w}"`); };
+$('worb').innerHTML = orb(64); $('eorb').innerHTML = orb(150);
+
+// ---------------- story ----------------
+const P = { M: ['Uncle Mike', '#5E6AD2', 'M'], L: ['Mom', '#C2557A', 'L'], J: ['Aunt Jen', '#D98A2B', 'J'], G: ['Grandma', '#3E9E7E', 'G'] };
+function typing(text, t0, dt, seed) { let s = seed, t = t0; return [...text].map(ch => { s = (s * 16807) % 2147483647; const r = t; t += dt * (1 + (s / 2147483647 - 0.5) * 0.5) + (ch === ' ' ? dt * 0.3 : 0); return r; }); }
+const ME1 = 'hold on', ME2 = 'no. alex wants it open til 8 on weeknights', ASKQ = 'are you trying to close the library?';
+const T = {};
+T.ty1 = typing(ME1, 6.35, 0.085, 3); T.send1 = T.ty1.at(-1) + 0.25;
+T.link = 9.15; T.tapLink = 10.0; T.push = [10.05, 10.45];
+T.tapW = 10.75; T.ty2 = typing(ASKQ, 11.1, 0.048, 7); T.sendW = T.ty2.at(-1) + 0.25;
+T.wdots = T.sendW + 0.3; T.wans = [T.sendW + 1.0, T.sendW + 2.3];
+T.pop = [T.wans[1] + 1.1, T.wans[1] + 1.5];
+T.ty3 = typing(ME2, T.pop[1] + 0.35, 0.055, 11); T.send3 = T.ty3.at(-1) + 0.25;
+T.end = [T.send3 + 3.5, T.send3 + 4.0]; T.dur = T.end[1] + 2.7;
+window.DUR = T.dur; window.T = T;
+
+// messages: [kind, who, text, tDots, tShow, extra]
+const MSG = [
+  ['ts', null, '<b>Today</b> 5:58 PM', -9, -9],
+  ['in', 'L', 'ok who is bringing what thursday', -9, -9],
+  ['in', 'J', "i'll do the green bean thing", -9, -9],
+  ['out', null, "i'll bring rolls", -9, -9],
+  ['in', 'M', 'did you guys see the lady running for city council wants to shut down the library', 0.7, 1.55],
+  ['in', 'L', 'where did you see that', 2.7, 3.35],
+  ['in', 'M', 'a guy on facebook', 4.15, 4.8, { tb: ['😐', 5.55] }],
+  ['out', null, ME1, null, T.send1],
+  ['in', 'G', 'Who is running for city council', 7.85, 8.55],
+  ['link', null, '', null, T.link],
+  ['out', null, ME2, null, T.send3],
+  ['in', 'M', 'oh', T.send3 + 0.55, T.send3 + 1.15],
+  ['in', 'G', 'Who is Alex', T.send3 + 1.55, T.send3 + 2.2, { tb: ['😂', T.send3 + 2.85] }],
+];
+window.MSG = MSG;
+const list = $('list');
+MSG.forEach((m, i) => {
+  const [kind, who, text, , , ex = {}] = m; const prev = MSG[i - 1];
+  let h = '';
+  if (kind === 'ts') h = `<div class="ts">${text}</div>`;
+  else if (kind === 'in') {
+    const p = P[who]; const showName = !(prev && prev[0] === 'in' && prev[1] === who);
+    h = (showName ? `<div class="who">${p[0]}</div>` : '') + `<div class="in"><div class="av" style="background:${p[1]}">${p[2]}</div><div class="bub">${text}${ex.tb ? `<span class="tb" data-t="${ex.tb[1]}">${ex.tb[0]}</span>` : ''}</div></div>`;
+  } else if (kind === 'out') h = `<div class="out"><div class="bub">${text}</div></div>`;
+  else if (kind === 'link') h = `<div class="out"><div class="link"><div class="img">${orb(54)}<div><div class="t">Ask Alex Rivera</div><div class="s">answers drawn only from the<br>campaign's own knowledge base</div></div></div><div class="meta"><b>Ask Alex Rivera</b><span>alexriveraforcitycouncil.com</span></div></div></div>`;
+  const wrap = document.createElement('div'); wrap.className = 'm'; wrap.innerHTML = `<div class="mi">${h}</div>`; list.appendChild(wrap); m.el = wrap;
+  if (m[3] !== null && m[3] > 0) { const d = document.createElement('div'); d.className = 'm'; d.innerHTML = `<div class="mi"><div class="in"><div class="av" style="background:${P[who][1]}">${P[who][2]}</div><div class="bub"><span class="dots"><i></i><i></i><i></i></span></div></div></div>`; list.insertBefore(d, wrap); m.dots = d; }
+});
+// widget messages
+$('wmsgs').innerHTML = `<div class="wu" id="wu">${ASKQ[0].toUpperCase() + ASKQ.slice(1)}</div><div class="wa" id="wa">${orb(26)}<div class="bb"><div class="lbl">Ask Alex · AI representative</div><div id="wtext"></div><span class="dots" id="wdot"><i></i><i></i><i></i></span></div></div>`;
+const ANSWER = "No. Alex's plan keeps Eastgate Library open until 8pm on weeknights, and reopens the Lincoln Park pool on weekends.";
+
+// ---------------- keyboard ----------------
+const keyEl = {}; const rows = ['qwertyuiop', 'asdfghjkl', 'zxcvbnm'];
+(function build() {
+  const box = $('keys'), W = 432, side = 3.5, kg = 5.8, kw = (W - 2 * side - 9 * kg) / 10, y0 = 10, rh = 44, g = 12;
+  const add = (l, x, y, w, c = '') => { const d = document.createElement('div'); d.className = 'key ' + c; Object.assign(d.style, { left: x + 'px', top: y + 'px', width: w + 'px' }); d.textContent = l; box.appendChild(d); return d; };
+  rows.forEach((r, ri) => { const y = y0 + ri * (rh + g), rw = r.length * kw + (r.length - 1) * kg; let x = ri === 0 ? side : (W - rw) / 2;
+    if (ri === 2) { add('⇧', side, y, kw * 1.28, 'sp'); add('⌫', W - side - kw * 1.28, y, kw * 1.28, 'sp'); }
+    for (const ch of r) { keyEl[ch] = { el: add(ch, x, y, kw), x: x + kw / 2, y }; x += kw + kg; } });
+  const y = y0 + 3 * (rh + g);
+  add('123', side, y, kw * 1.28, 'sp'); add('😀', side + kw * 1.28 + kg, y, kw * 1.1, 'sp');
+  keyEl[' '] = { el: add('space', side + kw * 2.38 + kg * 2, y, W - 2 * side - kw * 2.38 - kg * 3 - 92, ''), y };
+  keyEl['.'] = keyEl[' ']; keyEl['?'] = keyEl[' '];
+  keyEl.ret = { el: add('return', W - side - 92, y, 92, 'sp'), y };
+})();
+const count = (ts, t) => ts.filter(x => t >= x).length;
+function pressed(text, ts, t) { for (let i = ts.length - 1; i >= 0; i--) if (t >= ts[i] && t < ts[i] + 0.09) return text[i]; return null; }
+function touch(x, y, t, at) { const k = prog(t, at - 0.05, at + 0.28); if (k <= 0 || k >= 1) return; const e = $('touch'); e.style.display = 'block'; e.style.left = x + 'px'; e.style.top = y + 'px'; e.style.opacity = k < .25 ? k / .25 : 1 - (k - .25) / .75; e.style.transform = `scale(${.85 + .25 * k})`; }
+
+function render(t) {
+  // which screen; the Ask page pushes in from the right, then slides back out
+  const push = eio(prog(t, ...T.push)), pop = eio(prog(t, ...T.pop));
+  const onPage = push - pop;
+  $('page').style.transform = `translateX(${(1 - onPage) * 100}%)`;
+  $('page').style.boxShadow = onPage > 0 && onPage < 1 ? '-10px 0 30px rgba(0,0,0,0.12)' : 'none';
+  $('msgs').style.transform = `translateX(${-onPage * 30}%)`;
+  $('page').style.display = onPage > 0.001 ? '' : 'none';
+
+  // keyboard: up while typing (chat 1, widget, chat 2)
+  const kbWin = [[6.15, T.send1 + 0.05], [T.tapW + 0.05, T.sendW + 0.05], [T.pop[1] + 0.05, T.send3 + 0.05]];
+  let kbK = 0, kbIdx = -1;
+  kbWin.forEach(([a, b], i) => { if (t >= a && t < b + 0.35) { kbK = t < b ? eout(prog(t, a, a + 0.3)) : 1 - eout(prog(t, b, b + 0.3)); kbIdx = i; } });
+  $('kb').style.transform = `translateY(${(1 - kbK) * 302}px)`; $('kb').style.display = kbK > 0.001 ? '' : 'none';
+  const chatKb = (kbIdx === 0 || kbIdx === 2) ? kbK : 0;
+  const ibarY = 768 - 34 - 52 - chatKb * (292 - 26);
+  $('ibar').style.top = ibarY + 'px';
+  $('thread').style.height = (ibarY - 132) + 'px';
+  $('home').style.opacity = kbK > 0.5 ? 0 : 1;
+
+  // input field text
+  let txt = '', caret = false;
+  if (kbIdx === 0 && t < T.send1) { txt = ME1.slice(0, count(T.ty1, t)); caret = true; }
+  if (kbIdx === 2 && t < T.send3) { txt = ME2.slice(0, count(T.ty3, t)); caret = true; }
+  const fld = $('fld');
+  if (txt) { fld.classList.add('has'); fld.innerHTML = `<span>${txt.length > 26 ? '…' + txt.slice(-25) : txt}</span>${caret ? '<span class="caret"></span>' : ''}<span class="send"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"><path d="M12 19V5M5 12l7-7 7 7"/></svg></span>`; }
+  else { fld.classList.remove('has'); fld.innerHTML = (caret && Math.floor(t / 0.5) % 2 === 0 ? '<span class="caret" style="margin:0 2px 0 0"></span>' : '') + 'iMessage'; }
+
+  // chat messages grow in; typing bubbles come and go
+  for (const m of MSG) {
+    const inner = m.el.firstChild, h = inner.offsetHeight;
+    const k = m[4] < 0 ? 1 : eout(prog(t, m[4], m[4] + 0.22));
+    m.el.style.height = (k * h) + 'px';
+    inner.style.opacity = m[4] < 0 ? 1 : clamp((t - m[4]) / 0.12);
+    const b = inner.querySelector('.bub, .link'); if (b) { b.style.transform = `scale(${m[4] < 0 ? 1 : 0.86 + 0.14 * spring(prog(t, m[4], m[4] + 0.4))})`; b.style.transformOrigin = m[0] === 'in' ? '0% 100%' : '100% 100%'; }
+    const tb = inner.querySelector('.tb'); if (tb) { const tk = prog(t, +tb.dataset.t, +tb.dataset.t + 0.35); tb.style.opacity = tk > 0 ? 1 : 0; tb.style.transform = `scale(${spring(tk)})`; }
+    if (m.dots) { const di = m.dots.firstChild, dh = di.offsetHeight;
+      const a = prog(t, m[3], m[3] + 0.2), z = prog(t, m[4] - 0.05, m[4] + 0.12);
+      m.dots.style.height = (eout(a) * (1 - z) * dh) + 'px'; di.style.opacity = a * (1 - z);
+      di.querySelectorAll('.dots i').forEach((d, i) => d.style.opacity = 0.35 + 0.65 * Math.max(0, Math.sin(t * 7 - i * 0.9))); }
+  }
+  // "Delivered" not shown; keep the thread pinned to the newest message (bottom-anchored list)
+
+  // widget
+  const nW = count(T.ty2, t), sentW = t >= T.sendW;
+  const winp = $('winp');
+  if (!sentW && nW > 0) { winp.classList.add('has'); const q = ASKQ[0].toUpperCase() + ASKQ.slice(1, nW); winp.innerHTML = q.slice(-34) + '<span class="caret" style="height:16px;vertical-align:-3px"></span>'; }
+  else if (!sentW && t >= T.tapW) { winp.classList.remove('has'); winp.innerHTML = '<span class="caret" style="height:16px;vertical-align:-3px;margin-right:2px"></span>Ask Alex anything…'; }
+  else { winp.classList.remove('has'); winp.textContent = 'Ask Alex anything…'; }
+  $('wsend').style.opacity = !sentW && nW > 0 ? 1 : 0.4;
+  $('wu').style.display = sentW ? '' : 'none'; $('wu').style.opacity = clamp((t - T.sendW) / 0.15);
+  $('wa').style.display = t >= T.wdots ? '' : 'none'; $('wa').style.opacity = clamp((t - T.wdots) / 0.15);
+  $('wdot').style.display = t < T.wans[0] ? '' : 'none';
+  $('wdot').querySelectorAll('i').forEach((d, i) => d.style.opacity = 0.35 + 0.65 * Math.max(0, Math.sin(t * 7 - i * 0.9)));
+  const words = ANSWER.split(' '); $('wtext').textContent = t >= T.wans[0] ? words.slice(0, Math.round(eio(prog(t, ...T.wans)) * words.length)).join(' ') : '';
+  // lift the widget above the keyboard while typing
+  
+
+  // key presses
+  Object.values(keyEl).forEach(k => k.el.classList.remove('down')); $('pop').style.display = 'none';
+  let pk = null, text = null, ts = null;
+  if (kbIdx === 0) { text = ME1; ts = T.ty1; } else if (kbIdx === 1) { text = ASKQ; ts = T.ty2; } else if (kbIdx === 2) { text = ME2; ts = T.ty3; }
+  if (text) pk = pressed(text, ts, t);
+  if (pk && kbK > 0.6) { const k = keyEl[pk]; if (k) { k.el.classList.add('down'); if (k.x) { $('pop').style.display = 'block'; $('pop').style.left = (k.x - 28) + 'px'; $('pop').style.top = (768 - 292 + k.y - 56) + 'px'; $('popc').textContent = pk; } } }
+  const up = kbIdx === 1 && count(T.ty2, t) === 0; rows.join('').split('').forEach(c => keyEl[c].el.textContent = up ? c.toUpperCase() : c);
+
+  // taps
+  $('touch').style.display = 'none';
+  touch(150, 768 - 34 - 26, t, 6.12);
+  touch(400, ibarY + 26, t, T.send1 - 0.02);
+  if (t > T.link && t < T.push[1]) { const r = MSG[9].el.getBoundingClientRect(); touch(r.right - 120, r.top + 80, t, T.tapLink); }
+  touch(150, 500, t, T.tapW);
+  touch(406, 0, t, -99);
+  touch(40, 90, t, T.pop[0] - 0.05);
+  touch(150, 768 - 34 - 26, t, T.pop[1] + 0.02);
+  touch(400, ibarY + 26, t, T.send3 - 0.02);
+
+  // overlays
+  const o1 = clamp(prog(t, 0.15, 0.4)) * (1 - prog(t, 5.6, 5.9));
+  $('ov1').style.opacity = o1; $('ov1').style.transform = `translateX(-50%) translateY(${(1 - eout(prog(t, 0.15, 0.45))) * 8}px)`;
+  const o2 = clamp(prog(t, T.sendW + 0.35, T.sendW + 0.6)) * (1 - prog(t, T.wans[1] + 0.5, T.wans[1] + 0.8));
+  $('ov2').style.opacity = o2;
+
+  // end frame
+  const e = eio(prog(t, ...T.end));
+  $('end').style.opacity = e;
+  $('eorb').style.transform = `scale(${0.7 + 0.3 * spring(prog(t, T.end[0] + 0.1, T.end[1] + 0.6))})`;
+  [...$('end').children].slice(1).forEach((c, i) => { const k = eout(prog(t, T.end[1] + 0.05 + i * 0.12, T.end[1] + 0.55 + i * 0.12)); c.style.opacity = k; c.style.transform = `translateY(${(1 - k) * 10}px)`; });
+}
+window.render = render;
+window.ready = document.fonts.ready;
+if (!location.search.includes('render')) window.ready.then(() => { const s = performance.now(); const loop = n => { render(((n - s) / 1000) % (T.dur + 0.5)); requestAnimationFrame(loop); }; requestAnimationFrame(loop); });
+</script>
+</body>
+</html>

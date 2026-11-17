@@ -1,0 +1,217 @@
+<!doctype html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Poli Weekly Posts</title>
+<style>
+  @font-face { font-family: 'Inter'; font-weight: 400; src: url('file:///usr/share/fonts/opentype/inter/Inter-Regular.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 500; src: url('file:///usr/share/fonts/opentype/inter/Inter-Medium.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 600; src: url('file:///usr/share/fonts/opentype/inter/Inter-SemiBold.otf'); }
+  @font-face { font-family: 'Inter'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/Inter-Bold.otf'); }
+  @font-face { font-family: 'Display'; font-weight: 700; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-Bold.otf'); }
+  @font-face { font-family: 'Display'; font-weight: 800; src: url('file:///usr/share/fonts/opentype/inter/InterDisplay-ExtraBold.otf'); }
+
+  /* Existing Poli look: near-black aurora, white type, the blue -> purple -> red gradient as the only accent */
+  :root { --bg: #04050B; --ink: #FFFFFF; --soft: #C3C0D6; --dim: #8E8BA3; --line: rgba(255,255,255,0.10);
+          --blue: #1C56DB; --purple: #7A4FB8; --red: #DC3547;
+          --grad: linear-gradient(90deg, #1E55D8 0%, #5E50C2 38%, #8E47A6 68%, #D23A55 100%); }
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { width: 1080px; height: 1350px; overflow: hidden; background: var(--bg); color: var(--ink); font-family: 'Inter', 'Noto Color Emoji', sans-serif; -webkit-font-smoothing: antialiased; }
+  #s { position: relative; width: 1080px; height: 1350px; overflow: hidden;
+    background:
+      radial-gradient(720px 720px at 60px 220px, rgba(28,86,219,0.30), transparent 70%),
+      radial-gradient(640px 640px at 560px 880px, rgba(122,79,184,0.20), transparent 70%),
+      radial-gradient(760px 760px at 1060px 1330px, rgba(220,53,71,0.20), transparent 70%), var(--bg); }
+  #s.warm { background:
+      radial-gradient(760px 640px at 900px 160px, rgba(220,53,71,0.22), transparent 70%),
+      radial-gradient(700px 700px at 120px 1240px, rgba(28,86,219,0.24), transparent 70%),
+      radial-gradient(600px 600px at 540px 700px, rgba(122,79,184,0.14), transparent 70%), var(--bg); }
+  .grain { position: absolute; inset: 0; opacity: 0.07; background-image: radial-gradient(circle, #fff 1.2px, transparent 1.5px); background-size: 40px 40px; background-position: 20px 0;
+    -webkit-mask-image: radial-gradient(ellipse 70% 55% at 50% 40%, #000 20%, transparent 80%); }
+  .vig { position: absolute; inset: 0; pointer-events: none; background: radial-gradient(ellipse at 50% 45%, transparent 58%, rgba(0,0,0,0.5) 100%); }
+
+  .top { position: absolute; top: 64px; left: 84px; right: 84px; display: flex; justify-content: space-between; align-items: center; z-index: 5; }
+  .brand { display: flex; align-items: center; gap: 14px; font: 800 34px 'Display'; letter-spacing: -0.01em; }
+  .brand svg { width: 46px; height: 46px; }
+  .brand b { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .page { font: 600 22px 'Inter'; color: var(--dim); letter-spacing: 0.06em; }
+  .swipe { position: absolute; right: 84px; bottom: 70px; font: 600 24px 'Inter'; color: var(--soft); display: flex; align-items: center; gap: 10px; }
+
+  .h { font: 800 96px/0.98 'Display'; letter-spacing: -0.035em; }
+  .h2 { font: 800 76px/1.02 'Display'; letter-spacing: -0.03em; }
+  .g { background: var(--grad); -webkit-background-clip: text; background-clip: text; color: transparent; }
+  .p { font: 400 34px/1.42 'Inter'; color: var(--soft); letter-spacing: -0.01em; }
+  .tag { display: inline-block; font: 700 22px 'Inter'; letter-spacing: 0.14em; text-transform: uppercase; color: #B9A8F0; }
+  .abs { position: absolute; left: 84px; right: 84px; }
+
+  /* iMessage group chat (dark mode) */
+  .phone { position: absolute; left: 140px; right: 140px; top: 210px; bottom: 150px; border-radius: 56px; background: #000; border: 2px solid #26262B; overflow: hidden; box-shadow: 0 60px 120px -40px rgba(90,60,220,0.5); }
+  .phone .hd { display: flex; flex-direction: column; align-items: center; gap: 8px; padding: 34px 0 22px; border-bottom: 1px solid #1C1C20; background: #0D0D10; }
+  .phone .hd .av { width: 82px; height: 82px; border-radius: 50%; background: #2C2C32; display: grid; place-items: center; font-size: 44px; }
+  .phone .hd .nm { font: 600 26px 'Inter'; color: #fff; }
+  .phone .hd .sub { font: 400 19px 'Inter'; color: #8E8E93; }
+  .thread { padding: 26px 26px; display: flex; flex-direction: column; gap: 6px; }
+  .who { font: 400 18px 'Inter'; color: #8E8E93; margin: 14px 0 2px 70px; }
+  .row { display: flex; align-items: flex-end; gap: 12px; }
+  .row .pic { width: 56px; height: 56px; border-radius: 50%; display: grid; place-items: center; font: 600 22px 'Inter'; color: #fff; flex: none; }
+  .bub { max-width: 560px; padding: 15px 22px; border-radius: 30px; font: 400 29px/1.32 'Inter'; color: #fff; background: #26252A; }
+  .me { align-self: flex-end; background: #0A84FF; margin-top: 14px; }
+  .react { position: relative; }
+  .react i { position: absolute; top: -26px; right: -14px; font-style: normal; background: #2C2C32; border: 3px solid #000; border-radius: 22px; padding: 2px 8px; font-size: 24px; }
+  .time { text-align: center; font: 500 18px 'Inter'; color: #8E8E93; margin: 6px 0 4px; }
+
+  /* rules */
+  .num { font: 800 300px/0.8 'Display'; letter-spacing: -0.05em; }
+  /* Ask widget (demo campaign site look) */
+  .wid { position: absolute; left: 84px; right: 84px; border-radius: 40px; background: #F3F4F1; color: #111827; padding: 40px; box-shadow: 0 60px 120px -40px rgba(90,60,220,0.55); }
+  .wid .t1 { font: 700 38px 'Georgia', serif; color: rgb(20,40,75); }
+  .wid .t2 { font: 400 22px/1.5 'Inter'; color: #374151; margin-top: 6px; }
+  .wid .u { margin: 30px 0 18px auto; width: fit-content; max-width: 78%; background: rgb(20,40,75); color: #fff; font: 400 29px/1.4 'Inter'; padding: 18px 24px; border-radius: 28px 28px 8px 28px; }
+  .wid .a { display: flex; gap: 14px; align-items: flex-start; }
+  .wid .a svg { width: 54px; height: 54px; flex: none; }
+  .wid .b { background: #fff; border: 1px solid #E5E7EB; border-radius: 8px 28px 28px 28px; padding: 20px 24px; font: 400 29px/1.45 'Inter'; color: #111827; }
+  .wid .lbl { font: 600 19px 'Inter'; color: #6B7280; margin-bottom: 6px; }
+  .sample { position: absolute; font: 700 18px 'Inter'; letter-spacing: 0.16em; color: #E9E4FF; padding: 9px 16px; border-radius: 10px; background: rgba(20,16,44,0.85); border: 1.5px dashed rgba(190,170,255,0.6); }
+
+  /* split comparison */
+  .vs { position: absolute; left: 84px; right: 84px; top: 300px; bottom: 120px; align-content: center; display: grid; grid-template-columns: minmax(0,1fr) minmax(0,1fr); gap: 26px; }
+  .col { border-radius: 40px; padding: 52px 44px; min-height: 700px; display: flex; flex-direction: column; gap: 22px; }
+  .col.them { background: rgba(255,255,255,0.04); border: 1.5px solid var(--line); }
+  .col.us { background: linear-gradient(180deg, rgba(122,79,184,0.22), rgba(28,86,219,0.10)); border: 1.5px solid rgba(160,130,255,0.45); box-shadow: 0 40px 100px -40px rgba(120,90,255,0.6); }
+  .col .lab { display: flex; align-items: center; gap: 14px; font: 700 28px 'Inter'; }
+  .col .lab svg { width: 44px; height: 44px; }
+  .col .chip { width: 44px; height: 44px; border-radius: 12px; background: #2A2A33; display: grid; place-items: center; font: 700 20px 'Inter'; color: #8E8BA3; }
+  .col .say { font: 700 64px/1.05 'Display'; margin-top: 24px; letter-spacing: -0.02em; }
+  .col.them .say { color: #8E8BA3; }
+  .col .note { font: 400 34px/1.45 'Inter'; margin-top: auto; color: var(--soft); }
+  .col.them .note { color: #77748C; }
+
+  /* listicle */
+  .item { position: absolute; left: 84px; right: 84px; display: flex; gap: 40px; align-items: flex-start; }
+  .bignum { font: 800 220px/0.82 'Display'; letter-spacing: -0.06em; flex: none; width: 210px; }
+  .card { position: absolute; left: 84px; right: 84px; border-radius: 36px; padding: 40px 44px; background: rgba(255,255,255,0.05); border: 1.5px solid var(--line); }
+  .card .k { font: 600 22px 'Inter'; color: var(--dim); letter-spacing: 0.04em; }
+  .card .v { font: 700 40px/1.25 'Display'; letter-spacing: -0.015em; margin-top: 12px; }
+</style>
+</head>
+<body>
+<div id="s"><div class="grain"></div><div id="c"></div><div class="vig"></div></div>
+<script>
+function load(u) { const x = new XMLHttpRequest(); x.open('GET', u, false); x.send(); return x.responseText; }
+let k = 0;
+const SRC = load('poli-orb.svg');
+const ORB = () => { const sfx = 'o' + (k++); return SRC.replace(/id="([^"]+)"/g, (m, a) => `id="${a}${sfx}"`).replace(/url\(#([^)]+)\)/g, (m, a) => `url(#${a}${sfx})`); };
+const orb = (w, extra = '') => ORB().replace(/<svg([^>]*?)width="\d+" height="\d+"/, `<svg$1width="${w}" height="${w}" ${extra}`);
+const Q = new URLSearchParams(location.search), P = +Q.get('p') || 1, N = +Q.get('n') || 1;
+const head = (i, n) => `<div class="top"><div class="brand">${orb(46)}<b>Poli</b></div><div class="page">${i} / ${n}</div></div>`;
+const swipe = `<div class="swipe">swipe <svg width="30" height="30" viewBox="0 0 24 24" fill="none" stroke="#C3C0D6" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12h14M13 6l6 6-6 6"/></svg></div>`;
+const ask = (q, top) => `<div class="abs" style="top:${top}px"><div style="font:600 22px Inter;letter-spacing:.12em;color:#8E8BA3;margin-bottom:18px">TRY ASKING</div><div style="display:inline-flex;align-items:center;gap:20px;padding:22px 34px 22px 22px;border-radius:999px;background:rgba(255,255,255,0.06);border:1.5px solid rgba(160,130,255,0.4);font:500 34px Inter;color:#fff">${orb(60)}${q}</div></div>`;
+const foot = `<div class="abs" style="bottom:70px;display:flex;align-items:center;justify-content:space-between"><span class="p" style="font-size:28px">Look for "Ask [Candidate]" on their website.</span><span style="font:700 30px Inter" class="g">askpoli.us</span></div>`;
+
+// -------------------------------------------------------------------------------------------
+// POST 1 · Thanksgiving is next week. Politics will come up. A guide to surviving it.
+// -------------------------------------------------------------------------------------------
+const P1 = [
+  () => `${head(1, 6)}
+    <div class="abs" style="top:300px"><span class="tag">Thanksgiving is next week</span>
+      <div class="h" style="margin-top:28px">how to talk politics at thanksgiving <span class="g">without ruining the pie</span></div>
+      <div class="p" style="margin-top:44px;max-width:780px">a short guide. we tested none of this on our own families.</div></div>
+    <div class="abs" style="bottom:150px;font-size:130px;line-height:1">🥧</div>${swipe}`,
+  () => `${head(2, 6)}
+    <div class="phone"><div class="hd"><div class="av">🦃</div><div class="nm">Family 🦃</div><div class="sub">8 people</div></div>
+      <div class="thread">
+        <div class="time">Today 9:41 PM</div>
+        <div class="who">Uncle Mike</div>
+        <div class="row"><div class="pic" style="background:#5E6AD2">M</div><div class="bub">did you guys see the lady running for council wants to shut down the library</div></div>
+        <div class="who">Mom</div>
+        <div class="row"><div class="pic" style="background:#C2557A">L</div><div class="bub">where did you see that</div></div>
+        <div class="who">Uncle Mike</div>
+        <div class="row"><div class="pic" style="background:#5E6AD2">M</div><div class="bub react">a guy on facebook<i>😐</i></div></div>
+        <div class="bub me">mike.</div>
+        <div class="who">Grandma</div>
+        <div class="row"><div class="pic" style="background:#3E9E7E">G</div><div class="bub">Who is running for council</div></div>
+      </div></div>
+    <div class="abs" style="bottom:70px;text-align:center" ><span class="p" style="font-size:28px">sound familiar?</span></div>`,
+  () => `${head(3, 6)}
+    <div class="abs" style="top:260px"><div class="num g" style="font-size:360px">1</div>
+      <div class="h2" style="margin-top:70px;font-size:88px">ask where they heard it.</div>
+      <div class="p" style="margin-top:40px;max-width:860px;font-size:38px">not to win. just to know.<br>a screenshot of a screenshot isn't a source, and most people will admit that if you ask nicely.</div></div>
+    <div class="abs" style="bottom:80px;font-size:96px;line-height:1">🧐</div>`,
+  () => `${head(4, 6)}
+    <div class="abs" style="top:260px"><div class="num g" style="font-size:360px">2</div>
+      <div class="h2" style="margin-top:70px;font-size:88px">go to the source.</div>
+      <div class="p" style="margin-top:40px;max-width:860px;font-size:38px">what a candidate actually said beats what someone said they said.<br><br>most of them put their plans right on their own website. it takes two minutes to check.</div></div>
+    <div class="abs" style="bottom:80px;font-size:96px;line-height:1">🔎</div>`,
+  () => `${head(5, 6)}
+    <div class="abs" style="top:260px"><div class="num g" style="font-size:360px">3</div>
+      <div class="h2" style="margin-top:70px;font-size:88px">"i don't know" is allowed.</div>
+      <div class="p" style="margin-top:40px;max-width:860px;font-size:38px">easily the most underrated sentence at any dinner table.<br><br>we built Poli to say it too. if a campaign hasn't covered something, it tells you instead of guessing.</div></div>
+    <div class="abs" style="bottom:80px;font-size:96px;line-height:1">🤷</div>`,
+  () => `${head(6, 6)}
+    <div class="abs" style="top:210px"><div class="h2">or skip the argument and <span class="g">just ask them.</span></div></div>
+    <div class="sample" style="right:110px;top:452px">SAMPLE · DEMO CANDIDATE</div>
+    <div class="wid" style="top:480px">
+      <div style="display:flex;gap:22px;align-items:center">${orb(92)}<div><div class="t1">Ask Alex Rivera</div><div class="t2">AI Representative for Alex's campaign</div></div></div>
+      <div class="u">Are you trying to close the library?</div>
+      <div class="a">${orb(54)}<div class="b"><div class="lbl">Ask Alex · AI representative</div>No. Alex's plan keeps Eastgate Library open until 8pm on weeknights.</div></div>
+    </div>
+    <div class="abs" style="bottom:150px;font:600 32px Inter;color:#fff">happy thanksgiving. pass the stuffing. 🥧</div>${foot}`,
+];
+
+// -------------------------------------------------------------------------------------------
+// POST 2 · People used chatbots as voter guides this election. Split-screen contrast.
+// -------------------------------------------------------------------------------------------
+const them = `<div class="lab" style="color:#8E8BA3"><span class="chip">AI</span>A general chatbot</div>`;
+const us = () => `<div class="lab">${orb(44)}<span class="g">Poli</span></div>`;
+const vs = (i, a, an, b, bn) => `${head(i, 6)}
+  <div class="abs" style="top:220px"><span class="tag" style="font-size:26px">${['', '', 'Where it gets answers', "When it doesn't know", 'Whose words they are', 'Where your question goes'][i]}</span></div>
+  <div class="vs"><div class="col them">${them}<div class="say">${a}</div><div class="note">${an}</div></div>
+    <div class="col us">${us()}<div class="say">${b}</div><div class="note">${bn}</div></div></div>`;
+const P2 = [
+  () => `${head(1, 6)}
+    <div class="abs" style="top:290px"><span class="tag">This election season</span>
+      <div class="h" style="margin-top:28px">a lot of people asked a chatbot <span class="g">how to vote.</span></div>
+      <div class="p" style="margin-top:44px;max-width:820px">we get it. ballots are long and nobody has time. but where those answers come from matters a lot.</div></div>${swipe}`,
+  () => vs(2, 'the whole internet', 'including sites with no author, old news, and posts from people who just really don\'t like the guy.', "the candidate's own material", "only what the campaign actually shared. their plans, their record, their words."),
+  () => vs(3, 'a confident guess', "it'll fill the gap with something that sounds right. that's the part that gets people.", '"I don\'t know"', "if the campaign hasn't covered it, Poli says so. then you can ask the campaign directly."),
+  () => vs(4, "someone's summary", "you get a blend of what other people think the candidate meant.", "the candidate's", "it's their AI Representative, clearly labeled as an AI. it never pretends to be them in person."),
+  () => vs(5, 'nowhere useful', 'the people on your ballot never find out you asked.', 'to the campaign', "they see what voters are asking about, so they know what you actually care about. your info is never sold."),
+  () => `${head(6, 6)}
+    <div class="abs" style="top:300px;text-align:center;display:flex;flex-direction:column;align-items:center">
+      ${orb(300)}
+      <div class="h2" style="margin-top:56px">same questions.<br><span class="g">straight from the source.</span></div>
+      <div class="p" style="margin-top:30px">save this for the next time your ballot is two pages long.</div></div>${foot}`,
+];
+
+// -------------------------------------------------------------------------------------------
+// POST 3 · The 2027 local races are already starting. What your city council actually decides.
+// -------------------------------------------------------------------------------------------
+const li = (i, n, title, body, q) => `${head(i, 7)}
+  <div class="abs" style="top:250px"><div class="bignum g" style="font-size:340px;width:auto">${n}</div>
+    <div class="h2" style="font-size:84px;margin-top:60px">${title}</div><div class="p" style="margin-top:30px;font-size:38px;max-width:880px">${body}</div></div>${ask(q, 1080)}`;
+const P3 = [
+  () => `${head(1, 7)}
+    <div class="abs" style="top:290px"><span class="tag">The midterms are over. Next up: your city</span>
+      <div class="h" style="margin-top:28px">the race that changes your week the most is the one <span class="g">nobody watches.</span></div>
+      <div class="p" style="margin-top:44px;max-width:820px">5 things your city council decides that you'll actually feel.</div></div>${swipe}`,
+  () => li(2, '1', 'how long a new home takes to get built', "permits run through city hall. slow permits means fewer homes, and fewer homes usually means higher rent.", '"how will you speed up permits?"'),
+  () => li(3, '2', 'whether that pothole ever gets fixed', "road repair is a city budget line. someone on your council votes on it every year.", '"when will my street get fixed?"'),
+  () => li(4, '3', 'the streetlight on your block', "public safety staffing, response times, broken lights. a lot of it is local.", '"what\'s your plan for public safety?"'),
+  () => li(5, '4', "if the pool's open on saturday", 'parks, libraries, rec centers, summer jobs for teens. all decided at the city level.', '"will the pool open on weekends?"'),
+  () => li(6, '5', "what's in your water pipes", "replacing old pipes is a city project with a real price tag. someone decides when it happens.", '"when do the old pipes get replaced?"'),
+  () => `${head(7, 7)}
+    <div class="abs" style="top:240px"><div class="h2">lots of cities pick a mayor and council <span class="g">in 2027.</span></div>
+      <div class="p" style="margin-top:30px;max-width:860px">some campaigns are already starting. you don't need to follow every headline. just know who's running and ask them what they'll do.</div></div>
+    <div class="card" style="top:720px"><div class="k">THINGS YOU CAN ASK</div>
+      <div class="v">"what's your plan for rent?"</div><div class="v">"when will my street get repaved?"</div><div class="v">"will you keep the library open?"</div></div>
+    ${foot}`,
+];
+
+const POSTS = { 1: P1, 2: P2, 3: P3 };
+if (P === 1) document.getElementById('s').classList.add('warm');
+document.getElementById('c').innerHTML = POSTS[P][N - 1]();
+window.COUNTS = { 1: P1.length, 2: P2.length, 3: P3.length };
+window.ready = document.fonts.ready;
+</script>
+</body>
+</html>
