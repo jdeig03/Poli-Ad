@@ -81,6 +81,10 @@
   .col.them .say { font-size: 48px !important; text-decoration: line-through; text-decoration-color: rgba(154,151,173,0.6); text-decoration-thickness: 3px; }
   .col.us .say { font-size: 70px !important; color: #14131C; }
   .col.them .note { font-size: 28px !important; }
+  .col.eq { min-height: 720px !important; }
+  .col.loud { background: #fff; border: 2px solid #14131C; box-shadow: 0 30px 70px -40px rgba(20,19,28,0.35); }
+  .col.quiet { background: var(--panel); border: 2px dashed #D6D3E0; }
+  .col.loud .note, .col.quiet .note { font-size: 32px; }
   .verdict { position: absolute; left: 84px; right: 84px; bottom: 96px; text-align: center; font: 700 44px/1.2 'Display'; letter-spacing: -0.02em; color: #14131C; }
   .col { border-radius: 40px; padding: 52px 44px; min-height: 700px; display: flex; flex-direction: column; gap: 22px; }
   .col.them { background: var(--panel); border: 1.5px solid var(--line); }
@@ -201,25 +205,35 @@ const P2 = [
 // -------------------------------------------------------------------------------------------
 // POST 3 · The 2027 local races are already starting. What your city council actually decides.
 // -------------------------------------------------------------------------------------------
-const li = (i, n, title, body, q) => `${head(i, 7)}
-  <div class="abs" style="top:250px"><div class="bignum g" style="font-size:340px;width:auto">${n}</div>
-    <div class="h2" style="font-size:84px;margin-top:60px">${title}</div><div class="p" style="margin-top:30px;font-size:38px;max-width:880px">${body}</div></div>${ask(q, 1080)}`;
+const li = (i, n, area, title, body, q) => `${head(i, 8)}
+  <div class="abs" style="top:230px"><div style="display:flex;align-items:flex-end;gap:28px"><div class="bignum g" style="font-size:300px;width:auto">${n}</div><span class="tag" style="font-size:28px;padding-bottom:34px">${area}</span></div>
+    <div class="h2" style="font-size:86px;margin-top:56px">${title}</div><div class="p" style="margin-top:30px;font-size:38px;max-width:900px">${body}</div></div>${ask(q, 1090)}`;
 const P3 = [
-  () => `${head(1, 7)}
-    <div class="abs" style="top:290px"><span class="tag">The midterms are over. Next up: your city</span>
-      <div class="h" style="margin-top:28px">the race that changes your week the most is the one <span class="g">nobody watches.</span></div>
-      <div class="p" style="margin-top:44px;max-width:820px">5 things your city council decides that you'll actually feel.</div></div>${swipe}`,
-  () => li(2, '1', 'how long a new home takes to get built', "permits run through city hall. slow permits means fewer homes, and fewer homes usually means higher rent.", '"how will you speed up permits?"'),
-  () => li(3, '2', 'whether that pothole ever gets fixed', "road repair is a city budget line. someone on your council votes on it every year.", '"when will my street get fixed?"'),
-  () => li(4, '3', 'the streetlight on your block', "public safety staffing, response times, broken lights. a lot of it is local.", '"what\'s your plan for public safety?"'),
-  () => li(5, '4', "if the pool's open on saturday", 'parks, libraries, rec centers, summer jobs for teens. all decided at the city level.', '"will the pool open on weekends?"'),
-  () => li(6, '5', "what's in your water pipes", "replacing old pipes is a city project with a real price tag. someone decides when it happens.", '"when do the old pipes get replaced?"'),
-  () => `${head(7, 7)}
-    <div class="abs" style="top:240px"><div class="h2">lots of cities pick a mayor and council <span class="g">in 2027.</span></div>
-      <div class="p" style="margin-top:30px;max-width:860px">some campaigns are already starting. you don't need to follow every headline. just know who's running and ask them what they'll do.</div></div>
-    <div class="card" style="top:720px"><div class="k">THINGS YOU CAN ASK</div>
-      <div class="v">"what's your plan for rent?"</div><div class="v">"when will my street get repaved?"</div><div class="v">"will you keep the library open?"</div></div>
-    ${foot}`,
+  () => `${head(1, 8)}
+    <div class="abs" style="top:270px"><span class="tag">The midterms are over. Next up: your city</span>
+      <div class="h" style="margin-top:28px">the election that shapes your daily life the most is the one <span class="g">you know the least about.</span></div>
+      <div class="p" style="margin-top:44px;max-width:840px">that's not your fault. swipe and you'll see why.</div></div>${swipe}`,
+  () => li(2, '1', 'Your rent', 'how many homes get built near you', "permits run through city hall. slow permits mean fewer homes, and fewer homes mean you pay more.", '"how will you speed up permits?"'),
+  () => li(3, '2', 'Your commute', 'whether that pothole ever gets fixed', "road repair is a line in the city budget. your council votes on it every single year.", '"when will my street get fixed?"'),
+  () => li(4, '3', 'Your street at night', 'how safe the walk home feels', "police staffing, response times, the broken streetlight on your block. a lot of it is decided locally.", '"what\'s your plan for public safety?"'),
+  () => li(5, '4', 'Your weekend', 'whether the pool and library are open', "parks, libraries, rec centers, summer jobs for teens. all set by the people on your city ballot.", '"will the library stay open later?"'),
+  () => li(6, '5', 'Your tap water', "what's still in the pipes", "replacing old pipes is a real city project with a real price tag. someone decides when it finally happens.", '"when do the old pipes get replaced?"'),
+  () => `${head(7, 8)}
+    <div class="abs" style="top:200px"><span class="tag" style="font-size:26px">So why don't you know who's running?</span></div>
+    <div class="vs" style="grid-template-columns:minmax(0,1fr) minmax(0,1fr)">
+      <div class="col eq loud"><div class="lab" style="color:#4B4860">🇺🇸 The president</div><div class="say" style="font-size:58px !important">you can't escape it</div><div class="note">televised debates, nonstop news, ads on every channel. you know more than you ever wanted to.</div></div>
+      <div class="col eq quiet"><div class="lab" style="color:#4B4860">🏛️ Your city council</div><div class="say" style="font-size:58px !important;text-decoration:none;color:#9A97AD">you have to go looking</div><div class="note" style="color:#6E6A80">a mailer, if you're lucky. a website nobody reads. local races barely get covered, even though they hit closest to home.</div></div></div>
+    <div class="verdict">the people with the most power over your week get the least attention.</div>`,
+  () => `${head(8, 8)}
+    <div class="abs" style="top:200px"><div class="h2">so skip the digging. <span class="g">ask them directly.</span></div>
+      <div class="p" style="margin-top:22px;max-width:900px">Poli puts an AI Representative on a candidate's own website. any question on this list, any time, answered in their own words.</div></div>
+    <div class="sample" style="right:110px;top:582px">SAMPLE · DEMO CANDIDATE</div>
+    <div class="wid" style="top:610px;padding:34px">
+      <div style="display:flex;gap:20px;align-items:center">${orb(80)}<div><div class="t1" style="font-size:34px">Ask Alex Rivera</div><div class="t2">AI Representative for Alex's campaign</div></div></div>
+      <div class="u" style="margin-top:22px">How will you speed up permits?</div>
+      <div class="a">${orb(50)}<div class="b"><div class="lbl">Ask Alex · AI representative</div>Alex's plan cuts new-home permit waits from 143 days to 70.</div></div>
+    </div>
+    <div class="abs" style="bottom:128px;font:600 30px Inter;color:#14131C">lots of cities elect a mayor and council in 2027. candidate not on Poli yet? ask them to join.</div>${foot}`,
 ];
 
 const POSTS = { 1: P1, 2: P2, 3: P3 };
