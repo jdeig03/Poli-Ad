@@ -6,6 +6,7 @@ Six logo concepts for the Evansville City Council, Ward 3 race: three for **Glen
 |---|------|---------|------|
 | 1 | Glen | River Rise | A sun rising over the Ohio River's bend. Three river ribbons stand for Ward 3. |
 | 2 | Glen | The Torch | The torch from Indiana's flag forms the I in MILLER. Its flame has three tongues, and there are 19 stars in all. |
+| 2B | Glen | The Flag Torch | Concept 2 refined. The torch is drawn to the Indiana flag's own proportions and keeps the flag's rays and star. |
 | 3 | Glen | Bridge Builder | The M is a twin-span truss bridge (a nod to the U.S. 41 Twin Bridges), with three piers. |
 | 4 | Scott | The Cardinal | A faceted state bird perched on the R of MILLER. |
 | 5 | Scott | Hometown Star | Indiana outline with a star on Evansville and three rings rippling out. |

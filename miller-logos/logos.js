@@ -70,7 +70,7 @@ function emblemRiverRise(uid) {
   </g>`;
 }
 const concept1 = {
-  id: "glen-river-rise", name: "Glen", title: "River Rise",
+  id: "glen-river-rise", num: "1", name: "Glen", title: "River Rise",
   banner() {
     const b = `
       <g transform="translate(50 50)">${emblemRiverRise("b1")}</g>
@@ -149,7 +149,7 @@ function starRow(cx, y, count, r, gapW, fill) {
   return s;
 }
 const concept2 = {
-  id: "glen-torch", name: "Glen", title: "The Torch",
+  id: "glen-torch", num: "2", name: "Glen", title: "The Torch",
   banner() {
     const b = `
       ${torchWordmark(545, 392, 790, "b2")}
@@ -226,7 +226,7 @@ function emblemBridgeM() {
     ${[0, 1, 2].map(i => `<path d="M${10 + i * 18} ${deck + 58 + i * 22} q 23 -12 46 0 t 46 0 t 46 0 t 46 0 t 46 0 t 46 0 t 46 0 ${i < 2 ? "t 46 0" : ""}" stroke="${i === 1 ? C3.river2 : C3.river}" stroke-width="9" fill="none" stroke-linecap="round" transform="translate(${i * -6} 0)"/>`).join("")}`;
 }
 const concept3 = {
-  id: "glen-bridge", name: "Glen", title: "Bridge Builder",
+  id: "glen-bridge", num: "3", name: "Glen", title: "Bridge Builder",
   banner() {
     const b = `
       <g transform="translate(70 42) scale(1)">${emblemBridgeM()}</g>
@@ -294,7 +294,7 @@ function layoutBird(g) {
     <g transform="translate(${P(rx + R.inkW * k * 0.38)} ${P(base - capH + 2)}) scale(${P(birdScale)})">${cardinal()}</g>`;
 }
 const concept4 = {
-  id: "scott-cardinal", name: "Scott", title: "The Cardinal",
+  id: "scott-cardinal", num: "4", name: "Scott", title: "The Cardinal",
   banner() {
     const b = `
       ${cardinalWordmark(530, 362, 880, C4.white)}
@@ -337,7 +337,7 @@ function emblemIndiana() {
     ${star(ex, ey + 2, 28, C5.red)}`;
 }
 const concept5 = {
-  id: "scott-hometown-star", name: "Scott", title: "Hometown Star",
+  id: "scott-hometown-star", num: "5", name: "Scott", title: "Hometown Star",
   banner() {
     const b = `
       <g transform="translate(60 26) scale(0.95)">${emblemIndiana()}</g>
@@ -395,7 +395,7 @@ function emblemTulip(uid) {
     <path d="M200 140 L200 300" stroke="${C6.petal2}" stroke-width="3" opacity=".8"/></g>`;
 }
 const concept6 = {
-  id: "scott-tulip-tree", name: "Scott", title: "Tulip Tree",
+  id: "scott-tulip-tree", num: "6", name: "Scott", title: "Tulip Tree",
   banner() {
     const b = `
       <g transform="translate(50 50)">${emblemTulip("b6")}</g>
@@ -419,7 +419,90 @@ const concept6 = {
   },
 };
 
-const CONCEPTS = [concept1, concept2, concept3, concept4, concept5, concept6];
+
+/* ------------------------------------------------------------------ */
+/* 2B · GLEN — "The Flag Torch": the torch from Indiana's flag, drawn  */
+/* to the flag's own proportions, is the I in MILLER.                   */
+/* ------------------------------------------------------------------ */
+// Geometry traced from the 1917 Indiana state flag (public domain), in flag
+// units. Torch center x = 300.95, rim top y = 180.93. The flag's handle is
+// broken by a star; here it runs unbroken to a point at y = 365.
+const FLAG = {
+  "flameL": "M 279.66,179.17 L 279.58,179.07 C 267.37,162.94 279.79,157.07 280.04,145.61 C 288.12,160.61 276.28,165.27 290.35,179.18 L 279.66,179.17 Z",
+  "flameC": "M 293.14,179.18 C 288.84,173.13 285.82,163.48 287.14,157.18 C 288.46,150.88 292.79,144.67 292.14,139.9 C 294.42,145.27 297.24,145.28 296.57,149.23 C 299.99,139.04 301.44,131.23 312.09,130.71 C 300.85,147.07 323.66,161.05 307.09,179.2 L 293.14,179.18 Z",
+  "flameR": "M 310.69,179.2 C 325.9,160.85 306.55,151.45 324.19,143.2 C 324.83,148.62 320.51,148.62 322.42,155.26 A 13.14,13.14 0 0,1 321.42,162.48 C 323.22,160.28 326.71,156.13 328.92,154.48 C 323.68,162.38 333.55,169.3 320.92,179.13 L 310.43,179.13 Z",
+  "rim": "M 329.24,186.37 L 272.64,186.31 L 272.64,180.93 L 329.25,180.99 L 329.24,186.37 Z",
+  "cup": "M 311.86,225.27 C 312.66,204.82 317.04,198.59 325.33,190.04 L 276.61,190.04 C 284.87,198.6 289.24,204.83 290,225.28 Q 300.94,225.23 311.86,225.27 L 311.86,225.27 Z",
+  "collar": "M 315.46,234.12 L 285.6,234.12 L 285.6,227.4 L 315.46,227.4 L 315.46,234.12 Z",
+  "rays": "M 160.47,181.23 L 267.05,168.46 L 266.72,165.6 L 160.11,178.38 L 160.47,181.23 M 180.72,116.55 L 268.37,150.26 L 269.37,147.58 L 181.73,113.87 L 180.72,116.55 M 235,78.92 L 272.72,132.66 L 275.06,131 L 237.32,77.28 L 235,78.92 Z",
+  "star": "M 280,93 L 295.78,93 L 301,77.56 L 305.8,93 L 321.67,93 L 309.36,103 L 313.82,117.62 L 300.82,108.85 L 287.91,117.7 L 292.3,102.86 L 280,93 Z",
+  "dash": "M 299.11,114.18 L 299.11,125.65 L 302,125.65 L 302,114.17 L 299.11,114.18 Z"
+};
+FLAG.handle = "M291.1 235.9 L310.8 235.9 L306.15 318 C305.6 345 303.4 359 300.95 365 C298.5 359 296.3 345 295.75 318 Z";
+const C2B = { bg: "#0A2A6E", bg2: "#123B8C", deep: "#071D4E", gold: "#E9B02A", goldHi: "#F6C94A", white: "#FFFFFF", pale: "#B9CAE8" };
+function flagTorch(fill, withRays) {
+  const parts = ["flameL", "flameC", "flameR", "rim", "cup", "collar", "handle"].map(k => `<path d="${FLAG[k]}"/>`).join("");
+  // Rays, dash and star are lifted 12 flag units so the lowest rays clear the cap line of the neighbouring letters.
+  const rays = withRays ? `<g transform="translate(0 -12)"><path d="${FLAG.rays}"/><path d="${FLAG.rays}" transform="translate(601.9 0) scale(-1 1)"/><path d="${FLAG.dash}"/><path d="${FLAG.star}"/></g>` : "";
+  return `<g fill="${fill}">${rays}${parts}</g>`;
+}
+function layoutFlagTorch(g) {
+  const cx = +g.dataset.cx, base = +g.dataset.base, width = +g.dataset.width;
+  const font = "700 100px Oswald";
+  const m = measure(font, "M"), l = measure(font, "LLER");
+  const capH = m.ascent;
+  const k100 = capH / (365 - 180.93);            // flag units -> px at 100px type
+  const torchW = (329.25 - 272.64) * k100, gap = 6;
+  const total = m.adv + gap + torchW + gap + l.inkRight;
+  const s = width / total, size = 100 * s, k = k100 * s, H = capH * s;
+  const x0 = cx - width / 2;
+  const tx = x0 + (m.adv + gap + torchW / 2) * s;
+  const lx = x0 + (m.adv + gap * 2 + torchW) * s;
+  const glen = H * 0.3, glenTrack = glen * 0.5;
+  const rayReach = (300.95 - 160.11) * k;
+  g.innerHTML = `
+    <text x="${P(x0)}" y="${base}" font-family="Oswald" font-weight="700" font-size="${P(size)}" fill="${C2B.white}">M</text>
+    <g transform="translate(${P(tx)} ${base}) scale(${P(k)}) translate(-300.95 -365)">${flagTorch(C2B.gold, true)}</g>
+    <text x="${P(lx)}" y="${base}" font-family="Oswald" font-weight="700" font-size="${P(size)}" fill="${C2B.white}">LLER</text>
+    <text class="glen" x="${P(cx + width / 2 + glenTrack)}" y="${P(base - H - H * 0.2)}" text-anchor="end" font-family="Oswald" font-weight="600" font-size="${P(glen)}" letter-spacing="${P(glenTrack)}" fill="${C2B.goldHi}">GLEN</text>`;
+  g.dataset.torchX = P(tx); g.dataset.rayReach = P(rayReach);
+}
+function flagTorchWordmark(cx, base, width) {
+  return `<g class="flagtorchmark" data-cx="${cx}" data-base="${base}" data-width="${width}"></g>`;
+}
+function glow(id, cx, cy, r) {
+  return `<defs><radialGradient id="${id}" cx="${cx}" cy="${cy}" r="${r}" gradientUnits="userSpaceOnUse"><stop offset="0" stop-color="#2A62C9" stop-opacity=".85"/><stop offset=".45" stop-color="${C2B.bg2}" stop-opacity=".55"/><stop offset="1" stop-color="${C2B.bg}" stop-opacity="0"/></radialGradient></defs>`;
+}
+const concept2b = {
+  id: "glen-flag-torch", num: "2B", name: "Glen", title: "The Flag Torch",
+  banner() {
+    // Wordmark 820 wide centred at x=520; torch sits ~ x=330.
+    const b = `
+      ${glow("g2bb", 352, 170, 440)}
+      <rect width="1500" height="500" fill="url(#g2bb)"/>
+      ${flagTorchWordmark(520, 400, 820)}
+      ${starRow(520, 448, 18, 7.5, 47, C2B.gold)}
+      <rect x="1010" y="78" width="3" height="344" fill="${C2B.gold}"/>
+      ${T("CITY COUNCIL", { x: 1060, y: 172, font: "Oswald", weight: 600, size: 58, fill: C2B.white, ls: 6, fit: 380 })}
+      ${T("WARD 3", { x: 1055, y: 340, font: "Oswald", weight: 700, size: 160, fill: C2B.gold, ls: 4, fit: 386 })}
+      ${T("DEMOCRAT", { x: 1061, y: 412, font: "Oswald", weight: 500, size: 34, fill: C2B.pale, ls: 14, fit: 380 })}`;
+    return svgWrap(1500, 500, C2B.bg, b, "2b-banner");
+  },
+  sign() {
+    const b = `
+      ${glow("g2bs", 410, 230, 520)}
+      <rect width="1200" height="900" fill="url(#g2bs)"/>
+      ${flagTorchWordmark(600, 545, 960)}
+      ${starRow(600, 600, 18, 8.5, 55, C2B.gold)}
+      <rect y="660" width="1200" height="240" fill="${C2B.deep}"/>
+      <rect y="660" width="1200" height="8" fill="${C2B.gold}"/>
+      ${T("CITY COUNCIL · WARD 3", { x: 600, y: 792, font: "Oswald", weight: 700, size: 100, fill: C2B.white, ls: 8, anchor: "middle", fit: 950 })}
+      ${T("DEMOCRAT  ·  LIGHTING THE WAY FORWARD", { x: 600, y: 856, font: "Oswald", weight: 500, size: 38, fill: C2B.gold, ls: 8, anchor: "middle", fit: 760 })}`;
+    return svgWrap(1200, 900, C2B.bg, b, "2b-sign");
+  },
+};
+
+const CONCEPTS = [concept1, concept2, concept2b, concept3, concept4, concept5, concept6];
 
 /* ---------------------------- layout pass --------------------------- */
 const _cv = document.createElement("canvas").getContext("2d");
@@ -447,6 +530,7 @@ function fitTexts(svg) {
 }
 function layoutAll(root) {
   root.querySelectorAll("g.torchmark").forEach(layoutTorch);
+  root.querySelectorAll("g.flagtorchmark").forEach(layoutFlagTorch);
   root.querySelectorAll("g.birdmark").forEach(layoutBird);
   root.querySelectorAll("svg[data-id]").forEach(fitTexts);
 }

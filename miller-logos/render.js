@@ -14,7 +14,7 @@ const path = require('path');
   await p.goto('file://' + path.resolve(__dirname, 'dev.html'));
   await p.waitForSelector('body[data-ready="1"]', { timeout: 30000 });
   await p.waitForTimeout(500);
-  const names = { '1': 'glen-river-rise', '2': 'glen-torch', '3': 'glen-bridge', '4': 'scott-cardinal', '5': 'scott-hometown-star', '6': 'scott-tulip-tree' };
+  const names = { '1': 'glen-river-rise', '2': 'glen-torch', '3': 'glen-bridge', '4': 'scott-cardinal', '5': 'scott-hometown-star', '6': 'scott-tulip-tree', '2b': 'glen-flag-torch' };
   for (const s of await p.$$('svg[data-id]')) {
     const id = await s.getAttribute('data-id');
     const [n, kind] = id.split('-');

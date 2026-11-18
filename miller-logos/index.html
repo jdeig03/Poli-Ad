@@ -44,9 +44,9 @@ footer { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line);
   <header>
     <div class="eyebrow">Evansville City Council · Ward 3 · Democrat</div>
     <h1>Miller for Ward 3</h1>
-    <p class="lede">Six campaign identities: three for <strong>Glen Miller</strong>, three for <strong>Scott Miller</strong>. Each one is shown as a 3:1 banner (billboards, mailers, web headers) and as a standard 24×18 in. yard sign. Every mark uses flat colors so it prints cleanly in two or three spot inks, and every one hides the number 3 for Ward 3.</p>
+    <p class="lede">Seven campaign identities: four for <strong>Glen Miller</strong> (including 2B, the refined flag-torch banner), three for <strong>Scott Miller</strong>. Each one is shown as a 3:1 banner (billboards, mailers, web headers) and as a standard 24×18 in. yard sign. Every mark uses flat colors so it prints cleanly in two or three spot inks, and every one hides the number 3 for Ward 3.</p>
     <div class="filter" role="group" aria-label="Show name">
-      <button type="button" id="f-all" data-f="all" aria-pressed="true">All six</button>
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">All</button>
       <button type="button" id="f-glen" data-f="Glen" aria-pressed="false">Glen Miller</button>
       <button type="button" id="f-scott" data-f="Scott" aria-pressed="false">Scott Miller</button>
     </div>
@@ -72,7 +72,7 @@ const NOTES = {
     fonts: "Montserrat Black + Bold",
   },
   "glen-torch": {
-    tag: "Indiana pride · Built into the name", pick: true,
+    tag: "Indiana pride · Built into the name", pick: false,
     lede: "The torch from Indiana's state flag becomes the I in MILLER. It's the one design here where the symbol and the name are the same object, and that's what makes people look twice.",
     points: [
       "The flame has three tongues, one for each part of Ward 3.",
@@ -80,6 +80,16 @@ const NOTES = {
       "A tall condensed face keeps MILLER huge on a narrow sign, and GLEN tucks into the space next to the flame.",
     ],
     fonts: "Oswald Bold",
+  },
+  "glen-flag-torch": {
+    tag: "Indiana's own torch · Refined banner", pick: true,
+    lede: "Same idea as concept 2, but the torch is now drawn to the exact proportions of the one on Indiana's state flag. That means the five-tongued flame, the flat rim, the flared cup, the collar band and the long tapered handle. It keeps the flag's six rays of light and the Indiana star with its small dash above the flame. Anyone who has seen the state flag will recognize it instantly.",
+    points: [
+      "The torch stands in for the I, so the handle ends in a point right on the baseline of MILLER. The flag's handle is broken by a star at that spot, and here it runs unbroken.",
+      "The rays and star sit above the cap line, so they spread over the name like a halo without touching the letters. 18 small stars below plus the Indiana star make the flag's 19.",
+      "A soft blue glow behind the torch adds depth on billboards and screens. Leave it out for one-color printing and the mark still works.",
+    ],
+    fonts: "Oswald Bold + SemiBold",
   },
   "glen-bridge": {
     tag: "Connection · Getting it built", pick: false,
@@ -138,12 +148,12 @@ function swatches(svg) {
   MILLER.CONCEPTS.forEach((c, i) => {
     const n = NOTES[c.id];
     if (c.name !== last) {
-      html += `<div class="group-label" data-name="${c.name}">${c.name} Miller <span>${c.name === "Glen" ? "Concepts 1 to 3" : "Concepts 4 to 6"}</span></div>`;
+      html += `<div class="group-label" data-name="${c.name}">${c.name} Miller <span>${c.name === "Glen" ? "Concepts 1 to 3, plus 2B" : "Concepts 4 to 6"}</span></div>`;
       last = c.name;
     }
     const banner = c.banner(), sign = c.sign();
     html += `<section class="concept" data-name="${c.name}">
-      <div class="concept-head"><h2>${i + 1}. ${c.title}</h2><span class="tag">${n.tag}</span>${n.pick ? '<span class="pick">My pick for ' + c.name + '</span>' : ""}</div>
+      <div class="concept-head"><h2>${c.num}. ${c.title}</h2><span class="tag">${n.tag}</span>${n.pick ? '<span class="pick">My pick for ' + c.name + '</span>' : ""}</div>
       <div class="art">${banner}<div class="caption">Banner / billboard · 3:1</div></div>
       <div class="row">
         <div class="art">${sign}<div class="caption">Yard sign · 24 × 18 in.</div></div>
