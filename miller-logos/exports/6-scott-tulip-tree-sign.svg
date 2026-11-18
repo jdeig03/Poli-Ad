@@ -1,0 +1,32 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" data-id="6-sign"><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&amp;family=Oswald:wght@500;600;700&amp;family=Barlow+Semi+Condensed:wght@600;700;800&amp;family=Archivo+Black&amp;family=Bebas+Neue&amp;family=Inter:wght@500;600;700;800&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&amp;display=swap');</style><rect width="1200" height="900" fill="#F6F4EC"></rect>
+      <g transform="translate(440 28) scale(0.8)">
+    <circle cx="200" cy="200" r="196" fill="#1F4D3A"></circle>
+    <circle cx="200" cy="200" r="183" fill="none" stroke="#E9E3A8" stroke-width="3" opacity=".55"></circle>
+    <g transform="translate(0 -14)">
+    <path d="M200 300 L200 360" stroke="#4C9A63" stroke-width="10" stroke-linecap="round"></path>
+    <g transform="translate(194 352) rotate(-64) scale(1.05)"><path d="M0 0 C -14 -8 -40 -16 -58 -40 L -44 -52 C -54 -66 -52 -88 -40 -104 L -14 -98 C -8 -96 -4 -92 0 -86 C 4 -92 8 -96 14 -98 L 40 -104 C 52 -88 54 -66 44 -52 L 58 -40 C 40 -16 14 -8 0 0 Z" fill="#2F7A4F"></path>
+          <path d="M0 0 L0 -86 M0 -36 L-36 -50 M0 -36 L36 -50 M0 -62 L -30 -88 M0 -62 L 30 -88" stroke="#1F4D3A" stroke-width="3" fill="none" stroke-linecap="round"></path></g>
+    <g transform="translate(206 352) rotate(64) scale(1.05)"><path d="M0 0 C -14 -8 -40 -16 -58 -40 L -44 -52 C -54 -66 -52 -88 -40 -104 L -14 -98 C -8 -96 -4 -92 0 -86 C 4 -92 8 -96 14 -98 L 40 -104 C 52 -88 54 -66 44 -52 L 58 -40 C 40 -16 14 -8 0 0 Z" fill="#4C9A63"></path>
+          <path d="M0 0 L0 -86 M0 -36 L-36 -50 M0 -36 L36 -50 M0 -62 L -30 -88 M0 -62 L 30 -88" stroke="#1F4D3A" stroke-width="3" fill="none" stroke-linecap="round"></path></g>
+    
+    <clipPath id="s6l"><path d="M200 304 C 150 304 112 280 102 214 C 98 190 100 172 106 156 C 136 160 162 182 178 214 C 188 236 194 270 200 304 Z"></path></clipPath>
+    <path d="M200 304 C 150 304 112 280 102 214 C 98 190 100 172 106 156 C 136 160 162 182 178 214 C 188 236 194 270 200 304 Z" fill="#D7CF86"></path>
+    <g clip-path="url(#s6l)"><path d="M60 330 L60 262 Q 200 228 340 262 L340 330 Z" fill="#EE7B22"></path></g>
+    <path d="M200 304 C 150 304 112 280 102 214 C 98 190 100 172 106 156 C 136 160 162 182 178 214 C 188 236 194 270 200 304 Z" fill="none" stroke="#1F4D3A" stroke-width="6" stroke-linejoin="round"></path>
+    
+    <clipPath id="s6r"><path d="M200 304 C 250 304 288 280 298 214 C 302 190 300 172 294 156 C 264 160 238 182 222 214 C 212 236 206 270 200 304 Z"></path></clipPath>
+    <path d="M200 304 C 250 304 288 280 298 214 C 302 190 300 172 294 156 C 264 160 238 182 222 214 C 212 236 206 270 200 304 Z" fill="#D7CF86"></path>
+    <g clip-path="url(#s6r)"><path d="M60 330 L60 262 Q 200 228 340 262 L340 330 Z" fill="#EE7B22"></path></g>
+    <path d="M200 304 C 250 304 288 280 298 214 C 302 190 300 172 294 156 C 264 160 238 182 222 214 C 212 236 206 270 200 304 Z" fill="none" stroke="#1F4D3A" stroke-width="6" stroke-linejoin="round"></path>
+    
+    <clipPath id="s6m"><path d="M200 306 C 166 306 146 280 144 222 C 143 186 150 150 160 128 C 176 120 224 120 240 128 C 250 150 257 186 256 222 C 254 280 234 306 200 306 Z"></path></clipPath>
+    <path d="M200 306 C 166 306 146 280 144 222 C 143 186 150 150 160 128 C 176 120 224 120 240 128 C 250 150 257 186 256 222 C 254 280 234 306 200 306 Z" fill="#E9E3A8"></path>
+    <g clip-path="url(#s6m)"><path d="M60 330 L60 262 Q 200 228 340 262 L340 330 Z" fill="#EE7B22"></path></g>
+    <path d="M200 306 C 166 306 146 280 144 222 C 143 186 150 150 160 128 C 176 120 224 120 240 128 C 250 150 257 186 256 222 C 254 280 234 306 200 306 Z" fill="none" stroke="#1F4D3A" stroke-width="6" stroke-linejoin="round"></path>
+    <path d="M200 140 L200 300" stroke="#D7CF86" stroke-width="3" opacity=".8"></path></g></g>
+      <text x="600" y="530" font-family="Fraunces" font-weight="800" font-size="214.53" fill="#173A2C" text-anchor="middle" style="font-variation-settings:'opsz' 144">Scott Miller</text>
+      <text x="600" y="618" font-family="Fraunces" font-weight="600" font-size="43.82" fill="#2F7A4F" text-anchor="middle" font-style="italic">Rooted in Ward 3. Growing Evansville.</text>
+      <rect y="680" width="1200" height="220" fill="#1F4D3A"></rect>
+      <rect y="680" width="1200" height="10" fill="#EE7B22"></rect>
+      <text x="603.34" y="800" font-family="Inter" font-weight="800" font-size="66.73" fill="#F6F4EC" letter-spacing="6.67" text-anchor="middle">CITY COUNCIL · WARD 3</text>
+      <text x="600" y="860" font-family="Inter" font-weight="800" font-size="34" fill="#EE7B22" letter-spacing="14" text-anchor="middle">DEMOCRAT</text></svg>

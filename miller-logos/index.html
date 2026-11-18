@@ -1,0 +1,167 @@
+<title>Miller for Ward 3</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@500;600;700&family=Barlow+Semi+Condensed:wght@600;700;800&family=Archivo+Black&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&display=swap">
+<style>
+/* Layout: a printer's proof sheet. One concept per row: banner on top, yard sign + rationale below. */
+:root {
+  --bg: #EEF1F5; --panel: #FFFFFF; --fg: #13213A; --muted: #5A6880; --line: #D5DCE6; --accent: #1C4E9A;
+  --display: "Bebas Neue", "Oswald", Impact, sans-serif; --body: "Inter", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0C1320; --panel: #141E30; --fg: #E6ECF5; --muted: #93A1B8; --line: #26344B; --accent: #7FA8E8; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0C1320; --panel: #141E30; --fg: #E6ECF5; --muted: #93A1B8; --line: #26344B; --accent: #7FA8E8; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.page { max-width: 1240px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: grid; gap: 10px; margin-bottom: 36px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(44px, 8vw, 88px); line-height: .92; margin: 0; letter-spacing: .01em; text-wrap: balance; }
+.lede { max-width: 68ch; color: var(--muted); margin: 0; }
+.filter { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 8px; }
+.filter button { font: 600 13px var(--body); padding: 8px 14px; border-radius: 999px; border: 1px solid var(--line); background: var(--panel); color: var(--fg); cursor: pointer; }
+.filter button[aria-pressed="true"] { background: var(--fg); color: var(--bg); border-color: var(--fg); }
+.filter button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.group-label { font-family: var(--display); font-size: 40px; letter-spacing: .02em; margin: 44px 0 14px; display: flex; align-items: baseline; gap: 14px; }
+.group-label span { font-family: var(--body); font-size: 13px; font-weight: 600; color: var(--muted); letter-spacing: .04em; }
+.concept { display: grid; gap: 18px; padding-block: 28px; border-top: 1px solid var(--line); }
+.concept-head { display: flex; align-items: baseline; gap: 14px; flex-wrap: wrap; }
+.concept-head h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 34px; letter-spacing: .02em; }
+.concept-head .tag { font-size: 12px; font-weight: 700; letter-spacing: .12em; text-transform: uppercase; color: var(--muted); }
+.art svg { width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 1px 2px rgba(10,20,40,.12), 0 8px 24px rgba(10,20,40,.10); }
+.row { display: grid; grid-template-columns: minmax(0, 5fr) minmax(0, 6fr); gap: 28px; align-items: start; }
+.notes { min-width: 0; display: grid; gap: 14px; }
+.notes p { margin: 0; max-width: 62ch; }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; }
+.notes li::marker { color: var(--accent); }
+.meta { display: flex; gap: 18px; flex-wrap: wrap; align-items: center; font-size: 13px; color: var(--muted); }
+.swatches { display: flex; gap: 6px; }
+.swatches i { width: 22px; height: 22px; border-radius: 50%; border: 1px solid var(--line); display: block; }
+.caption { font-size: 12px; color: var(--muted); margin-top: 8px; letter-spacing: .02em; }
+.pick { display: inline-block; font-size: 11px; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; background: var(--fg); color: var(--bg); padding: 4px 10px; border-radius: 3px; }
+footer { margin-top: 40px; padding-top: 24px; border-top: 1px solid var(--line); color: var(--muted); font-size: 13px; display: grid; gap: 8px; max-width: 80ch; }
+@media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Evansville City Council · Ward 3 · Democrat</div>
+    <h1>Miller for Ward 3</h1>
+    <p class="lede">Six campaign identities: three for <strong>Glen Miller</strong>, three for <strong>Scott Miller</strong>. Each one is shown as a 3:1 banner (billboards, mailers, web headers) and as a standard 24×18 in. yard sign. Every mark uses flat colors so it prints cleanly in two or three spot inks, and every one hides the number 3 for Ward 3.</p>
+    <div class="filter" role="group" aria-label="Show name">
+      <button type="button" id="f-all" data-f="all" aria-pressed="true">All six</button>
+      <button type="button" id="f-glen" data-f="Glen" aria-pressed="false">Glen Miller</button>
+      <button type="button" id="f-scott" data-f="Scott" aria-pressed="false">Scott Miller</button>
+    </div>
+  </header>
+  <main id="list"></main>
+  <footer>
+    <div><strong>Before printing:</strong> Indiana requires a "Paid for by" disclaimer on campaign signs and ads. Add the committee's exact name in small type along the bottom band of the yard sign.</div>
+    <div>Print-ready PNGs (2×) and editable SVGs for every banner and sign are in the <code>miller-logos/exports</code> folder of the Poli-Ad repo.</div>
+  </footer>
+</div>
+
+<script src="logos.js"></script>
+<script>
+const NOTES = {
+  "glen-river-rise": {
+    tag: "Optimism · The river city", pick: false,
+    lede: "A sun rises over the Ohio River as it bends into the horizon. Evansville was built on that bend, so the mark says <em>a new day for the river city</em> without saying a word.",
+    points: [
+      "Three white river ribbons for Ward 3. They taper toward the horizon to pull the eye forward.",
+      "A thin gold ring around a navy seal makes it look official enough for a podium or a lapel pin.",
+      "The heavy geometric MILLER reads from a moving car. GLEN is tracked wide above it so the first name never competes.",
+    ],
+    fonts: "Montserrat Black + Bold",
+  },
+  "glen-torch": {
+    tag: "Indiana pride · Built into the name", pick: true,
+    lede: "The torch from Indiana's state flag becomes the I in MILLER. It's the one design here where the symbol and the name are the same object, and that's what makes people look twice.",
+    points: [
+      "The flame has three tongues, one for each part of Ward 3.",
+      "The gold star above the flame is Indiana's, the 19th state. The 18 small stars below complete the flag's 19.",
+      "A tall condensed face keeps MILLER huge on a narrow sign, and GLEN tucks into the space next to the flame.",
+    ],
+    fonts: "Oswald Bold",
+  },
+  "glen-bridge": {
+    tag: "Connection · Getting it built", pick: false,
+    lede: "The M is drawn as a twin-span steel truss bridge standing over the water, a nod to the U.S. 41 Twin Bridges between Evansville and Henderson. It frames the candidate as someone who connects neighborhoods and gets things built.",
+    points: [
+      "Three piers and three water lines for Ward 3.",
+      "The two arched spans meet in a V and form a readable M even at thumbnail size.",
+      "Steel blue and river aqua stand apart from the usual red, white and blue sign clutter.",
+    ],
+    fonts: "Barlow Semi Condensed ExtraBold",
+  },
+  "scott-cardinal": {
+    tag: "Homegrown · Indiana's state bird", pick: false,
+    lede: "Indiana's state bird is perched on the R of MILLER, turned back toward the name. The faceted cut makes it look modern and keeps it simple enough to print in two reds.",
+    points: [
+      "The cardinal is a familiar backyard sight across Southern Indiana. It's warm and local, and it doesn't feel partisan.",
+      "The red is used only for SCOTT, WARD 3 and the bird, so the eye goes from the name to the bird to the ward.",
+      "The bird gives you a stand-alone icon for social avatars, buttons and stickers.",
+    ],
+    fonts: "Archivo Black + Inter",
+  },
+  "scott-hometown-star": {
+    tag: "Hometown · Here is home", pick: true,
+    lede: "Indiana drawn from real map coordinates, with a red star exactly where Evansville sits on the Ohio River. Three rings spread out from the star: work that starts in Ward 3 and reaches the rest of the city.",
+    points: [
+      "This is the boldest name here. SCOTT MILLER in tall Bebas fills the sign, so it's the most legible from across a street.",
+      "Anyone in the state recognizes the shape at a glance, and the star makes it local.",
+      "The WARD 3 block on the banner works on its own as a social tile or a door-hanger tab.",
+    ],
+    fonts: "Bebas Neue + Inter",
+  },
+  "scott-tulip-tree": {
+    tag: "Rooted · Growing", pick: false,
+    lede: "The bloom of the tulip poplar, Indiana's state tree, with its signature orange band and the tree's notched, square-tipped leaves. On a street lined with blue and red signs, this one looks different.",
+    points: [
+      "Three petals for Ward 3, and a tagline that matches: <em>Rooted in Ward 3. Growing Evansville.</em>",
+      "The soft, high-contrast serif comes across as neighborly and trustworthy, like a local business you'd vouch for.",
+      "Forest green and orange on cream give the campaign a warm look that's easy to own.",
+    ],
+    fonts: "Fraunces ExtraBold + Inter",
+  },
+};
+
+const FAMS = ['700 100px Montserrat','800 100px Montserrat','900 100px Montserrat','700 100px Oswald','600 100px Oswald','500 100px Oswald','800 100px "Barlow Semi Condensed"','700 100px "Barlow Semi Condensed"','600 100px "Barlow Semi Condensed"','400 100px "Archivo Black"','400 100px "Bebas Neue"','800 100px Inter','700 100px Inter','800 100px Fraunces','italic 600 100px Fraunces'];
+
+function swatches(svg) {
+  const seen = [];
+  (svg.match(/fill="(#[0-9A-Fa-f]{6})"/g) || []).forEach(m => { const c = m.slice(6, 13).toUpperCase(); if (!seen.includes(c)) seen.push(c); });
+  return seen.slice(0, 6).map(c => `<i style="background:${c}" title="${c}"></i>`).join("");
+}
+
+(async () => {
+  try { await Promise.all(FAMS.map(f => document.fonts.load(f))); await document.fonts.ready; } catch (e) {}
+  const list = document.getElementById("list");
+  let html = "", last = "";
+  MILLER.CONCEPTS.forEach((c, i) => {
+    const n = NOTES[c.id];
+    if (c.name !== last) {
+      html += `<div class="group-label" data-name="${c.name}">${c.name} Miller <span>${c.name === "Glen" ? "Concepts 1 to 3" : "Concepts 4 to 6"}</span></div>`;
+      last = c.name;
+    }
+    const banner = c.banner(), sign = c.sign();
+    html += `<section class="concept" data-name="${c.name}">
+      <div class="concept-head"><h2>${i + 1}. ${c.title}</h2><span class="tag">${n.tag}</span>${n.pick ? '<span class="pick">My pick for ' + c.name + '</span>' : ""}</div>
+      <div class="art">${banner}<div class="caption">Banner / billboard · 3:1</div></div>
+      <div class="row">
+        <div class="art">${sign}<div class="caption">Yard sign · 24 × 18 in.</div></div>
+        <div class="notes">
+          <p>${n.lede}</p>
+          <ul>${n.points.map(p => `<li>${p}</li>`).join("")}</ul>
+          <div class="meta"><div class="swatches">${swatches(banner + sign)}</div><span>${n.fonts}</span></div>
+        </div>
+      </div>
+    </section>`;
+  });
+  list.innerHTML = html;
+  MILLER.layoutAll(list);
+
+  const btns = document.querySelectorAll(".filter button");
+  btns.forEach(b => b.addEventListener("click", () => {
+    btns.forEach(x => x.setAttribute("aria-pressed", x === b ? "true" : "false"));
+    document.querySelectorAll("[data-name]").forEach(el => { el.hidden = b.dataset.f !== "all" && el.dataset.name !== b.dataset.f; });
+  }));
+})();
+</script>
