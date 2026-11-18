@@ -92,17 +92,27 @@ function billboard(b) {
     <figcaption>Billboard · 14 × 48 ft bulletin</figcaption></figure>`;
 }
 
+function shirtPrint(b) {
+  // Artwork printed straight onto the shirt fabric (no background box).
+  const c = b.c, on = c.onPrimary;
+  const office = (y) => T("CITY COUNCIL · WARD 3", { x: 150, y, font: b.font.display === "Fraunces" ? "Inter" : b.font.display, weight: 800, size: 30, fill: c.accent, ls: 3, anchor: "middle", fit: 230 });
+  let body;
+  if (b.key === "torch" || b.key === "flag-torch") body = `${nameBlock(b, 150, 50, 280, on, c.primary)}${office(262)}`;
+  else if (b.key === "sunset-o") body = `${nameBlock(b, 150, 80, 270, on, c.primary)}${office(262)}`;
+  else body = `<g transform="translate(92 0) scale(.29)">${b.mark(uid("sp"))}</g>${nameBlock(b, 150, 128, 250, on, c.primary)}${office(282)}`;
+  return svgBox(300, 300, body, uid("shirt"));
+}
+
 function shirt(b) {
   const body = "M118 26 L162 10 Q200 46 238 10 L282 26 L382 86 L346 168 L302 146 L302 436 L98 436 L98 146 L54 168 L18 86 Z";
-  const tee = (fill, stroke, inner, cap) => `<div class="tee">
-      <svg viewBox="0 0 400 446" class="tee-shape" aria-hidden="true"><path d="${body}" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M162 10 Q200 46 238 10" fill="none" stroke="${stroke}" stroke-width="5"/><path d="M98 146 L98 200 M302 146 L302 200" stroke="${stroke}" stroke-width="1" opacity=".5"/></svg>
+  const tee = (fill, stroke, inner, cap, cls) => `<div class="tee ${cls}">
+      <svg viewBox="0 0 400 446" class="tee-shape" aria-hidden="true"><path d="${body}" fill="${fill}" stroke="${stroke}" stroke-width="2"/><path d="M162 10 Q200 46 238 10" fill="none" stroke="${stroke}" stroke-width="6"/></svg>
       <div class="tee-print">${inner}</div><div class="tee-cap">${cap}</div></div>`;
-  const front = conceptById(b.concept).sign();
   const chest = `<div class="tee-mark">${markSvg(b)}</div><div class="tee-name" style="font-family:'${b.font.display}';font-weight:${b.font.weight};color:${b.c.onLight}">${nm(b, b.first + " " + b.last)}</div>`;
   return `<figure class="mock">
     <div class="tee-row" style="background:${b.c.soft}">
-      ${tee(b.c.primary, "rgba(0,0,0,.25)", `<div class="tee-sign">${front}</div>`, "Front print")}
-      ${tee("#FFFFFF", "#CBD2DC", chest, "Volunteer tee")}
+      ${tee(b.c.primary, "rgba(0,0,0,.28)", shirtPrint(b), "Front print", "front")}
+      ${tee("#FFFFFF", "#CBD2DC", chest, "Volunteer tee", "vol")}
     </div>
     <figcaption>T-shirts · full front print and a lighter volunteer version</figcaption></figure>`;
 }
@@ -139,7 +149,12 @@ function website(b) {
 function social(b) {
   const f = b.font, c = b.c;
   const disp = `font-family:'${f.display}';font-weight:${f.weight}`;
-  const tile1 = svgBox(400, 400, `${b.key === "torch" || b.key === "flag-torch" || b.key === "sunset-o" ? nameBlock(b, 200, 70, 320, c.onPrimary, c.primary) : `<g transform="translate(120 40) scale(.4)">${b.mark(uid("t"))}</g>${nameBlock(b, 200, 210, 300, c.onPrimary, c.primary)}`}`, uid("tile"), c.primary);
+  const onAccent = b.key === "sunset-o" || b.key === "tulip" ? "#FFFFFF" : c.primary;
+  const integrated = b.key === "torch" || b.key === "flag-torch" || b.key === "sunset-o";
+  const tile1 = svgBox(400, 400, integrated
+    ? nameBlock(b, 200, b.key === "sunset-o" ? 110 : 60, 330, c.onPrimary, c.primary)
+    : `<g transform="translate(130 36) scale(.35)">${b.mark(uid("t"))}</g>${nameBlock(b, 200, 200, 300, c.onPrimary, c.primary)}`, uid("tile"), c.primary);
+  const up = f.upper ? "text-transform:uppercase" : "";
   return `<figure class="mock">
     <div class="phone">
       <div class="ig-head">
@@ -148,8 +163,11 @@ function social(b) {
       </div>
       <div class="ig-grid">
         <div class="tile">${tile1}</div>
-        <div class="tile" style="background:${c.accent};color:${b.key === "sunset-o" || b.key === "tulip" ? "#FFFFFF" : c.primary}"><div class="tile-text" style="${disp};${f.upper ? "text-transform:uppercase" : ""}">Ward&nbsp;3,<br>let's get to work.</div></div>
-        <div class="tile" style="background:${c.light}">${markSvg(b, "tile-mark")}</div>
+        <div class="tile" style="background:${c.accent};color:${onAccent}"><div class="tile-text" style="${disp};${up}">Ward&nbsp;3,<br>let's get to work.</div></div>
+        <div class="tile" style="background:${c.soft}">${markSvg(b, "tile-mark")}</div>
+        <div class="tile" style="background:${c.soft}"><div class="tile-sign">${conceptById(b.concept).sign()}</div></div>
+        <div class="tile" style="background:${c.light};color:${c.onLight};box-shadow:inset 0 0 0 1px ${c.soft}"><div class="tile-text small" style="${disp};${up}">Knock doors<br>with us this<br><span style="color:${c.accent === "#F6C94A" ? c.primary : c.accent}">Saturday.</span></div></div>
+        <div class="tile" style="background:${c.primary}">${markSvg(b, "tile-mark")}</div>
       </div>
     </div>
     <figcaption>Social · profile picture and launch posts</figcaption></figure>`;
@@ -172,19 +190,21 @@ function pinAndSticker(b) {
 
 function poleBanner(b) {
   const c = b.c, W = 300, H = 760;
-  const integrated = b.key === "torch" || b.key === "flag-torch" || b.key === "sunset-o";
-  const top = integrated
-    ? `${T("VOTE", { x: 150, y: 120, font: b.font.display, weight: b.font.weight, size: 60, fill: c.accent, ls: 16, anchor: "middle", fit: 150 })}${nameBlock(b, 150, 210, 250, c.onPrimary, c.primary)}`
-    : `<g transform="translate(50 50) scale(.5)">${b.mark(uid("pb"))}</g>${nameBlock(b, 150, 300, 250, c.onPrimary, c.primary)}`;
-  const body = `${top}
-    <rect x="60" y="${integrated ? 520 : 480}" width="180" height="4" fill="${c.accent}"/>
-    ${T("CITY COUNCIL", { x: 150, y: integrated ? 590 : 560, font: b.font.display === "Fraunces" ? "Inter" : b.font.display, weight: 700, size: 40, fill: c.onPrimary, ls: 4, anchor: "middle", fit: 220 })}
-    ${T("WARD 3", { x: 150, y: integrated ? 680 : 660, font: b.font.display === "Fraunces" ? "Fraunces" : b.font.display, weight: 800, size: 80, fill: c.accent, ls: 4, anchor: "middle", fit: 200 })}`;
-  const one = svgBox(W, H, body, uid("pole"), c.primary);
+  const f2 = b.font.display === "Fraunces" ? "Inter" : b.font.display;
+  const L = b.key === "torch" || b.key === "flag-torch"
+    ? { top: `${T("VOTE", { x: 150, y: 128, font: b.font.display, weight: b.font.weight, size: 60, fill: c.accent, ls: 18, anchor: "middle", fit: 140 })}${nameBlock(b, 150, 172, 270, c.onPrimary, c.primary)}`, rule: 392, council: 462, ward: 568, dem: 646 }
+    : b.key === "sunset-o"
+    ? { top: `${T("VOTE", { x: 150, y: 128, font: b.font.display, weight: b.font.weight, size: 60, fill: c.accent, ls: 18, anchor: "middle", fit: 140 })}${nameBlock(b, 150, 212, 262, c.onPrimary, c.primary)}`, rule: 392, council: 462, ward: 568, dem: 646 }
+    : { top: `<g transform="translate(60 64) scale(.45)">${b.mark(uid("pb"))}</g>${nameBlock(b, 150, 286, 250, c.onPrimary, c.primary)}`, rule: 440, council: 506, ward: 600, dem: 664 };
+  const body = `${L.top}
+    <rect x="70" y="${L.rule}" width="160" height="4" fill="${c.accent}"/>
+    ${T("CITY COUNCIL", { x: 150, y: L.council, font: f2, weight: 700, size: 40, fill: c.onPrimary, ls: 4, anchor: "middle", fit: 220 })}
+    ${T("WARD 3", { x: 150, y: L.ward, font: b.font.display, weight: b.font.display === "Fraunces" ? 800 : b.font.weight, size: 80, fill: c.accent, ls: 4, anchor: "middle", fit: 210 })}
+    ${T("DEMOCRAT", { x: 150, y: L.dem, font: f2, weight: 600, size: 26, fill: c.onPrimary, ls: 8, anchor: "middle", fit: 150, attr: { opacity: ".75" } })}`;
   return `<figure class="mock">
     <div class="pole-scene">
-      <div class="pole"><div class="lamp"></div></div>
-      <div class="pole-banners"><div class="pb">${one}</div><div class="pb">${svgBox(W, H, body, uid("pole"), c.primary)}</div></div>
+      <div class="pole"><div class="lamp-arm"></div><div class="lamp-head"></div></div>
+      <div class="pole-banners"><div class="arm top"></div><div class="arm bottom"></div><div class="pb">${svgBox(W, H, body, uid("pole"), c.primary)}</div><div class="pb">${svgBox(W, H, body, uid("pole"), c.primary)}</div></div>
     </div>
     <figcaption>Street pole banners · 30 × 76 in. pair</figcaption></figure>`;
 }
@@ -196,7 +216,7 @@ function doorHanger(b) {
     <rect width="${W}" height="520" fill="${c.primary}"/>
     <circle cx="180" cy="78" r="44" fill="#7A4F33"/>
     <rect x="176" y="0" width="8" height="40" fill="#7A4F33"/>
-    ${integrated ? nameBlock(b, 180, 170, 300, c.onPrimary, c.primary) : `<g transform="translate(110 140) scale(.35)">${b.mark(uid("dh"))}</g>${nameBlock(b, 180, 300, 290, c.onPrimary, c.primary)}`}
+    ${integrated ? nameBlock(b, 180, b.key === "sunset-o" ? 255 : 220, 300, c.onPrimary, c.primary) : `<g transform="translate(110 140) scale(.35)">${b.mark(uid("dh"))}</g>${nameBlock(b, 180, 300, 290, c.onPrimary, c.primary)}`}
     <rect y="520" width="${W}" height="${H - 520}" fill="${c.light}"/>
     <rect y="514" width="${W}" height="8" fill="${c.accent}"/>
     ${T("CITY COUNCIL · WARD 3", { x: 180, y: 590, font: b.font.display === "Fraunces" ? "Inter" : b.font.display, weight: 800, size: 30, fill: c.onLight, ls: 3, anchor: "middle", fit: 300 })}
@@ -205,7 +225,7 @@ function doorHanger(b) {
     <rect x="40" y="790" width="280" height="60" rx="6" fill="${c.primary}"/>
     ${T(b.url, { x: 180, y: 829, font: "Inter", weight: 700, size: 20, fill: c.onPrimary, anchor: "middle", fit: 230 })}`;
   return `<figure class="mock">
-    <div class="dh-scene"><div class="door"><div class="knob"></div><div class="dh">${svgBox(W, H, body, uid("dh"))}</div></div></div>
+    <div class="dh-scene"><div class="door"><div class="dh">${svgBox(W, H, body, uid("dh"))}<div class="knob"></div></div></div></div>
     <figcaption>Door hanger · 4.25 × 11 in. for canvassing</figcaption></figure>`;
 }
 
