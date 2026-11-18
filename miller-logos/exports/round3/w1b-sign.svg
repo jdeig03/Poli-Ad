@@ -1,0 +1,26 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" data-id="w1b-sign"><style>@import url('https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&amp;family=Oswald:wght@500;600;700&amp;family=Barlow+Semi+Condensed:wght@600;700;800&amp;family=Archivo+Black&amp;family=Bebas+Neue&amp;family=Inter:wght@500;600;700;800&amp;family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&amp;family=Poppins:wght@600;700;800&amp;family=Outfit:wght@600;700;800&amp;display=swap');</style><rect width="1200" height="900" fill="#0D2747"></rect>
+      <defs><clipPath id="w1bs-c"><rect width="1200" height="630"></rect></clipPath></defs><g clip-path="url(#w1bs-c)"><path d="M600 630 L-499.46 595.45 L-493.18 507.73 Z" fill="#143561"></path><path d="M600 630 L-483.35 439.33 L-464.66 353.4 Z" fill="#143561"></path><path d="M600 630 L-445.19 287.09 L-414.45 204.7 Z" fill="#143561"></path><path d="M600 630 L-385.75 141.84 L-343.6 64.66 Z" fill="#143561"></path><path d="M600 630 L-306.24 6.52 L-253.54 -63.88 Z" fill="#143561"></path><path d="M600 630 L-208.29 -116.1 L-146.1 -178.29 Z" fill="#143561"></path><path d="M600 630 L-93.88 -223.54 L-23.48 -276.24 Z" fill="#143561"></path><path d="M600 630 L34.66 -313.6 L111.84 -355.75 Z" fill="#143561"></path><path d="M600 630 L174.7 -384.45 L257.09 -415.19 Z" fill="#143561"></path><path d="M600 630 L323.4 -434.66 L409.33 -453.35 Z" fill="#143561"></path><path d="M600 630 L477.73 -463.18 L565.45 -469.46 Z" fill="#143561"></path><path d="M600 630 L634.55 -469.46 L722.27 -463.18 Z" fill="#143561"></path><path d="M600 630 L790.67 -453.35 L876.6 -434.66 Z" fill="#143561"></path><path d="M600 630 L942.91 -415.19 L1025.3 -384.45 Z" fill="#143561"></path><path d="M600 630 L1088.16 -355.75 L1165.34 -313.6 Z" fill="#143561"></path><path d="M600 630 L1223.48 -276.24 L1293.88 -223.54 Z" fill="#143561"></path><path d="M600 630 L1346.1 -178.29 L1408.29 -116.1 Z" fill="#143561"></path><path d="M600 630 L1453.54 -63.88 L1506.24 6.52 Z" fill="#143561"></path><path d="M600 630 L1543.6 64.66 L1585.75 141.84 Z" fill="#143561"></path><path d="M600 630 L1614.45 204.7 L1645.19 287.09 Z" fill="#143561"></path><path d="M600 630 L1664.66 353.4 L1683.35 439.33 Z" fill="#143561"></path><path d="M600 630 L1693.18 507.73 L1699.46 595.45 Z" fill="#143561"></path></g>
+      <defs><clipPath id="w1bs-sun"><rect width="1200" height="630"></rect></clipPath></defs>
+      <circle cx="600" cy="630" r="150" fill="#F4AF2D" clip-path="url(#w1bs-sun)"></circle>
+      <g fill="#0D2747">
+    <rect x="530.5" y="624.15" width="29.26" height="5.85"></rect>
+    <rect x="535.99" y="530.88" width="18.29" height="93.63"></rect>
+    <rect x="530.13" y="524.66" width="30" height="6.95" rx="1.46"></rect>
+    <rect x="567.08" y="624.15" width="29.26" height="5.85"></rect>
+    <rect x="572.57" y="512" width="18.29" height="112.51"></rect>
+    <rect x="566.71" y="505.78" width="30" height="6.95" rx="1.46"></rect>
+    <rect x="603.66" y="624.15" width="29.26" height="5.85"></rect>
+    <rect x="609.14" y="512" width="18.29" height="112.51"></rect>
+    <rect x="603.29" y="505.78" width="30" height="6.95" rx="1.46"></rect>
+    <rect x="640.24" y="624.15" width="29.26" height="5.85"></rect>
+    <rect x="645.73" y="530.88" width="18.29" height="93.63"></rect>
+    <rect x="639.87" y="524.66" width="30" height="6.95" rx="1.46"></rect></g>
+      <text x="625.24" y="160" font-family="Montserrat" font-weight="800" font-size="100.96" fill="#F4AF2D" letter-spacing="50.48" text-anchor="middle">GLEN</text>
+      <text x="600" y="392" font-family="Montserrat" font-weight="900" font-size="267.94" fill="#FFFFFF" text-anchor="middle">MILLER</text>
+      <rect y="630" width="1200" height="270" fill="#1C4E9A"></rect>
+      <path d="M0 700 Q 300 682 600 696 T 1200 690 L1200 704 Q 900 710 600 708 T 0 714 Z" fill="#58B2E7" opacity=".55"></path>
+      <path d="M0 758 Q 300 738 600 752 T 1200 744 L1200 762 Q 900 770 600 768 T 0 776 Z" fill="#58B2E7" opacity=".35"></path>
+      <rect x="443.2" y="644" width="280" height="9" rx="4.5" fill="#F4AF2D" opacity="1"></rect><rect x="505.92" y="657" width="224" height="7.8" rx="3.9" fill="#F4AF2D" opacity="0.88"></rect><rect x="505.92" y="670" width="168" height="6.6" rx="3.3" fill="#F4AF2D" opacity="0.76"></rect><rect x="552.96" y="683" width="112" height="5.4" rx="2.7" fill="#F4AF2D" opacity="0.64"></rect>
+      <rect y="630" width="1200" height="4" fill="#F4AF2D"></rect>
+      <text x="602.9" y="812" font-family="Montserrat" font-weight="800" font-size="67.58" fill="#FFFFFF" letter-spacing="5.79" text-anchor="middle">CITY COUNCIL · WARD 3</text>
+      <text x="602.46" y="866" font-family="Montserrat" font-weight="700" font-size="24.63" fill="#F4AF2D" letter-spacing="4.93" text-anchor="middle">DEMOCRAT  ·  A NEW DAY FOR EVANSVILLE</text></svg>
