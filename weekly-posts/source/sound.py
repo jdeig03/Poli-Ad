@@ -1,5 +1,5 @@
-# Sound for the group-chat Reel, built from real sound-effect files (uisfx, CC0, see sfx/README.txt).
-# Only what a phone makes in this scene: key clicks, message sent, message received, tapbacks.
+# Sound for the group-chat Reel, built from the client's own iPhone screen recording (see sfx/README.txt):
+# real keyboard clicks, the real "sent" sound, and "received" = the sent sound reversed.
 # No music, no reverb. Usage: python3 sound.py timeline.json out.wav
 import json, sys, wave, os
 import numpy as np
@@ -12,28 +12,31 @@ rng = np.random.default_rng(4)
 
 def load(name):
     w = wave.open(os.path.join(HERE, 'sfx', name + '.wav')); x = np.frombuffer(w.readframes(w.getnframes()), '<i2') / 32768.0; w.close()
-    a = np.abs(x); on = np.where(a > a.max() * 0.01)[0]          # trim leading silence so sounds land on the frame
-    x = x[max(0, on[0] - 24):]
     return x / np.max(np.abs(x))
-KEY, SPACE, SENT, RECV, TAP = (load(n) for n in ('studio_typing', 'rubber_typing', 'studio_send', 'studio_receive', 'studio_reaction'))
+KEYS = [load(f'iphone_key_{k:02d}') for k in range(13)]
+SENT, RECV = load('iphone_send'), load('iphone_receive')
+SENT_PEAK = np.argmax(np.abs(SENT)) / SR            # where the sent sound hits hardest
+RECV_PEAK = np.argmax(np.abs(RECV)) / SR            # reversed: the hit is near the end
 
 def put(sig, t0, g=1.0):
     i0 = int(round(t0 * SR))
-    if i0 < 0 or i0 >= N: return
+    if i0 < 0: sig = sig[-i0:]; i0 = 0
+    if i0 >= N: return
     sig = sig[:N - i0] * g; L[i0:i0 + len(sig)] += sig; R[i0:i0 + len(sig)] += sig
 
-texts = {'ty1': 'hold on', 'ty2': 'are you trying to close the library?', 'ty3': 'no. alex wants it open til 8 on weeknights'}
-for key, txt in texts.items():
-    for i, tc in enumerate(T[key]):
-        put(SPACE if txt[i] == ' ' else KEY, tc, rng.uniform(0.8, 1.0) * 0.5)
+# keyboard: a different real click for each keypress, so it never sounds looped
+for key in ('ty1', 'ty2', 'ty3'):
+    for tc in T[key]:
+        put(KEYS[rng.integers(len(KEYS))], tc - 0.004, rng.uniform(0.85, 1.0) * 0.32)
+# messages: the sent sound when you send; the reversed sound peaks as an incoming bubble lands
 for kind, who, td, ts, tb in MSG:
     if ts is None or ts < 0: continue
-    put(RECV if kind == 'in' else SENT, ts - (0 if kind == 'in' else 0.02), 0.6 if kind == 'in' else 0.55)
-    if tb: put(TAP, tb, 0.35)
+    if kind == 'in': put(RECV, ts - RECV_PEAK + 0.03, 0.85)
+    else: put(SENT, ts - SENT_PEAK, 1.0)
 
 mix = np.stack([L, R], 1)
 mix *= 0.71 / np.max(np.abs(mix))                                  # peaks at -3 dBFS
 pcm = np.ascontiguousarray(np.round(mix * 8388607).astype('<i4'))
 with wave.open(sys.argv[2], 'wb') as w:
     w.setnchannels(2); w.setsampwidth(3); w.setframerate(SR); w.writeframes(pcm.view(np.uint8).reshape(-1, 4)[:, :3].tobytes())
-print('duration', round(N / SR, 2))
+print('duration', round(N / SR, 2), '| sent peak at', round(SENT_PEAK, 3), 's, received peak at', round(RECV_PEAK, 3), 's')
