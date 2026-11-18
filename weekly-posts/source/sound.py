@@ -27,7 +27,7 @@ def put(sig, t0, g=1.0):
 # keyboard: a different real click for each keypress, so it never sounds looped
 for key in ('ty1', 'ty2', 'ty3'):
     for tc in T[key]:
-        put(KEYS[rng.integers(len(KEYS))], tc - 0.004, rng.uniform(0.85, 1.0) * 0.32)
+        put(KEYS[rng.integers(len(KEYS))], tc - 0.004, rng.uniform(0.85, 1.0) * 0.1)
 # messages: the sent sound when you send; the reversed sound peaks as an incoming bubble lands
 for kind, who, td, ts, tb in MSG:
     if ts is None or ts < 0: continue
