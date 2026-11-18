@@ -1,0 +1,83 @@
+<title>Miller Finalists Round 2</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@500;600;700&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&display=swap">
+<style>
+/* Layout: two chapters (#1 River Rise, #2 Flag Torch). Each variation gets a row: yard sign beside its notes, banner full width below. */
+:root {
+  --bg: #EEF1F5; --panel: #FFFFFF; --fg: #13213A; --muted: #5A6880; --line: #D5DCE6; --accent: #1C4E9A; --gold: #B98310;
+  --display: "Bebas Neue", "Oswald", Impact, sans-serif; --body: "Inter", system-ui, sans-serif;
+}
+@media (prefers-color-scheme: dark) { :root:not([data-theme="light"]) { --bg: #0C1320; --panel: #141E30; --fg: #E6ECF5; --muted: #93A1B8; --line: #26344B; --accent: #7FA8E8; --gold: #F2C14E; color-scheme: dark } }
+:root[data-theme="dark"] { --bg: #0C1320; --panel: #141E30; --fg: #E6ECF5; --muted: #93A1B8; --line: #26344B; --accent: #7FA8E8; --gold: #F2C14E; color-scheme: dark }
+body { background: var(--bg); color: var(--fg); font-family: var(--body); font-size: 15px; line-height: 1.55; }
+.page { max-width: 1200px; margin: 0 auto; padding-block: 40px 64px; padding-left: max(16px, env(safe-area-inset-left, 0px)); padding-right: max(16px, env(safe-area-inset-right, 0px)); }
+header { display: grid; gap: 10px; margin-bottom: 20px; }
+.eyebrow { font-size: 12px; font-weight: 700; letter-spacing: .16em; text-transform: uppercase; color: var(--accent); }
+h1 { font-family: var(--display); font-weight: 400; font-size: clamp(44px, 8vw, 84px); line-height: .92; margin: 0; }
+.lede { max-width: 70ch; color: var(--muted); margin: 0; }
+.chapter { margin-top: 44px; }
+.chapter-head { display: grid; gap: 6px; padding-bottom: 14px; border-bottom: 2px solid var(--fg); }
+.chapter-head h2 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 46px; line-height: 1; letter-spacing: .01em; }
+.chapter-head p { margin: 0; color: var(--muted); max-width: 72ch; }
+.v { display: grid; gap: 16px; padding-block: 28px; border-bottom: 1px solid var(--line); }
+.v-head { display: flex; align-items: baseline; gap: 12px; flex-wrap: wrap; }
+.v-head h3 { margin: 0; font-family: var(--display); font-weight: 400; font-size: 32px; letter-spacing: .02em; }
+.row { display: grid; grid-template-columns: minmax(0, 1.15fr) minmax(0, 1fr); gap: 26px; align-items: start; }
+.art svg { width: 100%; height: auto; display: block; border-radius: 4px; box-shadow: 0 1px 2px rgba(10,20,40,.12), 0 8px 24px rgba(10,20,40,.12); }
+.cap { font-size: 12px; color: var(--muted); margin-top: 8px; }
+.notes { display: grid; gap: 12px; min-width: 0; }
+.notes p { margin: 0; max-width: 60ch; }
+.notes ul { margin: 0; padding-left: 18px; display: grid; gap: 6px; color: var(--muted); }
+.fix { font-size: 12px; font-weight: 800; letter-spacing: .12em; text-transform: uppercase; color: var(--gold); }
+footer { margin-top: 36px; color: var(--muted); font-size: 13px; max-width: 80ch; }
+@media (max-width: 760px) { .row { grid-template-columns: 1fr; } }
+</style>
+
+<div class="page">
+  <header>
+    <div class="eyebrow">Evansville City Council · Ward 3 · Round 2</div>
+    <h1>Miller Finalists Round 2</h1>
+    <p class="lede">Three new takes on each of the two favorites. #1 (River Rise) keeps its simplicity and loses the empty white space. #2 (Flag Torch) moves GLEN somewhere better or drops it. Each version is shown as a 24 × 18 in. yard sign and a 3:1 banner.</p>
+  </header>
+  <main id="list"></main>
+  <footer>Print-ready PNGs and SVGs for every version are in <code>miller-logos/exports/round2</code>. Add Indiana's "Paid for by" disclaimer before anything goes to print.</footer>
+</div>
+
+<script src="logos.js"></script>
+<script src="variants.js"></script>
+<script>
+const CH = {
+  1: { title: "#1 · River Rise", text: "His note: likes the simplicity, not the empty space. Each version keeps the same sunrise emblem, colors and lettering, and fills the sign in a different way." },
+  2: { title: "#2 · Flag Torch", text: "His note: doesn't like where GLEN sits, and might not want it at all. One version drops it, one moves it into the flag's own design, and one moves it to the bottom band." },
+};
+const FIX = {
+  "1a": ["Emblem beside the name, the same height as the name block", "Tagline fills the space under the gold rule", "Bigger, bolder office band"],
+  "1b": ["The emblem's sunrise becomes the whole background", "Sun shimmer on the water and soft rays fill every corner", "Most eye-catching of the three on a billboard"],
+  "1c": ["GLEN and MILLER span the full width for maximum size", "Emblem sits on the dividing line as a seal", "Gold rules frame GLEN so the spacing looks deliberate"],
+  "2a": ["No first name; MILLER is bigger and centered", "A faint light burst from the torch fills the old GLEN corner", "Cleanest read from a moving car"],
+  "2b": ["GLEN arcs over the star like INDIANA does on the flag", "First name kept, but as part of the emblem", "Rewards anyone who knows the flag"],
+  "2c": ["White sign: pops on green lawns and is cheaper to print", "Navy torch, gold flame and rays", "Full name in the band as a signature line"],
+};
+(async () => {
+  const fams = ['700 100px Montserrat', '800 100px Montserrat', '900 100px Montserrat', '700 100px Oswald', '600 100px Oswald', '500 100px Oswald'];
+  try { await Promise.all(fams.map(f => document.fonts.load(f))); await document.fonts.ready; } catch (e) {}
+  let html = "";
+  for (const g of [1, 2]) {
+    html += `<section class="chapter"><div class="chapter-head"><h2>${CH[g].title}</h2><p>${CH[g].text}</p></div>`;
+    for (const v of ROUND2.VARIANTS.filter(x => x.group === g)) {
+      html += `<article class="v">
+        <div class="v-head"><h3>${v.title}</h3></div>
+        <div class="row">
+          <div class="art">${v.sign()}<div class="cap">Yard sign · 24 × 18 in.</div></div>
+          <div class="notes"><div class="fix">What changed</div><p>${v.note}</p><ul>${FIX[v.id].map(f => `<li>${f}</li>`).join("")}</ul></div>
+        </div>
+        <div class="art">${v.banner()}<div class="cap">Banner / billboard · 3:1</div></div>
+      </article>`;
+    }
+    html += `</section>`;
+  }
+  const list = document.getElementById("list");
+  list.innerHTML = html;
+  ROUND2.layoutVariants(list);
+})();
+</script>
