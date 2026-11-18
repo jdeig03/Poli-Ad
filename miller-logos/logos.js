@@ -3,7 +3,7 @@
    and a 4:3 yard sign (1200x900). Text is fitted to exact widths after the
    web fonts load, so every lockup locks up the same way in any browser. */
 
-const FONT_CSS = "https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@500;600;700&family=Barlow+Semi+Condensed:wght@600;700;800&family=Archivo+Black&family=Bebas+Neue&family=Inter:wght@500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&display=swap";
+const FONT_CSS = "https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@500;600;700&family=Barlow+Semi+Condensed:wght@600;700;800&family=Archivo+Black&family=Bebas+Neue&family=Inter:wght@500;600;700;800&family=Fraunces:opsz,wght@9..144,600;9..144,700;9..144,800&family=Poppins:wght@600;700;800&family=Outfit:wght@600;700;800&display=swap";
 
 const P = (n) => +n.toFixed(2);
 const star = (cx, cy, r, fill, rot = 0) => {
@@ -248,116 +248,148 @@ const concept3 = {
 };
 
 /* ------------------------------------------------------------------ */
-/* 4 · SCOTT — "Cardinal": Indiana's state bird perched on the name   */
+/* 4 · SCOTT — "Sunset O": the O in SCOTT is the sun setting over the  */
+/* Ohio, in the evening palette.                                        */
 /* ------------------------------------------------------------------ */
-const C4 = { bg: "#0E1B33", red: "#D2202F", red2: "#A3121F", red3: "#E8433F", mask: "#05080F", beak: "#F49A2C", white: "#FFFFFF", pale: "#AAB6CC" };
-// Faceted cardinal, facing left, feet at (0,0), body drawn upward.
-function cardinal() {
-  const pts = (a) => a.map(p => p.join(" ")).join(" L");
-  const g = (d, f) => `<path d="M${d}Z" fill="${f}"/>`;
+const C4 = { bg: "#0F1C3A", sky: "#E2572F", sky2: "#C9402A", sun: "#FFC145", ray: "#F58A33", water: "#1D3F7E", ribbon: "#FFFFFF", ring: "#FFC145", white: "#FFFFFF", cream: "#FFE7C2", pale: "#A9B6D3" };
+// Generic river-and-sun roundel (shares its drawing with concept 1).
+function sunRoundel(uid, c) {
+  const H = 238;
+  let rays = "";
+  const n = 13;
+  for (let i = 0; i < n; i++) {
+    const a = Math.PI + (Math.PI / (n + 1)) * (i + 1), w = 0.06, r0 = 100, r1 = 300;
+    const p = (ang, r) => `${P(200 + r * Math.cos(ang))} ${P(H + r * Math.sin(ang))}`;
+    rays += `<path d="M${p(a - w * 0.35, r0)}L${p(a - w, r1)}L${p(a + w, r1)}L${p(a + w * 0.35, r0)}Z" fill="${c.ray}"/>`;
+  }
+  const B = (t, a, b, cc, d) => (1 - t) ** 3 * a + 3 * (1 - t) ** 2 * t * b + 3 * (1 - t) * t * t * cc + t ** 3 * d;
+  const ribbon = (p0, c1, c2, p3, w0, w1) => {
+    const L = [], R = [];
+    for (let i = 0; i <= 48; i++) {
+      const t = i / 48, e = 1e-3, f = (tt, k) => B(tt, p0[k], c1[k], c2[k], p3[k]);
+      const x = f(t, 0), y = f(t, 1);
+      let nx = -(f(Math.min(1, t + e), 1) - f(Math.max(0, t - e), 1)), ny = f(Math.min(1, t + e), 0) - f(Math.max(0, t - e), 0);
+      const nl = Math.hypot(nx, ny); nx /= nl; ny /= nl;
+      const w = (w0 * (1 - t) ** 1.2 + w1 * t) / 2;
+      L.push([x + nx * w, y + ny * w]); R.unshift([x - nx * w, y - ny * w]);
+    }
+    return `<path d="M${L.concat(R).map(p => p.map(P).join(" ")).join(" L")}Z" fill="${c.ribbon}"/>`;
+  };
+  const band = (k) => ribbon([-40, 292 + k * 62], [140, 280 + k * 66], [250, 268 + k * 40], [300 + k * 26, H + 3], 30 + k * 12, 3);
   return `
-    <g transform="translate(-112 -214)">
-      ${g(pts([[150, 105], [118, 0], [178, 58], [190, 112]]), C4.red2)}
-      ${g(pts([[118, 0], [92, 40], [150, 105], [178, 58]]), C4.red3)}
-      ${g(pts([[92, 40], [74, 78], [104, 128], [150, 105]]), C4.red)}
-      ${g(pts([[74, 78], [78, 135], [104, 128]]), C4.red2)}
-      ${g(pts([[150, 105], [104, 128], [92, 170], [138, 214], [196, 176], [190, 112]]), C4.red)}
-      ${g(pts([[104, 128], [78, 135], [80, 180], [92, 170]]), C4.red3)}
-      ${g(pts([[80, 180], [104, 210], [138, 214], [92, 170]]), C4.red3)}
-      ${g(pts([[150, 120], [196, 132], [232, 196], [196, 214], [150, 176]]), C4.red2)}
-      ${g(pts([[196, 214], [232, 196], [292, 300], [270, 312]]), C4.red2)}
-      ${g(pts([[196, 214], [270, 312], [248, 318], [184, 214]]), C4.red)}
-      ${g(pts([[92, 40], [62, 64], [56, 88], [74, 102], [104, 104], [106, 78]]), C4.mask)}
-      ${g(pts([[62, 64], [22, 86], [58, 98]]), C4.beak)}
-      ${g(pts([[58, 98], [22, 86], [60, 108]]), "#D97A16")}
-      <circle cx="86" cy="70" r="7.5" fill="${C4.white}"/><circle cx="84" cy="70" r="4.2" fill="${C4.mask}"/>
-      <path d="M120 212 L114 232 M144 212 L146 232" stroke="${C4.mask}" stroke-width="6" stroke-linecap="round"/>
-    </g>`;
+  <defs>
+    <clipPath id="${uid}c"><circle cx="200" cy="200" r="176"/></clipPath>
+    <clipPath id="${uid}s"><rect x="0" y="0" width="400" height="${H}"/></clipPath>
+  </defs>
+  <circle cx="200" cy="200" r="200" fill="${c.ring}"/>
+  <circle cx="200" cy="200" r="184" fill="${c.bg}"/>
+  <g clip-path="url(#${uid}c)">
+    <rect width="400" height="${H}" fill="${c.sky}"/>
+    <rect y="${H - 70}" width="400" height="70" fill="${c.sky2}" opacity=".0"/>
+    <g clip-path="url(#${uid}s)">${rays}<circle cx="200" cy="${H}" r="88" fill="${c.sun}"/></g>
+    <rect y="${H}" width="400" height="${400 - H}" fill="${c.water}"/>
+    ${band(0)}${band(1)}${band(2)}
+    <rect y="${H}" width="400" height="5" fill="${c.bg}"/>
+  </g>`;
 }
-function cardinalWordmark(cx, base, width, color, last = "MILLER", first = "SCOTT") {
-  return `<g class="birdmark" data-cx="${cx}" data-base="${base}" data-width="${width}" data-color="${color}" data-first="${first}" data-last="${last}"></g>`;
+function sunOWordmark(o) {
+  return `<g class="sunomark" data-o='${JSON.stringify(o)}'></g>`;
 }
-function layoutBird(g) {
-  const cx = +g.dataset.cx, base = +g.dataset.base, width = +g.dataset.width, color = g.dataset.color;
-  const m = measure("400 100px 'Archivo Black'", "MILLER");
-  const k = width / m.inkW, size = 100 * k;
-  const x0 = cx - width / 2 - m.inkLeft * k;
-  const capH = m.ascent * k;
-  const rM = measure("400 100px 'Archivo Black'", "MILLE");
-  const rx = x0 + rM.adv * k; // start of R
-  const R = measure("400 100px 'Archivo Black'", "R");
-  const birdScale = capH / 214 * 1.08;
-  const scott = capH * 0.42;
+function layoutSunO(g) {
+  const o = JSON.parse(g.dataset.o);
+  const font = "800 100px Poppins", ls = o.ls || 0; // ls in em/100
+  const word = o.text, oi = word.indexOf("O");
+  const full = measure(font, word);
+  const pre = measure(font, word.slice(0, oi)), O = measure(font, "O");
+  const nChars = word.length;
+  const total = full.adv + ls * (nChars - 1);
+  const k = o.width / total, size = 100 * k;
+  const x0 = o.anchor === "middle" ? o.x - o.width / 2 : o.x;
+  const before = word.slice(0, oi), after = word.slice(oi + 1);
+  const xO = x0 + (pre.adv + ls * oi) * k;
+  const cx = xO + (O.inkLeft + O.inkW / 2) * k;
+  const capH = measure(font, "H").ascent * k;
+  const cy = o.y - capH / 2;
+  const r = Math.max(O.inkW, O.ascent + O.descent) / 2 * k * 1.06;
+  const sc = r / 200;
+  const xAfter = xO + (O.adv + ls) * k;
   g.innerHTML = `
-    <text x="${P(x0)}" y="${base}" font-family="'Archivo Black'" font-size="${P(size)}" fill="${color}">MILLER</text>
-    <text x="${P(cx - width / 2)}" y="${P(base - capH - capH * 0.16)}" font-family="'Archivo Black'" font-size="${P(scott)}" letter-spacing="${P(scott * 0.32)}" fill="${C4.red}">SCOTT</text>
-    <g transform="translate(${P(rx + R.inkW * k * 0.38)} ${P(base - capH + 2)}) scale(${P(birdScale)})">${cardinal()}</g>`;
+    <text x="${P(x0)}" y="${o.y}" font-family="Poppins" font-weight="800" font-size="${P(size)}" letter-spacing="${P(ls * k)}" fill="${o.fill}">${before}</text>
+    <g transform="translate(${P(cx - 200 * sc)} ${P(cy - 200 * sc)}) scale(${P(sc)})">${sunRoundel(o.uid, { ...C4, bg: o.bg })}</g>
+    <text x="${P(xAfter)}" y="${o.y}" font-family="Poppins" font-weight="800" font-size="${P(size)}" letter-spacing="${P(ls * k)}" fill="${o.fill}" xml:space="preserve">${after.replace(/ /g, "&#160;")}</text>`;
 }
 const concept4 = {
-  id: "scott-cardinal", num: "4", name: "Scott", title: "The Cardinal",
+  id: "scott-sunset-o", num: "4", name: "Scott", title: "Sunset on the Ohio",
   banner() {
     const b = `
-      ${cardinalWordmark(530, 362, 880, C4.white)}
-      <rect x="1080" y="70" width="4" height="360" fill="${C4.red}"/>
-      ${T("CITY COUNCIL", { x: 1124, y: 168, font: "Inter", weight: 800, size: 54, fill: C4.white, ls: 5, fit: 316 })}
-      ${T("WARD 3", { x: 1121, y: 318, font: "Archivo Black", weight: 400, size: 110, fill: C4.red, ls: 2, fit: 320 })}
-      ${T("DEMOCRAT", { x: 1125, y: 392, font: "Inter", weight: 700, size: 30, fill: C4.pale, ls: 12, fit: 316 })}
-      ${T("HOMEGROWN  ·  HARD-WORKING  ·  HERE FOR YOU", { x: 90, y: 440, font: "Inter", weight: 700, size: 28, fill: C4.pale, ls: 7, fit: 880 })}`;
+      ${sunOWordmark({ text: "SCOTT MILLER", x: 80, y: 318, width: 1340, fill: C4.white, bg: C4.bg, uid: "b4", ls: 1 })}
+      <rect x="80" y="374" width="1340" height="3" fill="${C4.ring}" opacity=".9"/>
+      ${T("CITY COUNCIL · WARD 3", { x: 80, y: 440, font: "Poppins", weight: 700, size: 40, fill: C4.white, ls: 8, fit: 600 })}
+      ${T("DEMOCRAT  ·  A BRIGHTER EVANSVILLE", { x: 1420, y: 437, font: "Poppins", weight: 600, size: 30, fill: C4.cream, ls: 6, anchor: "end", fit: 560 })}`;
     return svgWrap(1500, 500, C4.bg, b, "4-banner");
   },
   sign() {
     const b = `
-      ${cardinalWordmark(560, 585, 960, C4.white)}
-      <rect y="660" width="1200" height="240" fill="${C4.red}"/>
-      ${T("CITY COUNCIL · WARD 3", { x: 600, y: 790, font: "Archivo Black", weight: 400, size: 100, fill: C4.white, ls: 4, anchor: "middle", fit: 980 })}
-      ${T("DEMOCRAT  ·  HOMEGROWN FOR EVANSVILLE", { x: 600, y: 855, font: "Inter", weight: 800, size: 36, fill: C4.white, ls: 8, anchor: "middle", fit: 740 })}`;
+      ${sunOWordmark({ text: "SCOTT", x: 600, y: 390, width: 1000, fill: C4.white, bg: C4.bg, uid: "s4", ls: 2, anchor: "middle" })}
+      ${T("MILLER", { x: 600, y: 590, font: "Poppins", weight: 800, size: 200, fill: C4.white, ls: 40, anchor: "middle", fit: 1000 })}
+      <rect y="665" width="1200" height="235" fill="${C4.sky}"/>
+      <rect y="665" width="1200" height="8" fill="${C4.sun}"/>
+      ${T("CITY COUNCIL · WARD 3", { x: 600, y: 790, font: "Poppins", weight: 800, size: 90, fill: C4.white, ls: 4, anchor: "middle", fit: 960 })}
+      ${T("DEMOCRAT  ·  A BRIGHTER EVANSVILLE", { x: 600, y: 852, font: "Poppins", weight: 700, size: 34, fill: C4.bg, ls: 7, anchor: "middle", fit: 700 })}`;
     return svgWrap(1200, 900, C4.bg, b, "4-sign");
   },
 };
 
 /* ------------------------------------------------------------------ */
-/* 5 · SCOTT — "Hometown Star": Indiana, with Evansville marked        */
+/* 5 · SCOTT — "River S": the S is the Ohio's bend at Evansville,       */
+/* drawn as three parallel lines for Ward 3.                            */
 /* ------------------------------------------------------------------ */
-const C5 = { bg: "#FFFFFF", blue: "#1747A6", navy: "#0F2550", red: "#D62839", sky: "#DCE6F7" };
-// Indiana outline from real coordinates (lon, lat), projected.
-const IN_PTS = [[-87.53, 41.76], [-84.81, 41.76], [-84.81, 39.10], [-84.88, 39.06], [-84.83, 38.90], [-85.18, 38.69], [-85.43, 38.73], [-85.47, 38.52], [-85.70, 38.32], [-85.84, 38.26], [-85.91, 38.06], [-86.04, 37.96], [-86.27, 38.14], [-86.38, 38.13], [-86.51, 37.93], [-86.76, 37.90], [-86.82, 37.99], [-87.04, 37.88], [-87.13, 37.79], [-87.40, 37.94], [-87.57, 37.97], [-87.62, 37.83], [-87.92, 37.90], [-88.03, 37.80], [-88.09, 37.90], [-87.92, 38.15], [-87.94, 38.29], [-87.74, 38.47], [-87.66, 38.51], [-87.50, 38.73], [-87.53, 39.15], [-87.65, 39.15], [-87.53, 39.35], [-87.53, 41.76]];
-const EVV = [-87.57, 37.97];
-function projIN(scale, ox, oy) {
-  const f = ([lon, lat]) => [ox + (lon + 88.12) * scale, oy + (41.78 - lat) * scale * 1.27];
-  return { f, d: "M" + IN_PTS.map(p => f(p).map(P).join(" ")).join(" L") + " Z" };
+const C5 = { bg: "#FFFFFF", navy: "#0E2650", river: "#1B5FB4", river2: "#58B4E8", gold: "#E8A72C", muted: "#4F6385", band: "#0E2650" };
+function riverSWordmark(o) {
+  return `<g class="riversmark" data-o='${JSON.stringify(o)}'></g>`;
 }
-function emblemIndiana() {
-  const { f, d } = projIN(88, 54, 0);
-  const [ex, ey] = f(EVV);
-  return `
-    <path d="${d}" fill="${C5.blue}" stroke="${C5.blue}" stroke-width="10" stroke-linejoin="round"/>
-    <clipPath id="inclip"><path d="${d}"/></clipPath>
-    <g clip-path="url(#inclip)">${[1, 2, 3].map(i => `<circle cx="${P(ex)}" cy="${P(ey)}" r="${30 + 46 * i}" stroke="#FFFFFF" stroke-width="${9 - i * 2}" fill="none" opacity="${1 - i * 0.2}"/>`).join("")}</g>
-    <circle cx="${P(ex)}" cy="${P(ey)}" r="36" fill="#FFFFFF" stroke="${C5.blue}" stroke-width="6"/>
-    ${star(ex, ey + 2, 28, C5.red)}`;
+function layoutRiverS(g) {
+  const o = JSON.parse(g.dataset.o);
+  const font = "800 100px Outfit", ls = o.ls || 0;
+  const word = o.text;
+  const full = measure(font, word), S = measure(font, "S"), I = measure(font, "I"), Hm = measure(font, "H");
+  const total = full.adv + S.inkW * 0.22 + ls * (word.length - 1);
+  const k = o.width / total, size = 100 * k;
+  const x0 = o.anchor === "middle" ? o.x - o.width / 2 : o.x;
+  const capH = Hm.ascent * k, stem = I.inkW * k;
+  const T = stem * 1.3;
+  const over = capH * 0.03;
+  const W = S.inkW * k * 1.2, xs = x0 + S.inkLeft * k;
+  const top = o.y - capH - over, Hh = capH + over * 2;
+  const U = [[0.96, 0.16], [0.86, 0.04], [0.70, 0.0], [0.50, 0.0], [0.24, 0.0], [0.05, 0.10], [0.05, 0.27], [0.05, 0.44], [0.24, 0.48], [0.50, 0.52], [0.76, 0.56], [0.95, 0.60], [0.95, 0.76], [0.95, 0.92], [0.76, 1.0], [0.50, 1.0], [0.28, 1.0], [0.12, 0.94], [0.03, 0.83]];
+  const mp = ([u, v]) => `${P(xs + T / 2 + u * (W - T))} ${P(top + T / 2 + v * (Hh - T))}`;
+  let d = "M" + mp(U[0]);
+  for (let i = 1; i < U.length; i += 3) d += ` C ${mp(U[i])} ${mp(U[i + 1])} ${mp(U[i + 2])}`;
+  const xAfter = x0 + (S.adv + S.inkW * 0.22 + ls) * k;
+  g.innerHTML = `
+    <path d="${d}" fill="none" stroke="${C5.river}" stroke-width="${P(T)}"/>
+    <path d="${d}" fill="none" stroke="${o.bg}" stroke-width="${P(T * 0.6)}"/>
+    <path d="${d}" fill="none" stroke="${C5.river2}" stroke-width="${P(T * 0.22)}"/>
+    <text x="${P(xAfter)}" y="${o.y}" font-family="Outfit" font-weight="800" font-size="${P(size)}" letter-spacing="${P(ls * k)}" fill="${o.fill}" xml:space="preserve">${word.slice(1).replace(/ /g, "&#160;")}</text>`;
 }
 const concept5 = {
-  id: "scott-hometown-star", num: "5", name: "Scott", title: "Hometown Star",
+  id: "scott-river-s", num: "5", name: "Scott", title: "River S",
   banner() {
     const b = `
-      <g transform="translate(60 26) scale(0.95)">${emblemIndiana()}</g>
-      ${T("SCOTT", { x: 420, y: 190, font: "Bebas Neue", weight: 400, size: 150, fill: C5.red, ls: 18, fit: 470 })}
-      ${T("MILLER", { x: 418, y: 395, font: "Bebas Neue", weight: 400, size: 250, fill: C5.navy, ls: 6, fit: 650 })}
-      <rect x="1115" y="80" width="330" height="340" rx="0" fill="${C5.blue}"/>
-      ${T("CITY COUNCIL", { x: 1280, y: 160, font: "Bebas Neue", weight: 400, size: 60, fill: "#FFFFFF", ls: 4, anchor: "middle", fit: 270 })}
-      ${T("WARD", { x: 1280, y: 228, font: "Bebas Neue", weight: 400, size: 52, fill: C5.sky, ls: 14, anchor: "middle" })}
-      ${T("3", { x: 1280, y: 388, font: "Bebas Neue", weight: 400, size: 190, fill: "#FFFFFF", anchor: "middle" })}
-      ${T("EVANSVILLE  ·  DEMOCRAT  ·  HOMETOWN STRONG", { x: 422, y: 450, font: "Inter", weight: 700, size: 24, fill: C5.blue, ls: 6, fit: 650 })}`;
+      ${riverSWordmark({ text: "SCOTT MILLER", x: 96, y: 300, width: 1310, fill: C5.navy, bg: C5.bg, ls: 4 })}
+      <rect x="100" y="372" width="120" height="8" fill="${C5.gold}"/>
+      ${T("EVANSVILLE CITY COUNCIL · WARD 3", { x: 248, y: 384, font: "Outfit", weight: 700, size: 40, fill: C5.river, ls: 7, fit: 760 })}
+      ${T("DEMOCRAT", { x: 1406, y: 384, font: "Outfit", weight: 800, size: 40, fill: C5.navy, ls: 9, anchor: "end", fit: 240 })}`;
     return svgWrap(1500, 500, C5.bg, b, "5-banner");
   },
   sign() {
     const b = `
-      <g transform="translate(70 92) scale(1.0)">${emblemIndiana()}</g>
-      ${T("SCOTT", { x: 450, y: 240, font: "Bebas Neue", weight: 400, size: 150, fill: C5.red, ls: 18, fit: 560 })}
-      ${T("MILLER", { x: 446, y: 520, font: "Bebas Neue", weight: 400, size: 300, fill: C5.navy, ls: 6, fit: 680 })}
-      <rect y="620" width="1200" height="280" fill="${C5.blue}"/>
-      ${T("CITY COUNCIL · WARD 3", { x: 600, y: 770, font: "Bebas Neue", weight: 400, size: 150, fill: "#FFFFFF", ls: 6, anchor: "middle", fit: 1000 })}
-      ${T("DEMOCRAT  ·  HOMETOWN STRONG", { x: 600, y: 845, font: "Inter", weight: 800, size: 36, fill: C5.sky, ls: 9, anchor: "middle", fit: 640 })}`;
+      ${riverSWordmark({ text: "SCOTT", x: 600, y: 375, width: 900, fill: C5.navy, bg: C5.bg, ls: 3, anchor: "middle" })}
+      ${T("MILLER", { x: 600, y: 598, font: "Outfit", weight: 800, size: 200, fill: C5.navy, ls: 6, anchor: "middle", fit: 900 })}
+      <rect y="660" width="1200" height="240" fill="${C5.band}"/>
+      <rect y="660" width="1200" height="8" fill="${C5.gold}"/>
+      ${T("CITY COUNCIL · WARD 3", { x: 600, y: 790, font: "Outfit", weight: 800, size: 100, fill: "#FFFFFF", ls: 5, anchor: "middle", fit: 960 })}
+      ${T("DEMOCRAT  ·  EVANSVILLE", { x: 600, y: 853, font: "Outfit", weight: 700, size: 36, fill: C5.river2, ls: 10, anchor: "middle", fit: 560 })}`;
     return svgWrap(1200, 900, C5.bg, b, "5-sign");
   },
 };
@@ -509,7 +541,7 @@ const _cv = document.createElement("canvas").getContext("2d");
 function measure(font, text) {
   _cv.font = font;
   const m = _cv.measureText(text);
-  return { adv: m.width, ascent: m.actualBoundingBoxAscent, inkLeft: -m.actualBoundingBoxLeft, inkRight: m.actualBoundingBoxRight, inkW: m.actualBoundingBoxRight + m.actualBoundingBoxLeft };
+  return { adv: m.width, ascent: m.actualBoundingBoxAscent, inkLeft: -m.actualBoundingBoxLeft, inkRight: m.actualBoundingBoxRight, inkW: m.actualBoundingBoxRight + m.actualBoundingBoxLeft, descent: m.actualBoundingBoxDescent };
 }
 function fitTexts(svg) {
   svg.querySelectorAll("text[data-fit]").forEach(t => {
@@ -531,7 +563,8 @@ function fitTexts(svg) {
 function layoutAll(root) {
   root.querySelectorAll("g.torchmark").forEach(layoutTorch);
   root.querySelectorAll("g.flagtorchmark").forEach(layoutFlagTorch);
-  root.querySelectorAll("g.birdmark").forEach(layoutBird);
+  root.querySelectorAll("g.sunomark").forEach(layoutSunO);
+  root.querySelectorAll("g.riversmark").forEach(layoutRiverS);
   root.querySelectorAll("svg[data-id]").forEach(fitTexts);
 }
 window.MILLER = { CONCEPTS, layoutAll, FONT_CSS };

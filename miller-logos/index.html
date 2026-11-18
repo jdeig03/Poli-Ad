@@ -1,6 +1,6 @@
 <title>Miller for Ward 3</title>
 <meta name="claude:viewport-fit-sides" content="cover">
-<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@500;600;700&family=Barlow+Semi+Condensed:wght@600;700;800&family=Archivo+Black&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&display=swap">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@600;700;800;900&family=Oswald:wght@500;600;700&family=Barlow+Semi+Condensed:wght@600;700;800&family=Archivo+Black&family=Bebas+Neue&family=Inter:wght@400;500;600;700;800&family=Fraunces:ital,opsz,wght@0,9..144,600;0,9..144,800;1,9..144,600&family=Poppins:wght@600;700;800&family=Outfit:wght@600;700;800&display=swap">
 <style>
 /* Layout: a printer's proof sheet. One concept per row: banner on top, yard sign + rationale below. */
 :root {
@@ -101,25 +101,25 @@ const NOTES = {
     ],
     fonts: "Barlow Semi Condensed ExtraBold",
   },
-  "scott-cardinal": {
-    tag: "Homegrown · Indiana's state bird", pick: false,
-    lede: "Indiana's state bird is perched on the R of MILLER, turned back toward the name. The faceted cut makes it look modern and keeps it simple enough to print in two reds.",
+  "scott-sunset-o": {
+    tag: "Sunset on the Ohio · Built into the name", pick: true,
+    lede: "The O in SCOTT is a sun setting over the Ohio River. It's the river-and-sun idea from concept 1, but in evening colors and set right inside the name the way the torch sits inside Glen's. Evansville watches that sunset from the riverfront every night.",
     points: [
-      "The cardinal is a familiar backyard sight across Southern Indiana. It's warm and local, and it doesn't feel partisan.",
-      "The red is used only for SCOTT, WARD 3 and the bird, so the eye goes from the name to the bird to the ward.",
-      "The bird gives you a stand-alone icon for social avatars, buttons and stickers.",
+      "Three white river ribbons for Ward 3, and a gold ring that matches the round O of the typeface, so the word still reads as SCOTT.",
+      "The heavy, round geometric letters feel friendly and confident. On the yard sign, SCOTT and MILLER are stacked at equal width so the name fills the sign.",
+      "The sunset roundel works on its own for social avatars, buttons and stickers. That's the job the cardinal was supposed to do.",
     ],
-    fonts: "Archivo Black + Inter",
+    fonts: "Poppins ExtraBold",
   },
-  "scott-hometown-star": {
-    tag: "Hometown · Here is home", pick: true,
-    lede: "Indiana drawn from real map coordinates, with a red star exactly where Evansville sits on the Ohio River. Three rings spread out from the star: work that starts in Ward 3 and reaches the rest of the city.",
+  "scott-river-s": {
+    tag: "The river bend · Quiet and modern", pick: false,
+    lede: "The S in SCOTT is drawn as the Ohio's bend at Evansville, with three parallel lines like a river between its banks. One line for each part of Ward 3. It's restrained and modern, the kind of mark that looks like a well-run institution.",
     points: [
-      "This is the boldest name here. SCOTT MILLER in tall Bebas fills the sign, so it's the most legible from across a street.",
-      "Anyone in the state recognizes the shape at a glance, and the star makes it local.",
-      "The WARD 3 block on the banner works on its own as a social tile or a door-hanger tab.",
+      "The deep blue outer lines and the light blue center line give a sense of moving water without spelling it out.",
+      "Everything else stays navy on white with one gold accent. That makes it the calmest and most readable of the set, and it's cheap to print.",
+      "The S alone makes a monogram for the campaign avatar and lapel pins.",
     ],
-    fonts: "Bebas Neue + Inter",
+    fonts: "Outfit ExtraBold",
   },
   "scott-tulip-tree": {
     tag: "Rooted · Growing", pick: false,
@@ -133,7 +133,7 @@ const NOTES = {
   },
 };
 
-const FAMS = ['700 100px Montserrat','800 100px Montserrat','900 100px Montserrat','700 100px Oswald','600 100px Oswald','500 100px Oswald','800 100px "Barlow Semi Condensed"','700 100px "Barlow Semi Condensed"','600 100px "Barlow Semi Condensed"','400 100px "Archivo Black"','400 100px "Bebas Neue"','800 100px Inter','700 100px Inter','800 100px Fraunces','italic 600 100px Fraunces'];
+const FAMS = ['700 100px Montserrat','800 100px Montserrat','900 100px Montserrat','700 100px Oswald','600 100px Oswald','500 100px Oswald','800 100px "Barlow Semi Condensed"','700 100px "Barlow Semi Condensed"','600 100px "Barlow Semi Condensed"','400 100px "Archivo Black"','400 100px "Bebas Neue"','800 100px Inter','700 100px Inter','800 100px Fraunces','italic 600 100px Fraunces','800 100px Poppins','700 100px Poppins','600 100px Poppins','800 100px Outfit','700 100px Outfit','600 100px Outfit'];
 
 function swatches(svg) {
   const seen = [];
