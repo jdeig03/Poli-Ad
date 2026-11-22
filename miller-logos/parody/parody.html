@@ -1,0 +1,134 @@
+<!doctype html><html><head><meta charset="utf-8">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Yellowtail&family=Alfa+Slab+One&family=Oswald:wght@500;600;700&display=swap">
+<style>body{margin:0;background:#888}.w{display:flex;flex-direction:column;gap:20px;padding:20px}svg{display:block}</style>
+</head><body><div class="w" id="w"></div>
+<script>
+/* Satirical "It's Miller Time" campaign gag, styled after a classic white American light-beer can.
+   Original artwork: no brewery logos, marks or label art are reproduced. */
+const C = { blue: "#173C8C", blue2: "#0F2A66", red: "#C8102E", gold: "#C9A13B", gold2: "#E3C26A", cream: "#FFFFFF", ink: "#14213D" };
+const P = n => +n.toFixed(2);
+
+function hop(x, y, s, rot) {
+  // A hop cone: overlapping bracts.
+  let b = "";
+  const rows = [[0, 1], [-0.55, 2], [-1.1, 3], [-1.65, 2], [-2.1, 1]];
+  rows.forEach(([dy, n], ri) => {
+    for (let i = 0; i < n; i++) {
+      const dx = (i - (n - 1) / 2) * 0.62;
+      b += `<path d="M${P(dx * s)} ${P(dy * s - 0.5 * s)} q ${P(0.42 * s)} ${P(0.3 * s)} 0 ${P(0.85 * s)} q ${P(-0.42 * s)} ${P(-0.3 * s)} 0 ${P(-0.85 * s)} Z" fill="${ri % 2 ? C.gold : C.gold2}" stroke="${C.blue2}" stroke-width="${P(s * 0.06)}"/>`;
+    }
+  });
+  return `<g transform="translate(${x} ${y}) rotate(${rot})">${b}<path d="M0 ${P(-2.6 * s)} q ${P(0.2 * s)} ${P(-0.5 * s)} ${P(0.6 * s)} ${P(-0.7 * s)}" stroke="${C.blue2}" stroke-width="${P(s * 0.1)}" fill="none"/></g>`;
+}
+function wheat(x, y, s, rot) {
+  let g = `<path d="M0 0 L0 ${P(-4.2 * s)}" stroke="${C.gold}" stroke-width="${P(s * 0.16)}"/>`;
+  for (let i = 0; i < 6; i++) {
+    const yy = -1.4 * s - i * 0.5 * s;
+    g += `<ellipse cx="${P(-0.32 * s)}" cy="${P(yy)}" rx="${P(0.22 * s)}" ry="${P(0.42 * s)}" transform="rotate(-28 ${P(-0.32 * s)} ${P(yy)})" fill="${C.gold}"/>`;
+    g += `<ellipse cx="${P(0.32 * s)}" cy="${P(yy)}" rx="${P(0.22 * s)}" ry="${P(0.42 * s)}" transform="rotate(28 ${P(0.32 * s)} ${P(yy)})" fill="${C.gold}"/>`;
+  }
+  g += `<ellipse cx="0" cy="${P(-4.35 * s)}" rx="${P(0.2 * s)}" ry="${P(0.4 * s)}" fill="${C.gold}"/>`;
+  return `<g transform="translate(${x} ${y}) rotate(${rot})">${g}</g>`;
+}
+// Crest: gold ring with wheat + hops flanking a "3".
+function crest(cx, cy, r) {
+  return `<g>
+    <circle cx="${cx}" cy="${cy}" r="${r}" fill="${C.cream}" stroke="${C.gold}" stroke-width="${P(r * 0.07)}"/>
+    <circle cx="${cx}" cy="${cy}" r="${P(r * 0.84)}" fill="none" stroke="${C.blue}" stroke-width="${P(r * 0.025)}"/>
+    ${wheat(cx - r * 0.42, cy + r * 0.55, r * 0.17, -24)}${wheat(cx + r * 0.42, cy + r * 0.55, r * 0.17, 24)}
+    ${hop(cx - r * 0.2, cy + r * 0.38, r * 0.15, -18)}${hop(cx + r * 0.2, cy + r * 0.38, r * 0.15, 18)}
+    <text x="${cx}" y="${P(cy + r * 0.12)}" text-anchor="middle" font-family="Alfa Slab One" font-size="${P(r * 0.62)}" fill="${C.blue}">3</text>
+    <text x="${cx}" y="${P(cy - r * 0.5)}" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="${P(r * 0.16)}" letter-spacing="${P(r * 0.05)}" fill="${C.red}">WARD</text>
+  </g>`;
+}
+// Ribbon banner with folded tails.
+function ribbon(cx, y, w, h, text, fs) {
+  const x0 = cx - w / 2, x1 = cx + w / 2, t = h * 0.9;
+  return `<g>
+    <path d="M${P(x0 - t)} ${P(y + h * 0.25)} L${P(x0)} ${P(y + h * 0.25)} L${P(x0)} ${P(y + h * 1.25)} L${P(x0 - t)} ${P(y + h * 1.25)} L${P(x0 - t * 0.6)} ${P(y + h * 0.75)} Z" fill="#9B0B22"/>
+    <path d="M${P(x1 + t)} ${P(y + h * 0.25)} L${P(x1)} ${P(y + h * 0.25)} L${P(x1)} ${P(y + h * 1.25)} L${P(x1 + t)} ${P(y + h * 1.25)} L${P(x1 + t * 0.6)} ${P(y + h * 0.75)} Z" fill="#9B0B22"/>
+    <path d="M${P(x0)} ${P(y + h * 1.25)} L${P(x0 + h * 0.4)} ${P(y + h)} L${P(x0)} ${P(y + h)} Z M${P(x1)} ${P(y + h * 1.25)} L${P(x1 - h * 0.4)} ${P(y + h)} L${P(x1)} ${P(y + h)} Z" fill="#6E0718"/>
+    <rect x="${P(x0)}" y="${y}" width="${w}" height="${h}" fill="${C.red}"/>
+    <text x="${cx}" y="${P(y + h * 0.5 + fs * 0.36)}" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="${fs}" letter-spacing="${P(fs * 0.12)}" fill="${C.cream}" data-fitw="${P(w * 0.86)}">${text}</text>
+  </g>`;
+}
+// Stacked label, used by every format. Origin top-center, width W.
+function label(cx, y, W) {
+  const s = W / 600;
+  return `
+    ${crest(cx, y + 92 * s, 86 * s)}
+    <text x="${cx}" y="${P(y + 268 * s)}" text-anchor="middle" font-family="Yellowtail" font-size="${P(96 * s)}" fill="${C.red}" data-fitw="${P(300 * s)}">Glen</text>
+    <text x="${cx}" y="${P(y + 418 * s)}" text-anchor="middle" font-family="Alfa Slab One" font-size="${P(160 * s)}" fill="${C.blue}" stroke="${C.blue2}" stroke-width="${P(2 * s)}" data-fitw="${P(560 * s)}">MILLER</text>
+    <rect x="${P(cx - 280 * s)}" y="${P(y + 436 * s)}" width="${P(560 * s)}" height="${P(6 * s)}" fill="${C.gold}"/>
+    ${ribbon(cx, y + 462 * s, 440 * s, 74 * s, "IT'S MILLER TIME", 40 * s)}
+    <text x="${cx}" y="${P(y + 606 * s)}" text-anchor="middle" font-family="Oswald" font-weight="600" font-size="${P(26 * s)}" letter-spacing="${P(5 * s)}" fill="${C.red}" data-fitw="${P(500 * s)}">A FINE PILSNER OF PUBLIC SERVICE</text>
+    <text x="${cx}" y="${P(y + 652 * s)}" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="${P(30 * s)}" letter-spacing="${P(4 * s)}" fill="${C.blue}" data-fitw="${P(520 * s)}">CITY COUNCIL · WARD 3 · EVANSVILLE</text>`;
+}
+
+const logo = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 820" width="800" height="820" data-id="miller-time-logo">
+  <rect width="800" height="820" fill="${C.cream}"/>
+  ${label(400, 60, 600)}
+  <text x="400" y="790" text-anchor="middle" font-family="Oswald" font-weight="500" font-size="14" letter-spacing="2" fill="#7A8296">PARODY · NOT AFFILIATED WITH ANY BREWERY</text>
+</svg>`;
+
+const can = () => {
+  const W = 520, H = 980, x0 = 140, x1 = x0 + W, top = 120, bot = top + H;
+  return `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 800 1240" width="800" height="1240" data-id="miller-time-can">
+  <defs>
+    <linearGradient id="body" x1="0" x2="1"><stop offset="0" stop-color="#C9CED8"/><stop offset=".12" stop-color="#FFFFFF"/><stop offset=".55" stop-color="#F4F6F9"/><stop offset=".85" stop-color="#D6DAE2"/><stop offset="1" stop-color="#A9B0BD"/></linearGradient>
+    <linearGradient id="metal" x1="0" x2="1"><stop offset="0" stop-color="#8E96A3"/><stop offset=".3" stop-color="#E6E9EE"/><stop offset=".7" stop-color="#B9C0CB"/><stop offset="1" stop-color="#7D8592"/></linearGradient>
+    <linearGradient id="shade" x1="0" x2="1"><stop offset="0" stop-color="#000" stop-opacity=".22"/><stop offset=".14" stop-color="#000" stop-opacity="0"/><stop offset=".8" stop-color="#000" stop-opacity="0"/><stop offset="1" stop-color="#000" stop-opacity=".28"/></linearGradient>
+    <clipPath id="canclip"><path d="M${x0} ${top + 40} Q ${x0} ${top + 10} ${x0 + 30} ${top} L ${x1 - 30} ${top} Q ${x1} ${top + 10} ${x1} ${top + 40} L ${x1} ${bot - 40} Q ${x1} ${bot - 10} ${x1 - 30} ${bot} L ${x0 + 30} ${bot} Q ${x0} ${bot - 10} ${x0} ${bot - 40} Z"/></clipPath>
+  </defs>
+  <rect width="800" height="1240" fill="#1B2A4A"/>
+  <ellipse cx="400" cy="${bot + 40}" rx="330" ry="40" fill="#000" opacity=".35"/>
+  <path d="M${x0 + 40} ${top} Q ${x0 + 60} ${top - 70} ${x0 + 110} ${top - 76} L ${x1 - 110} ${top - 76} Q ${x1 - 60} ${top - 70} ${x1 - 40} ${top} Z" fill="url(#metal)"/>
+  <ellipse cx="400" cy="${top - 76}" rx="${(W - 220) / 2}" ry="22" fill="#C3C9D3" stroke="#8E96A3" stroke-width="3"/>
+  <rect x="${400 - 46}" y="${top - 90}" width="92" height="30" rx="14" fill="#9AA2AF" stroke="#7D8592" stroke-width="2"/>
+  <g clip-path="url(#canclip)">
+    <rect x="${x0}" y="${top}" width="${W}" height="${H}" fill="url(#body)"/>
+    <rect x="${x0}" y="${top + 34}" width="${W}" height="14" fill="${C.blue}"/>
+    <rect x="${x0}" y="${top + 48}" width="${W}" height="5" fill="${C.gold}"/>
+    <rect x="${x0 + W * 0.15}" y="${top}" width="22" height="${H}" fill="#FFF" opacity=".6"/>
+    ${label(400, top + 150, 500)}
+    <rect x="${x0}" y="${bot - 150}" width="${W}" height="5" fill="${C.gold}"/>
+    <rect x="${x0}" y="${bot - 145}" width="${W}" height="14" fill="${C.blue}"/>
+    <text x="400" y="${bot - 84}" text-anchor="middle" font-family="Oswald" font-weight="600" font-size="24" letter-spacing="5" fill="${C.blue}">12 FL OZ OF GOOD GOVERNMENT</text>
+    <rect x="${x0}" y="${top}" width="${W}" height="${H}" fill="url(#shade)"/>
+  </g>
+  <path d="M${x0 + 30} ${bot} Q ${x0 + 60} ${bot + 34} ${x0 + 120} ${bot + 36} L ${x1 - 120} ${bot + 36} Q ${x1 - 60} ${bot + 34} ${x1 - 30} ${bot} Z" fill="url(#metal)"/>
+  <text x="400" y="1225" text-anchor="middle" font-family="Oswald" font-weight="500" font-size="14" letter-spacing="2" fill="#8D9AB5">PARODY · NOT AFFILIATED WITH ANY BREWERY</text>
+</svg>`;
+};
+
+const sign = () => `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1200 900" width="1200" height="900" data-id="miller-time-sign">
+  <rect width="1200" height="900" fill="${C.cream}"/>
+  <rect width="1200" height="26" fill="${C.blue}"/><rect y="26" width="1200" height="8" fill="${C.gold}"/>
+  <rect y="866" width="1200" height="8" fill="${C.gold}"/><rect y="874" width="1200" height="26" fill="${C.blue}"/>
+  ${crest(220, 300, 160)}
+  <text x="760" y="200" text-anchor="middle" font-family="Yellowtail" font-size="120" fill="${C.red}" data-fitw="300">Glen</text>
+  <text x="760" y="390" text-anchor="middle" font-family="Alfa Slab One" font-size="190" fill="${C.blue}" stroke="${C.blue2}" stroke-width="2" data-fitw="700">MILLER</text>
+  <rect x="410" y="414" width="700" height="8" fill="${C.gold}"/>
+  <text x="760" y="478" text-anchor="middle" font-family="Oswald" font-weight="600" font-size="30" letter-spacing="6" fill="${C.red}" data-fitw="700">A FINE PILSNER OF PUBLIC SERVICE</text>
+  ${ribbon(600, 560, 800, 120, "IT'S MILLER TIME", 70)}
+  <text x="600" y="800" text-anchor="middle" font-family="Oswald" font-weight="700" font-size="54" letter-spacing="6" fill="${C.blue}" data-fitw="980">CITY COUNCIL · WARD 3 · EVANSVILLE</text>
+  <text x="600" y="850" text-anchor="middle" font-family="Oswald" font-weight="500" font-size="16" letter-spacing="3" fill="#7A8296">PARODY · NOT AFFILIATED WITH ANY BREWERY</text>
+</svg>`;
+
+(async () => {
+  await Promise.all(['400 100px Yellowtail', '400 100px "Alfa Slab One"', '700 100px Oswald', '600 100px Oswald', '500 100px Oswald'].map(f => document.fonts.load(f)));
+  await document.fonts.ready;
+  const w = document.getElementById('w');
+  w.innerHTML = logo() + can() + sign();
+  // Shrink any text wider than its slot.
+  w.querySelectorAll('text[data-fitw]').forEach(t => {
+    const max = +t.dataset.fitw, len = t.getComputedTextLength();
+    if (len > max) {
+      const f = max / len;
+      t.setAttribute('font-size', P(+t.getAttribute('font-size') * f));
+      const ls = t.getAttribute('letter-spacing'); if (ls) t.setAttribute('letter-spacing', P(+ls * f));
+    }
+  });
+  document.body.dataset.ready = '1';
+})();
+</script></body></html>
