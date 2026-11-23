@@ -20,7 +20,7 @@ const SIZES = [['Poli-Banner-X-1500x500', 1500, 500], ['Poli-Banner-LinkedIn-158
       <i style="width:${w * 0.55}px;height:${h * 1.3}px;left:${-w * 0.12}px;top:${-h * 0.15}px;background:rgba(111,143,239,0.40)"></i>
       <i style="width:${w * 0.55}px;height:${h * 1.3}px;right:${-w * 0.12}px;top:${-h * 0.15}px;background:rgba(232,102,122,0.36)"></i>
       <i style="width:${w * 0.4}px;height:${h * 0.9}px;left:${w * 0.3}px;top:${h * 0.55}px;background:rgba(155,127,218,0.32)"></i>
-    </div><div class="c"><div class="l">${B.brandMark({ size: m, id: 'b' })}<span class="w">Poli</span></div><div class="s">Ask anything.</div></div></body></html>`;
+    </div><div class="c"><div class="l">${B.brandMark({ size: m, id: 'b' })}<span class="w">Poli</span></div><div class="s">Expand your understanding.</div></div></body></html>`;
     const tmp = path.join(__dirname, '.banner-tmp.html'); require('fs').writeFileSync(tmp, html);
     await p.goto('file://' + tmp); await p.evaluate(() => document.fonts.ready); require('fs').unlinkSync(tmp);
     await p.screenshot({ path: path.join(out, name + '.png') }); await p.close();
